@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/pages/ExplorePage/explore_view.dart';
 import 'package:moto_kent/pages/GroupsPage/CreateChatGroupPage/create_chat_group_view.dart';
+import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_view.dart';
 import 'package:moto_kent/pages/GroupsPage/groups_view.dart';
 import 'package:moto_kent/pages/LoginView/login_page.dart';
 import 'package:moto_kent/pages/PostDetailPage/post_detail_page.dart';
@@ -61,6 +62,10 @@ final GoRouter router = GoRouter(
                 GoRoute(
                   path: "create_chat_group",
                   builder: (context, state) =>  CreateChatGroupView(),
+                ),
+                GoRoute(
+                  path: "my_groups",
+                  builder: (context, state) => const MyGroupsView(),
                 )
               ]),
         ]),

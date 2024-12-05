@@ -6,14 +6,16 @@ import 'package:moto_kent/services/dio_service_3.dart';
 import 'package:moto_kent/utils/data_objects.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ChatGroupsViewmodel extends ChangeNotifier {
+class MyGroupsViewmodel extends ChangeNotifier {
   List<ChatGroupModel> _groupsList = [];
   List<ChatGroupModel> get groupsList => _groupsList;
 
   DioService3 apiService = DioService3();
 
-  Future<void> fetchChatGropsList() async {
-    var response = await apiService.getRequest(ApiConstants.getAllChatGroups);
+  Future<void> fetchMyChatGroups() async {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? userId = prefs.getString("user_id");
+    var response = await apiService.getRequest(ApiConstants.getUserChatGroups(userId!));
 
     // Dönüşümü doğru şekilde yapın
     if (response.data is List) {
@@ -27,12 +29,4 @@ class ChatGroupsViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Response> joinChatGroup(String groupId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId= prefs.getString("user_id");
-    var object=DataObjects.joinGroup(groupId, userId!);
-    var response=await apiService.postRequest(ApiConstants.joinChatGroups,object);
-    return response;
-  }
 }
-//8a7480f4-dad5-48c5-dd3a-08dd14cd563e

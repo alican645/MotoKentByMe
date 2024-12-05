@@ -10,4 +10,11 @@ class DataObjects{
     };
     return object;
   }
+
+  static Object getUserChatGroups(String userId){
+    var object={
+      "userId": userId
+    };
+    return object;
+  }
 }

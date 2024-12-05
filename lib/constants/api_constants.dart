@@ -35,5 +35,9 @@ class ApiConstants {
 
   static const String createChatGroup = '$baseUrl/api/ChatGroup/CreateChatGroup';
   static const String getAllChatGroups = '$baseUrl/api/ChatGroup/GetAllChatGroups';
+  static  String getUserChatGroups (String userId){
+    return '$baseUrl/api/ChatGroup/GetUserChatGroups?userId=$userId';
+  }
   static const String joinChatGroups = '$baseUrl/api/ChatGroup/JoinGroup';
 }
+//

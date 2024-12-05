@@ -98,7 +98,9 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      context.go("/chat_groups_page/my_groups");
+                    },
                     icon: const Icon(
                       Icons.person_2_outlined,
                       size: 48,

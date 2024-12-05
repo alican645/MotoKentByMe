@@ -6,6 +6,8 @@ import 'package:moto_kent/pages/ExplorePage/explore_view.dart';
 import 'package:moto_kent/pages/ExplorePage/explore_viewmodel.dart';
 import 'package:moto_kent/pages/GroupsPage/CreateChatGroupPage/create_chat_group_view.dart';
 import 'package:moto_kent/pages/GroupsPage/CreateChatGroupPage/create_group_viewmodel.dart';
+import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_view.dart';
+import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_viewmodel.dart';
 import 'package:moto_kent/pages/GroupsPage/groups_view.dart';
 import 'package:moto_kent/pages/GroupsPage/groups_viewmodel.dart';
 import 'package:moto_kent/pages/LoginView/login_page.dart';
@@ -36,6 +38,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => ProfileViewmodel(),child: const ProfilePage()),
         ChangeNotifierProvider(create: (context) => CreateChatGroupViewmodel(),child: CreateChatGroupView()),
         ChangeNotifierProvider(create: (context) => ChatGroupsViewmodel(),child: ChatGroupsView()),
+        ChangeNotifierProvider(create: (context) => MyGroupsViewmodel(),child: MyGroupsView()),
       ],
       child:  MyApp(initialRoute: initialRoute)));
 
