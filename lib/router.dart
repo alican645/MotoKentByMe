@@ -5,6 +5,7 @@ import 'package:moto_kent/pages/GroupsPage/CreateChatGroupPage/create_chat_group
 import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_view.dart';
 import 'package:moto_kent/pages/GroupsPage/groups_view.dart';
 import 'package:moto_kent/pages/LoginView/login_page.dart';
+import 'package:moto_kent/pages/MessagePage/message_view.dart';
 import 'package:moto_kent/pages/PostDetailPage/post_detail_page.dart';
 import 'package:moto_kent/pages/PostSharing/post_sharing_view.dart';
 import 'package:moto_kent/pages/RegisterPage/register_page.dart'; // RegisterPage import edildi
@@ -66,6 +67,12 @@ final GoRouter router = GoRouter(
                 GoRoute(
                   path: "my_groups",
                   builder: (context, state) => const MyGroupsView(),
+                  routes: [
+                    GoRoute(
+                      path: "message_page",
+                      builder: (context, state) =>  const MessageView(),
+                    ),
+                  ]
                 )
               ]),
         ]),

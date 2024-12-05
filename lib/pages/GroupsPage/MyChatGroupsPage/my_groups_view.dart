@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:moto_kent/components/chat_group_item.dart';
 import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_viewmodel.dart';
@@ -41,7 +42,7 @@ class _MyGroupsView extends State<MyGroupsView> {
                   child: ChatGroupItem(
                     chatGroupModel: value.groupsList[index],
                     onPressed: () {
-
+                        context.go('/chat_groups_page/my_groups/message_page');
                     },
                   ),
                 ),
@@ -54,25 +55,4 @@ class _MyGroupsView extends State<MyGroupsView> {
     );
   }
 
-  GestureDetector _buildButton(
-      {required VoidCallback onPressed,
-        required Icon icon,
-        required String content}) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-            child: icon,
-          ),
-          Text(
-            content,
-            style: Theme.of(context).textTheme.headlineSmall,
-          )
-        ],
-      ),
-    );
-  }
 }
