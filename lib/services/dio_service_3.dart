@@ -78,14 +78,13 @@ class DioService3 {
 
   // Generic POST fonksiyonu
   Future<Response> postRequest(String endpoint, Object data) async {
-    final token = await ensureValidToken();
-    return await _dio.post(
-      endpoint,
-      data: data,
-      options: Options(headers: {"Authorization": "Bearer $token"}),
-    );
     try {
-
+      final token = await ensureValidToken();
+      return await _dio.post(
+        endpoint,
+        data: data,
+        options: Options(headers: {"Authorization": "Bearer $token"}),
+      );
     } on DioException catch (e) {
       throw Exception('POST isteğinde hata oluştu: ${e.message}');
     }

@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/components/chat_group_item.dart';
-import 'package:moto_kent/constants/api_constants.dart';
-import 'package:moto_kent/models/chat_group_model.dart';
+
 
 import 'package:moto_kent/pages/GroupsPage/groups_viewmodel.dart';
 import 'package:moto_kent/services/signalr_service2.dart';
 import 'package:provider/provider.dart';
-
-
 
 class ChatGroupsView extends StatefulWidget {
   const ChatGroupsView({super.key});
@@ -33,6 +30,44 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
     });
   }
 
+  Future<void> joinChatGroup(String groupId) async {
+    try {
+      var response = await context
+          .read<ChatGroupsViewmodel>()
+          .joinChatGroup(groupId);
+      if (response.statusCode == 200) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text("Gruba Katıldınız"),
+          ),
+        );
+      }
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(e.toString()),
+        ),
+      );
+    }
+  }
+
+  void joinChatGropShowDialog(String groupId){
+    showDialog(context: context, builder: (joinChatGropShowDialogContext) => AlertDialog(
+      title: Text("Bu gruba katılmak ister misiniz?"),
+      actions: [
+        TextButton(onPressed: () {
+          Navigator.pop(joinChatGropShowDialogContext);
+        }, child: Text("İptal")),
+        TextButton(onPressed: () async {
+          Navigator.pop(joinChatGropShowDialogContext);
+          await joinChatGroup(groupId);
+        }, child: Text("Katıl")),
+      ],
+    ),);
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -49,8 +84,9 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
                   padding: const EdgeInsets.symmetric(vertical: 2.50),
                   child: ChatGroupItem(
                     chatGroupModel: value.groupsList[index],
-
-                   
+                    onPressed: () {
+                      joinChatGropShowDialog(value.groupsList[index].uniqueId!);
+                    },
                   ),
                 ),
               ),
@@ -114,5 +150,3 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
     );
   }
 }
-
-

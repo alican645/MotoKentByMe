@@ -25,7 +25,9 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> signUserIn() async {
     // final username = usernameController.text;
     // final password = passwordController.text;
-    final username = "alicanaydin@gmail.com";
+    // final username = "alicanaydin@gmail.com";
+    // final password = "Alican0391.";
+    final username = "alican@gmail.com";
     final password = "Alican0391.";
 
 

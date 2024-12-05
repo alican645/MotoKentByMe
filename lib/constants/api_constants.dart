@@ -27,7 +27,7 @@ class ApiConstants {
     return '$baseUrl/api/Post/GetPaginatedPostsByCategoryId?page=$page&categoryId=$categoryId';
   }
 
-  static const String addWSPost = 'ws://localhost:5000/api/Post/AddPost';
+
 
   static const String signalRExploreHubEndpoint = '$baseUrl/exploreHub';
   static const String signalRChatGroupEndpoint = '$baseUrl/chatGroupHub';
@@ -35,4 +35,5 @@ class ApiConstants {
 
   static const String createChatGroup = '$baseUrl/api/ChatGroup/CreateChatGroup';
   static const String getAllChatGroups = '$baseUrl/api/ChatGroup/GetAllChatGroups';
+  static const String joinChatGroups = '$baseUrl/api/ChatGroup/JoinGroup';
 }
