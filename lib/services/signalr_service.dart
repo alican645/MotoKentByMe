@@ -34,10 +34,8 @@ class SignalRService {
     // Gelen post verisini dinle
     _connection.on("ReceivePost", (arguments)  {
       if (arguments != null && arguments.isNotEmpty) {
-        final Map<String, dynamic> postJson =
-            arguments[0] as Map<String, dynamic>;
 
-         context.read<ExploreViewmodel>().changeShowNewPostBtn();
+         context.read<ExploreViewmodel>().showNewPostBtnFun();
       }
     });
 

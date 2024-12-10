@@ -35,8 +35,7 @@ class _ExploreViewState extends State<ExploreView> {
       // SignalR'dan gelen verileri dinle
       _signalRService.onReceivePost = () {
         setState(() {
-
-            print("veri geldi");
+          print("veri geldi");
         });
       };
 
@@ -79,7 +78,8 @@ class _ExploreViewState extends State<ExploreView> {
                       final viewModel = context.read<ExploreViewmodel>();
 
                       viewModel.resetPagination(); // Pagination sıfırlanır
-                      await viewModel.fetchPostList(); // Tüm postlar yeniden yüklenir
+                      await viewModel
+                          .fetchPostList(); // Tüm postlar yeniden yüklenir
                     },
                     child: Consumer<ExploreViewmodel>(
                       builder: (context, viewModel, child) {
@@ -142,46 +142,43 @@ class _ExploreViewState extends State<ExploreView> {
           borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 5),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            GestureDetector(
-              onTap: () {
-                context.go("/post_screen_page/post_sharing_view");
-              },
-              child: const Icon(
-                Icons.add_circle,
-                size: 36,
-                color: Colors.white,
+        child: Consumer<ExploreViewmodel>(
+          builder: (context, value, child) => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  context.go("/post_screen_page/post_sharing_view");
+                },
+                child: const Icon(
+                  Icons.add_circle,
+                  size: 36,
+                  color: Colors.white,
+                ),
               ),
-            ),
-            Consumer<ExploreViewmodel>(builder: (context, value, child) =>
-               Visibility(
-                  visible: value.showNewPostBtn,
-                  child: GestureDetector(
-                    onTap: () async {
-                      value.changeShowNewPostBtn();
+              Visibility(
+                visible: value.showNewPostBtn,
+                child: GestureDetector(
+                  onTap: () async {
+                      value.resetPagination();
                       await value.fetchPostList();
-                      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-                    },
-                    child: Container(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 4),
-                        child: Text("Yeni Göderileri Gör"),
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        color: Colors.white
-                      ),
+                      value.dontShowNewPostBtnFun();
+                  },
+                  child: Container(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 4),
+                      child: Text("Yeni Göderileri Gör"),
                     ),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(16),
+                        color: Colors.white),
                   ),
                 ),
-            ),
-            Consumer<ExploreViewmodel>(
-              builder: (context, value, child) =>
-                  Button(list: value.postCategoryModelList),
-            )
-          ],
+              ),
+              Button(list: value.postCategoryModelList),
+            ],
+          ),
         ),
       ),
     );
@@ -269,7 +266,8 @@ class PostItem extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(Utils.formatDateToDayMonthYear(postDate), style: Theme.of(context).textTheme.titleSmall),
+                Text(Utils.formatDateToDayMonthYear(postDate),
+                    style: Theme.of(context).textTheme.titleSmall),
                 Row(
                   children: [
                     const Icon(
@@ -345,7 +343,7 @@ class ListItems extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               itemCount: list.length,
               itemBuilder: (context, index) => ChoiceCategoryItem(
-                categoryId:list[index].id ,
+                  categoryId: list[index].id,
                   iconPath: '${ApiConstants.baseUrl}${list[index].photoPath}',
                   color: Colors.amber[300]!,
                   categoryName: list[index].categoryName!),
@@ -364,7 +362,7 @@ class ChoiceCategoryItem extends StatelessWidget {
   final String categoryName;
   const ChoiceCategoryItem(
       {super.key,
-        required this.categoryId,
+      required this.categoryId,
       required this.iconPath,
       required this.color,
       required this.categoryName});
@@ -375,9 +373,11 @@ class ChoiceCategoryItem extends StatelessWidget {
       children: [
         GestureDetector(
           onTap: () async {
-            context.read<ExploreViewmodel>().changeCategory(categoryId); // Kategori değişimi
+            context
+                .read<ExploreViewmodel>()
+                .changeCategory(categoryId); // Kategori değişimi
             await context.read<ExploreViewmodel>().fetchAllOrCategoryId();
-            },
+          },
           child: Container(
             height: 50,
             color: color,

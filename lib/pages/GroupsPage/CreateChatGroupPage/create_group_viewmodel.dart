@@ -7,7 +7,7 @@ import 'package:moto_kent/services/dio_service_3.dart';
 class CreateChatGroupViewmodel extends ChangeNotifier {
   List<dynamic> _postCategoryModelList = [];
   List<dynamic> get postCategoryModelList => _postCategoryModelList;
-  final apiService = DioService3();
+  final apiService = DioService();
 
   Future<void> fetchPostCategoryList2() async {
     var response = await apiService.getRequest(

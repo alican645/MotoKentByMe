@@ -27,9 +27,10 @@ class _LoginPageState extends State<LoginPage> {
     // final password = passwordController.text;
     // final username = "alicanaydin@gmail.com";
     // final password = "Alican0391.";
-    final username = "alican@gmail.com";
+    // final username = "alican@gmail.com";
     final password = "Alican0391.";
-
+    final username ='ali@gmail.com';
+    //aliii@gmail.com
 
     try {
 

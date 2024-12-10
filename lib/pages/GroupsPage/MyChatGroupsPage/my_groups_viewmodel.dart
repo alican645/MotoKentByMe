@@ -10,7 +10,7 @@ class MyGroupsViewmodel extends ChangeNotifier {
   List<ChatGroupModel> _groupsList = [];
   List<ChatGroupModel> get groupsList => _groupsList;
 
-  DioService3 apiService = DioService3();
+  DioService apiService = DioService();
 
   Future<void> fetchMyChatGroups() async {
       SharedPreferences prefs = await SharedPreferences.getInstance();

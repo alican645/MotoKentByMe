@@ -138,8 +138,17 @@ class ExploreViewmodel extends ChangeNotifier {
 
   bool _showNewPostBtn = false;
   bool get showNewPostBtn => _showNewPostBtn;
+  // Yeni post butonunu göster/gizle
+  void showNewPostBtnFun() {
+    _showNewPostBtn = true;
+    notifyListeners();
+  }
+  void dontShowNewPostBtnFun() {
+    _showNewPostBtn = false;
+    notifyListeners();
+  }
 
-  final DioService3 _dio = DioService3();
+  final DioService _dio = DioService();
 
   // Kategori listesini getir
   Future<void> fetchPostCategoryList() async {
@@ -168,7 +177,7 @@ class ExploreViewmodel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      var response = await _dio.getRequest('${ApiConstants.getPaginatedPosts}$_currentPage');
+      var response = await _dio.getRequest('${ApiConstants.getPaginatedPostsByPageSize(_currentPage, 5)}');
       var model = PaginatedPostsModel.fromJson(response.data);
       _posts.addAll(model.items!);
       _currentPage++;
@@ -220,9 +229,5 @@ class ExploreViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Yeni post butonunu göster/gizle
-  void changeShowNewPostBtn() {
-    _showNewPostBtn = !_showNewPostBtn;
-    notifyListeners();
-  }
+
 }

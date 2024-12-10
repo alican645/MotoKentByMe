@@ -37,11 +37,8 @@ class SignalRService2 {
     // Gelen post verisini dinle
     _connection.on("ChatGroup", (arguments) async  {
       if (arguments != null && arguments.isNotEmpty) {
-        // final Map<String, dynamic> postJson =
-        // arguments[0] as Map<String, dynamic>;
-        // final post = ChatGroupModel.fromJson(postJson);
-        // print("Post Alındı: ");
-        await context.read<ChatGroupsViewmodel>().fetchChatGropsList();
+
+         context.read<ChatGroupsViewmodel>().changeNewChatGroups();
       }
     });
 
@@ -52,20 +49,6 @@ class SignalRService2 {
       print("SignalR bağlantı hatası: $e");
     }
   }
-
-  // /// SignalR hub'a PostModel nesnesi gönder
-  // Future<void> sendPost(PostModel post) async {
-  //   if (_connection.state == HubConnectionState.Connected) {
-  //     try {
-  //       await _connection.invoke("SendPost", args: [post.toJson()]);
-  //       print("Post gönderildi: ${post.postContentTitle}");
-  //     } catch (e) {
-  //       print("Post gönderme hatası: $e");
-  //     }
-  //   } else {
-  //     print("SignalR bağlantısı aktif değil.");
-  //   }
-  // }
 
   void dispose() {
     _connection.stop();

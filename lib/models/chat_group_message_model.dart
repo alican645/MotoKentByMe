@@ -1,23 +1,23 @@
-class ChatGroupMessage {
+class ChatGroupMessageModel {
   String? groupId;
   String? senderUserId;
   String? senderUserName;
   String? content;
-  String? sentAt;
+  DateTime? sentAt;
 
-  ChatGroupMessage(
+  ChatGroupMessageModel(
       {this.groupId,
         this.senderUserId,
         this.senderUserName,
         this.content,
         this.sentAt});
 
-  ChatGroupMessage.fromJson(Map<String, dynamic> json) {
+  ChatGroupMessageModel.fromJson(Map<String, dynamic> json) {
     groupId = json['groupId'];
     senderUserId = json['senderUserId'];
     senderUserName = json['senderUserName'];
     content = json['content'];
-    sentAt = json['sentAt'];
+    sentAt = DateTime.tryParse(json['sentAt']);
   }
 
   Map<String, dynamic> toJson() {
@@ -26,7 +26,7 @@ class ChatGroupMessage {
     data['senderUserId'] = this.senderUserId;
     data['senderUserName'] = this.senderUserName;
     data['content'] = this.content;
-    data['sentAt'] = this.sentAt;
+    data['sentAt'] = this.sentAt?.toIso8601String();
     return data;
   }
 }

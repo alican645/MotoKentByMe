@@ -5,7 +5,7 @@ import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
 
 class RegisterViewmodel extends ChangeNotifier{
-  final DioService3 _dio = DioService3();
+  final DioService _dio = DioService();
   bool _isCompleted=false;
   bool get isCompleted=>_isCompleted;
 

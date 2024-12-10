@@ -289,52 +289,54 @@ class _ProfilePageState extends State<ProfilePage> {
     showModalBottomSheet(
       context: context,
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "Profili Düzenle",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: fullNameController,
-                decoration: const InputDecoration(labelText: "Ad Soyad"),
-              ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: bioController,
-                decoration: const InputDecoration(labelText: "Biyografi"),
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () async {
-                  final pickedImage =
-                      await imagePicker.pickImage(source: ImageSource.gallery);
-                  if (pickedImage != null) {
-                    setState(() {
-                      _selectedProfilePhoto = File(pickedImage.path);
-                    });
-                  }
-                },
-                child: const Text("Profil Fotoğrafı Seç"),
-              ),
-              const SizedBox(height: 8),
-              ElevatedButton(
-                onPressed: () async {
-                  bool isCompleted = await updateProfile2(
-                      fullNameController.text,
-                      bioController.text,
-                      _selectedProfilePhoto);
-                  if (isCompleted) {
-                    Navigator.pop(context);
-                  }
-                },
-                child: const Text("Kaydet"),
-              ),
-            ],
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  "Profili Düzenle",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: fullNameController,
+                  decoration: const InputDecoration(labelText: "Ad Soyad"),
+                ),
+                const SizedBox(height: 8),
+                TextField(
+                  controller: bioController,
+                  decoration: const InputDecoration(labelText: "Biyografi"),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () async {
+                    final pickedImage =
+                        await imagePicker.pickImage(source: ImageSource.gallery);
+                    if (pickedImage != null) {
+                      setState(() {
+                        _selectedProfilePhoto = File(pickedImage.path);
+                      });
+                    }
+                  },
+                  child: const Text("Profil Fotoğrafı Seç"),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: () async {
+                    bool isCompleted = await updateProfile2(
+                        fullNameController.text,
+                        bioController.text,
+                        _selectedProfilePhoto);
+                    if (isCompleted) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: const Text("Kaydet"),
+                ),
+              ],
+            ),
           ),
         );
       },

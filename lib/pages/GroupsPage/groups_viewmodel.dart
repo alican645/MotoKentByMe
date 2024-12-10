@@ -10,21 +10,32 @@ class ChatGroupsViewmodel extends ChangeNotifier {
   List<ChatGroupModel> _groupsList = [];
   List<ChatGroupModel> get groupsList => _groupsList;
 
-  DioService3 apiService = DioService3();
+  bool _showNewChatGroups = false;
+  bool get showNewChatGroups => _showNewChatGroups;
+  void changeNewChatGroups(){
+    _showNewChatGroups=!_showNewChatGroups;
+    notifyListeners();
+  }
+
+  DioService apiService = DioService();
 
   Future<void> fetchChatGropsList() async {
     var response = await apiService.getRequest(ApiConstants.getAllChatGroups);
 
-    // Dönüşümü doğru şekilde yapın
-    if (response.data is List) {
-      _groupsList = (response.data as List)
-          .map((item) => ChatGroupModel.fromJson(item))
-          .toList();
-    } else {
-      throw Exception('Unexpected data format: Expected a list');
+
+    if(response.statusCode==200){// Dönüşümü doğru şekilde yapın
+      if (response.data is List) {
+        _groupsList = (response.data as List)
+            .map((item) => ChatGroupModel.fromJson(item))
+            .toList();
+
+      } else {
+        throw Exception('Unexpected data format: Expected a list');
+      }
+      notifyListeners();
+      _showNewChatGroups=false;
     }
 
-    notifyListeners();
   }
 
   Future<Response> joinChatGroup(String groupId) async {

@@ -15,7 +15,7 @@ class PostSharingViewmodel extends ChangeNotifier {
 
 
   Future<void> fetchPostCategoryList2() async {
-    var response = await DioService3().getRequest(
+    var response = await DioService().getRequest(
         ApiConstants.getAllPostCategoriesFormFile,
        );
     _postCategoryModelList=response.data.map((item) => CategoryFormFileModel.fromJson(item)).toList();
@@ -26,7 +26,7 @@ class PostSharingViewmodel extends ChangeNotifier {
 
   Future<Response> AddPost(Object requestBody) async {
     var result =
-        await DioService3().postRequest(ApiConstants.addPost, requestBody);
+        await DioService().postRequest(ApiConstants.addPost, requestBody);
     return result;
   }
 }

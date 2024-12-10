@@ -23,6 +23,9 @@ class ApiConstants {
   static const String addPost = '$baseUrl/api/Post/AddPost';
   static const String getAllPost = '$baseUrl/api/Post/GetAllPost';
   static const String getPaginatedPosts = '$baseUrl/api/Post/GetPaginatedPosts?page=';
+  static String getPaginatedPostsByPageSize(int page,int pageSize){
+      return '/api/Post/GetPaginatedPosts?page=$page&pageSize=$pageSize';
+  }
   static String getPaginatedPostsByCategoryId (int page,int categoryId){
     return '$baseUrl/api/Post/GetPaginatedPostsByCategoryId?page=$page&categoryId=$categoryId';
   }
@@ -30,7 +33,7 @@ class ApiConstants {
 
 
   static const String signalRExploreHubEndpoint = '$baseUrl/exploreHub';
-  static const String signalRChatGroupEndpoint = '$baseUrl/chatGroupHub';
+  static const String signalRChatGroupEndpoint = '$baseUrl/chatHub';
 
 
   static const String createChatGroup = '$baseUrl/api/ChatGroup/CreateChatGroup';
@@ -39,5 +42,9 @@ class ApiConstants {
     return '$baseUrl/api/ChatGroup/GetUserChatGroups?userId=$userId';
   }
   static const String joinChatGroups = '$baseUrl/api/ChatGroup/JoinGroup';
+  static const String senMessageChatGroups = '$baseUrl/api/ChatGroup/SendMessageGroup';
+  static  String getMessagesChatGroup (String groupId){
+    return '$baseUrl/api/ChatGroup/GetGroupMessagesByGroupId?groupId=$groupId';
+  }
 }
 //

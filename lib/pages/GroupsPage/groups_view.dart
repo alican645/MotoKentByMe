@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/components/chat_group_item.dart';
 
-
 import 'package:moto_kent/pages/GroupsPage/groups_viewmodel.dart';
 import 'package:moto_kent/services/signalr_service2.dart';
 import 'package:provider/provider.dart';
@@ -32,9 +31,8 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
 
   Future<void> joinChatGroup(String groupId) async {
     try {
-      var response = await context
-          .read<ChatGroupsViewmodel>()
-          .joinChatGroup(groupId);
+      var response =
+          await context.read<ChatGroupsViewmodel>().joinChatGroup(groupId);
       if (response.statusCode == 200) {
         showDialog(
           context: context,
@@ -53,19 +51,30 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
     }
   }
 
-  void joinChatGropShowDialog(String groupId){
-    showDialog(context: context, builder: (joinChatGropShowDialogContext) => AlertDialog(
-      title: Text("Bu gruba katılmak ister misiniz?"),
-      actions: [
-        TextButton(onPressed: () {
-          Navigator.pop(joinChatGropShowDialogContext);
-        }, child: Text("İptal")),
-        TextButton(onPressed: () async {
-          Navigator.pop(joinChatGropShowDialogContext);
-          await joinChatGroup(groupId);
-        }, child: Text("Katıl")),
-      ],
-    ),);
+  void joinChatGropShowDialog(String groupId) {
+    showDialog(
+      context: context,
+      builder: (joinChatGropShowDialogContext) => AlertDialog(
+        title: Text("Bu gruba katılmak ister misiniz?"),
+        actions: [
+          TextButton(
+              onPressed: () {
+                Navigator.pop(joinChatGropShowDialogContext);
+              },
+              child: Text("İptal")),
+          TextButton(
+              onPressed: () async {
+                Navigator.pop(joinChatGropShowDialogContext);
+                await joinChatGroup(groupId);
+              },
+              child: Text("Katıl")),
+        ],
+      ),
+    );
+  }
+
+  Future<void> fethGroupList() async{
+    context.read<ChatGroupsViewmodel>().fetchChatGropsList();
   }
 
   @override
@@ -74,11 +83,29 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
     return Padding(
       padding: EdgeInsets.only(
           left: width * 0.05, right: width * 0.05, top: width * 0.01),
-      child: Column(
-        children: [
-          Flexible(
-            child: Consumer<ChatGroupsViewmodel>(
-              builder: (context, value, child) => ListView.builder(
+      child: Consumer<ChatGroupsViewmodel>(
+        builder: (context, value, child) => Column(
+          children: [
+            Visibility(
+              visible: value.showNewChatGroups,
+                child: GestureDetector(
+                  onTap: ()  async {
+                    await fethGroupList();
+                  },
+              child: Container(
+                width: 200,
+                height: 50,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(45),
+                  color: Colors.grey[300]
+                ),
+                child: Center(
+                  child: Text("Yeni Grupları Görüntüle"),
+                ),
+              ),
+            )),
+            Flexible(
+              child: ListView.builder(
                 itemCount: value.groupsList.length,
                 itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.symmetric(vertical: 2.50),
@@ -91,41 +118,41 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildButton(
-                    onPressed: () {
-                      context.go("/chat_groups_page/my_groups");
-                    },
-                    icon: const Icon(
-                      Icons.person_2_outlined,
-                      size: 48,
-                    ),
-                    content: "Gruplarım"),
-                _buildButton(
-                    onPressed: () {
-                      context.go("/chat_groups_page/create_chat_group");
-                    },
-                    icon: const Icon(
-                      Icons.add,
-                      size: 48,
-                    ),
-                    content: "Oluştur"),
-                _buildButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.search_rounded,
-                      size: 48,
-                    ),
-                    content: "Ara")
-              ],
-            ),
-          )
-        ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _buildButton(
+                      onPressed: () {
+                        context.go("/chat_groups_page/my_groups");
+                      },
+                      icon: const Icon(
+                        Icons.person_2_outlined,
+                        size: 48,
+                      ),
+                      content: "Gruplarım"),
+                  _buildButton(
+                      onPressed: () {
+                        context.go("/chat_groups_page/create_chat_group");
+                      },
+                      icon: const Icon(
+                        Icons.add,
+                        size: 48,
+                      ),
+                      content: "Oluştur"),
+                  _buildButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.search_rounded,
+                        size: 48,
+                      ),
+                      content: "Ara")
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

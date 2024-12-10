@@ -8,7 +8,7 @@ import 'package:moto_kent/services/api_service.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
 
 class ProfileViewmodel extends ChangeNotifier {
-  final DioService3 _dio = DioService3();
+  final DioService _dio = DioService();
   bool _isCompleted = false;
   bool get isCompleted => _isCompleted;
 
@@ -23,7 +23,7 @@ class ProfileViewmodel extends ChangeNotifier {
   Future<void>fetchUserPhoto3(String guid) async{
     _isCompleted=false;
     notifyListeners();
-    var response= await DioService3().getRequest('${ApiConstants.getUserPhotosEndpoint}?userId=$guid');
+    var response= await DioService().getRequest('${ApiConstants.getUserPhotosEndpoint}?userId=$guid');
     _userPhotosModel=UserPhotosModel.fromJson(response.data);
     _isCompleted=false;
     notifyListeners();

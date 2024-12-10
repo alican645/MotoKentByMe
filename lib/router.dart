@@ -26,6 +26,18 @@ final GoRouter router = GoRouter(
       path: "/register_page", // Yeni register_page rotası eklendi
       builder: (context, state) => RegisterPage(),
     ),
+    // GoRoute(
+    //   path: "/message_page",
+    //   builder: (context, state) {
+    //     final Map<String, dynamic> args =
+    //     state.extra as Map<String, dynamic>;
+    //     return MessageView(
+    //       userName: args['userName'],
+    //       groupId: args['groupId'],
+    //       userId: args['userId'],
+    //     );
+    //   },
+    // ),
     StatefulShellRoute.indexedStack(
       branches: [
         StatefulShellBranch(routes: [
@@ -62,17 +74,25 @@ final GoRouter router = GoRouter(
               routes: [
                 GoRoute(
                   path: "create_chat_group",
-                  builder: (context, state) =>  CreateChatGroupView(),
+                  builder: (context, state) => CreateChatGroupView(),
                 ),
                 GoRoute(
-                  path: "my_groups",
-                  builder: (context, state) => const MyGroupsView(),
-                  routes: [
-                    GoRoute(
-                      path: "message_page",
-                      builder: (context, state) =>  const MessageView(),
-                    ),
-                  ]
+                    path: "my_groups",
+                    builder: (context, state) => const MyGroupsView(),
+                    routes: [
+                      GoRoute(
+                        path: "message_page",
+                        builder: (context, state) {
+                          final Map<String, dynamic> args =
+                              state.extra as Map<String, dynamic>;
+                          return MessageView(
+                            userName: args['userName'],
+                            groupId: args['groupId'],
+                            userId: args['userId'],
+                          );
+                        },
+                      ),
+                    ]
                 )
               ]),
         ]),
