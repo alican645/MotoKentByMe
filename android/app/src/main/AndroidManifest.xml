@@ -11,12 +11,15 @@
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
+
     <!-- Android 13 (API 33) ve üstü için bildirim izni -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <application
         android:label="moto_kent"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyCWGyXIvxbhISOBjpbWalJuaK0Q9w445Co"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"

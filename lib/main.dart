@@ -10,6 +10,8 @@ import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_view.dart'
 import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_viewmodel.dart';
 import 'package:moto_kent/pages/GroupsPage/groups_view.dart';
 import 'package:moto_kent/pages/GroupsPage/groups_viewmodel.dart';
+import 'package:moto_kent/pages/LoactionIconMapPage/loaction_icon_map_view.dart';
+import 'package:moto_kent/pages/LoactionIconMapPage/loaction_icon_map_viewmodel.dart';
 import 'package:moto_kent/pages/LoginView/login_page.dart';
 import 'package:moto_kent/pages/LoginView/login_viewmodel.dart';
 import 'package:moto_kent/pages/MessagePage/message_view.dart';
@@ -42,6 +44,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => ChatGroupsViewmodel(),child: ChatGroupsView()),
         ChangeNotifierProvider(create: (context) => MyGroupsViewmodel(),child: MyGroupsView()),
         ChangeNotifierProvider(create: (context) => SendMessageViewmodel(),child: MessageView()),
+        ChangeNotifierProvider(create: (context) => LoactionIconMapViewmodel(),child: LocationIconMapView()),
       ],
       child:  MyApp(initialRoute: initialRoute)));
 

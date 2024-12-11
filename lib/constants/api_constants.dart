@@ -31,7 +31,6 @@ class ApiConstants {
   }
 
 
-
   static const String signalRExploreHubEndpoint = '$baseUrl/exploreHub';
   static const String signalRChatGroupEndpoint = '$baseUrl/chatHub';
 
@@ -46,5 +45,9 @@ class ApiConstants {
   static  String getMessagesChatGroup (String groupId){
     return '$baseUrl/api/ChatGroup/GetGroupMessagesByGroupId?groupId=$groupId';
   }
+
+  static const String getCustomMarkerItem = '$baseUrl/api/CustomLocationIcon/GetCustomLocationIcons';
+
+
 }
 //

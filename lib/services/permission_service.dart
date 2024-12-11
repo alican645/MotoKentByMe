@@ -7,6 +7,16 @@ class PermissionService {
 
   PermissionService(this.context);
 
+  Future<void> initializePermissions() async{
+    await requestStoragePermission();
+    await requestCameraPermission();
+    await requestMicrophonePermission();
+    await requestLocationPermission();
+    await requestContactsPermission();
+    await requestNotificationPermission();
+    await requestBackgroundLocationPermission();
+  }
+
   Future<void> requestStoragePermission() async {
     var status = await Permission.storage.status;
     if (status.isDenied) {
