@@ -1,5 +1,6 @@
 
 
+
 class Utils{
   Utils._();
   static String formatDateToDayMonthYear(DateTime dateTime) {
@@ -15,5 +16,7 @@ class Utils{
     String minute = time.minute.toString().padLeft(2, '0'); // Dakika (2 basamaklı)
     return "$hour:$minute";
   }
+
+
 
 }

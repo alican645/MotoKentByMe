@@ -126,5 +126,15 @@ class DioService {
     }
   }
 
+  Future<Response> getRequestUnit8List(String endpoint) async {
+    try {
+      return await _dio.get(
+        endpoint,
+        options: Options(responseType: ResponseType.bytes),
+      );
+    } on DioException catch (e) {
+      throw Exception('GET isteğinde hata oluştu: ${e.message}');
+    }
+  }
 
 }
