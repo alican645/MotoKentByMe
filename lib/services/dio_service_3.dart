@@ -1,10 +1,11 @@
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:moto_kent/services/iapi_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/api_constants.dart';
 
-class DioService {
+class DioService extends IApiService{
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: ApiConstants.baseUrl,
@@ -14,6 +15,7 @@ class DioService {
   );
 
   // Token'in geçerliliğini kontrol eden fonksiyon
+  @override
   Future<bool> isTokenExpired() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('jwt_token');
@@ -22,6 +24,7 @@ class DioService {
   }
 
   // Token yenileyen fonksiyon
+  @override
   Future<void> refreshToken() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? refreshToken = prefs.getString('refresh_token');
@@ -51,6 +54,7 @@ class DioService {
   }
 
   // Token alıp doğrulama işlemi
+  @override
   Future<String> ensureValidToken() async {
     if (await isTokenExpired()) {
       await refreshToken();
@@ -64,6 +68,7 @@ class DioService {
   }
 
   // Generic GET fonksiyonu
+  @override
   Future<Response> getRequest(String endpoint) async {
     try {
       final token = await ensureValidToken();
@@ -77,6 +82,7 @@ class DioService {
   }
 
   // Generic POST fonksiyonu
+  @override
   Future<Response> postRequest(String endpoint, Object data) async {
     try {
       final token = await ensureValidToken();
@@ -93,6 +99,7 @@ class DioService {
 
 
   // Generic POST fonksiyonu
+  @override
   Future<Response> postRequestWithoutToken(String endpoint, Object data) async {
     try {
 
@@ -107,6 +114,7 @@ class DioService {
   }
 
   // Fotoğraf yükleme (Multipart) fonksiyonu
+  @override
   Future<Response> uploadPhoto(String endpoint, XFile photo, Map<String, String> fields) async {
     try {
       final token = await ensureValidToken();
@@ -119,13 +127,16 @@ class DioService {
       return await _dio.post(
         endpoint,
         data: formData,
-        options: Options(headers: {"Authorization": "Bearer $token"}),
+        options: Options(headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": "Bearer $token"}),
       );
     } on DioException catch (e) {
       throw Exception('Fotoğraf yüklenirken hata oluştu: ${e.message}');
     }
   }
 
+  @override
   Future<Response> getRequestUnit8List(String endpoint) async {
     try {
       return await _dio.get(

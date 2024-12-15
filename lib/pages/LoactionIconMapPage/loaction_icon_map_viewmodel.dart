@@ -68,30 +68,25 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
       _markerList.add(Marker(
           position: LatLng(location.latitude!, location.longitude!),
           markerId: MarkerId(location.markerId!),
-          icon: BitmapDescriptor.bytes(customMarkerIconBytes,
-              height: 48, width: 48)));
+          // icon: BitmapDescriptor.bytes(customMarkerIconBytes,
+          //     height: 48, width: 48)
+      )
+      );
     }).toList();
     _isLoadingAllMarker = true;
 
     notifyListeners();
   }
 
-  Future<Response> addMarker(LocationModel model) async {
-    Uint8List? customMarkerIconBytes;
+  Future<Response> createMarker(LocationModel model) async {
+
     try {
 
       var response = await _dio.postRequest(ApiConstants.addLocation, model.toJson());
 
       if (response.statusCode == 200) {
 
-          customMarkerIconBytes =await fetchCustomMarkerIconBytes('${ApiConstants.baseUrl}${model.iconPath}');
 
-            markerList.add(Marker(
-                position: LatLng(model.latitude!, model.longitude!),
-                markerId: MarkerId(model.markerId!),
-                icon: BitmapDescriptor.bytes(customMarkerIconBytes,
-                    height: 48, width: 48)));
-            notifyListeners();
 
       }
 
@@ -99,5 +94,18 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
     } catch (e) {
       throw Exception(e.toString());
     }
+  }
+
+  Future<void> addMarker(LocationModel model) async{
+    Uint8List customMarkerIconBytes;
+    customMarkerIconBytes =await fetchCustomMarkerIconBytes('${ApiConstants.baseUrl}${model.iconPath}');
+
+    markerList.add(Marker(
+      position: LatLng(model.latitude!, model.longitude!),
+      markerId: MarkerId(model.markerId!),
+      // icon: BitmapDescriptor.bytes(customMarkerIconBytes,
+      //     height: 48, width: 48)
+    ));
+    notifyListeners();
   }
 }

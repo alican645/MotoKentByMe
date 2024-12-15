@@ -47,19 +47,6 @@ class SignalRService {
     }
   }
 
-  // /// SignalR hub'a PostModel nesnesi gönder
-  // Future<void> sendPost(PostModel post) async {
-  //   if (_connection.state == HubConnectionState.Connected) {
-  //     try {
-  //       await _connection.invoke("SendPost", args: [post.toJson()]);
-  //       print("Post gönderildi: ${post.postContentTitle}");
-  //     } catch (e) {
-  //       print("Post gönderme hatası: $e");
-  //     }
-  //   } else {
-  //     print("SignalR bağlantısı aktif değil.");
-  //   }
-  // }
 
   void dispose() {
     _connection.stop();

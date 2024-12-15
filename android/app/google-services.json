@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "125711780982",
+    "project_id": "motokent-notification",
+    "storage_bucket": "motokent-notification.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:125711780982:android:d4bc1ca6277a9be4d62357",
+        "android_client_info": {
+          "package_name": "com.mivaerp.alican.aydin.moto_kent"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCO6yfzr_gC1raC5Sj50eOmET9tVWz3tuc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

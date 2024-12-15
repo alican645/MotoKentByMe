@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/models/post_model.dart';
 import 'package:moto_kent/pages/ExplorePage/explore_viewmodel.dart';
+import 'package:moto_kent/services/current_laciton_service.dart';
 import 'package:moto_kent/services/signalr_service.dart';
 import 'package:moto_kent/utils/utils.dart';
 import 'package:popover/popover.dart';
@@ -28,6 +29,7 @@ class _ExploreViewState extends State<ExploreView> {
       viewModel.fetchPostList();
       viewModel.fetchPostCategoryList();
 
+      initializeSetLastLocation();
       // SignalR servisini başlat
       _signalRService = SignalRService(context);
       _signalRService.initializeSignalR();
@@ -48,6 +50,10 @@ class _ExploreViewState extends State<ExploreView> {
         }
       });
     });
+  }
+
+  Future<void> initializeSetLastLocation() async{
+    await CurrentLacitonService().initialize();
   }
 
   @override

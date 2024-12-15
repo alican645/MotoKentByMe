@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:moto_kent/pages/CallForHelpPage/%20call_for_help_view.dart';
 import 'package:moto_kent/pages/ExplorePage/explore_view.dart';
 import 'package:moto_kent/pages/GroupsPage/CreateChatGroupPage/create_chat_group_view.dart';
 import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_view.dart';
@@ -54,24 +55,14 @@ final GoRouter router = GoRouter(
         ]),
         StatefulShellBranch(routes: [
           GoRoute(
-              path: "/profile_page",
-              builder: (context, state) => const ProfilePage(),
-              routes: [
-                GoRoute(
-                  path: "post_detail_view",
-                  builder: (context, state) {
-                    final String? gelenDeger = state.extra as String?;
-                    return PostDetailPage(
-                      photoUrl: gelenDeger,
-                    );
-                  },
-                )
-              ]),
+            path: "/map_page",
+            builder: (context, state) => const LocationIconMapView(),
+          ),
         ]),
         StatefulShellBranch(routes: [
           GoRoute(
-            path: "/map_page",
-            builder: (context, state) => const LocationIconMapView(),
+            path: "/call_for_help_page",
+            builder: (context, state) => const CallForHelpView(),
           ),
         ]),
         StatefulShellBranch(routes: [

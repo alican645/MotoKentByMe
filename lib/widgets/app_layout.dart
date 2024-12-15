@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:moto_kent/services/firebase_notification_service.dart';
 import '../App/app_theme.dart';
 
 class AppLayout extends StatefulWidget {
   final StatefulNavigationShell statefulNavigationShell;
 
-  AppLayout({Key? key, required this.statefulNavigationShell}) : super(key: key);
+  AppLayout({Key? key, required this.statefulNavigationShell})
+      : super(key: key);
 
   @override
   _AppLayoutState createState() => _AppLayoutState();
 }
 
 class _AppLayoutState extends State<AppLayout> {
-  Key _navigationKey = UniqueKey(); // Sayfa yenilendiğinde widget'ı yeniden oluşturmak için key
-
+  Key _navigationKey =
+      UniqueKey(); // Sayfa yenilendiğinde widget'ı yeniden oluşturmak için key
+  //FirebaseNotificationService? _notificationService;
   // Sayfa yenileme işlemi
   Future<void> _onRefresh() async {
     setState(() {
       // Yeni bir key atayarak tüm `statefulNavigationShell` widget'ını yeniden oluşturuyoruz
       _navigationKey = UniqueKey();
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    //_notificationService!.connectNotification();
   }
 
   @override

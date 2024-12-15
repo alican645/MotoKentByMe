@@ -1,7 +1,12 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/init/Locator/locator.dart';
+import 'package:moto_kent/pages/CallForHelpPage/%20call_for_help_view.dart';
+import 'package:moto_kent/pages/CallForHelpPage/call_for_help_viewmodel.dart';
 import 'package:moto_kent/pages/ExplorePage/explore_view.dart';
 import 'package:moto_kent/pages/ExplorePage/explore_viewmodel.dart';
 import 'package:moto_kent/pages/GroupsPage/CreateChatGroupPage/create_chat_group_view.dart';
@@ -22,6 +27,8 @@ import 'package:moto_kent/pages/ProfilePage/profile_page.dart';
 import 'package:moto_kent/pages/ProfilePage/profile_viewmodel.dart';
 import 'package:moto_kent/pages/RegisterPage/register_page.dart';
 import 'package:moto_kent/pages/RegisterPage/register_viewmodel.dart';
+import 'package:moto_kent/services/current_laciton_service.dart';
+import 'package:moto_kent/services/firebase_notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:moto_kent/router.dart'; // Router dosya
@@ -32,6 +39,7 @@ Color _categorySelectionBarColor = const Color(0xfff48a34);
 void main() async {
   WidgetsFlutterBinding.ensureInitialized(); // Bu satır async kullanımı için gerekli
   String initialRoute = await getInitialRoute(); // İlk rotayı belirlemek için token kontrolü yapılacak
+  FirebaseNotificationService().connectNotification();
   setupLocator();
   runApp(MultiProvider(
       providers: [
@@ -45,6 +53,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => MyGroupsViewmodel(),child: MyGroupsView()),
         ChangeNotifierProvider(create: (context) => SendMessageViewmodel(),child: MessageView()),
         ChangeNotifierProvider(create: (context) => LoactionIconMapViewmodel(),child: LocationIconMapView()),
+        ChangeNotifierProvider(create: (context) => CallForHelpViewmodel(),child: CallForHelpView()),
       ],
       child:  MyApp(initialRoute: initialRoute)));
 
@@ -74,8 +83,7 @@ Future<String> getInitialRoute() async {
 class MyApp extends StatelessWidget {
   final String initialRoute;
 
-  const MyApp({required this.initialRoute, super.key});
-
+   MyApp({required this.initialRoute, super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(

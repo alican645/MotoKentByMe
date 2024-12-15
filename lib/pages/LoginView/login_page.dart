@@ -5,7 +5,7 @@ import 'package:moto_kent/components/my_textfile.dart';
 import 'package:moto_kent/models/login_response_model.dart';
 import 'package:moto_kent/pages/LoginView/login_viewmodel.dart';
 import 'package:moto_kent/services/permission_service.dart';
-import 'package:permission_handler/permission_handler.dart';
+
 import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,10 +25,10 @@ class _LoginPageState extends State<LoginPage> {
 
   // Kullanıcı giriş yapma fonksiyonu
   Future<void> signUserIn() async {
-    final username = usernameController.text;
-    final password = passwordController.text;
-    // final username = "alicanaydin@gmail.com";
-    // final password = "Alican0391.";
+    //final username = usernameController.text;
+    //final password = passwordController.text;
+     final username = "alicanaydin1@gmail.com";
+     final password = "Alican123.";
     // final username = "alican@gmail.com";
     // final password = "Alican0391.";
     // final username ='ali@gmail.com';

@@ -7,6 +7,7 @@ import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/models/location_model.dart';
 import 'package:moto_kent/pages/LoactionIconMapPage/loaction_icon_map_viewmodel.dart';
+import 'package:moto_kent/services/generic_signalr_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,13 +23,16 @@ class LocationIconMapView extends StatefulWidget {
 class _LocationIconMapViewState extends State<LocationIconMapView> {
   final Completer<GoogleMapController> _controller =
       Completer<GoogleMapController>();
+  GenericSignalRService signalRService = GenericSignalRService(
+      endpoint: ApiConstants.signalRLocationHubEndpoint,
+      methodName: "AddLocation");
 
   Uint8List? customMarkerIconBytes;
   String? iconPath;
 
   LoactionIconMapViewmodel? viewmodel;
 
-  Set<Marker> _markers = {};
+
   // Dinamik başlangıç konumu
   CameraPosition _initialPosition = const CameraPosition(
     target: LatLng(37.42796133580664, -122.085749655962), // Varsayılan konum
@@ -39,12 +43,19 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
   void initState() {
     super.initState();
     viewmodel = context.read<LoactionIconMapViewmodel>();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      initialize();
-    },);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        initialize();
+        signalRService.initializeSignalR();
 
-
-
+        signalRService.onReceiveMessage = (arguments) {
+          final json = arguments[0] as Map<String, dynamic>;
+          LocationModel model = LocationModel.fromJson(json);
+          viewmodel!.addMarker(model);
+          viewmodel!.setSelectLocation(false);
+        };
+      },
+    );
   }
 
   @override
@@ -67,7 +78,7 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
     String? userId = await prefs.getString("user_id");
 
     LocationModel model = LocationModel()
-      .. id=0
+      ..id = 0
       ..longitude = location.longitude
       ..latitude = location.latitude
       ..markerId =
@@ -76,15 +87,16 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
       ..userId = userId
       ..iconPath = iconPath;
 
-    await viewmodel!.addMarker(model);
+    await viewmodel!.createMarker(model);
   }
 
-
-  Future<void> _selectLocationIcon(String selectIconPath,BuildContext selectContext) async{
-    iconPath= selectIconPath;
+  Future<void> _selectLocationIcon(
+      String selectIconPath, BuildContext selectContext) async {
+    iconPath = selectIconPath;
     Navigator.pop(selectContext);
     viewmodel!.setSelectLocation(true);
   }
+
   /// Telefon un anlık konumunu alıp harita başlangıç konumunu ayarlar
   Future<void> _setInitialLocation() async {
     // Konum izinlerini kontrol et ve iste
@@ -137,46 +149,59 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
     return Scaffold(
       body: Column(
         children: [
-
           Flexible(
-            child: viewmodel!.isLoadingAllMarker? Stack(
-              children: [
-                Consumer<LoactionIconMapViewmodel>(
-                  builder: (context, value, child) => GoogleMap(
-                    onTap: (argument) {
-                      if (value.selectLocation) {
-                        LatLng location =
-                            LatLng(argument.latitude, argument.longitude);
-                        _loadCustomMarker(location);
-                      }
-                      value.setSelectLocation(false);
-                    },
-                    mapType: MapType.normal,
-                    markers: value.markerList,
-                    initialCameraPosition:
-                        _initialPosition, // Dinamik başlangıç pozisyonu
-                    onMapCreated: (GoogleMapController controller) {
-                      _controller.complete(controller);
-                    },
-                  ),
-                ),
-                Provider.of<LoactionIconMapViewmodel>(context).selectLocation
-                    ? Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Align(
-                          alignment: Alignment.topRight,
-                          child: Container(
-                              padding: EdgeInsets.all(10),
-                              color: Colors.white,
-                              child: CircularProgressIndicator()),
+              child: viewmodel!.isLoadingAllMarker
+                  ? Stack(
+                      children: [
+                        Consumer<LoactionIconMapViewmodel>(
+                          builder: (context, value, child) => GoogleMap(
+                            onTap: (argument) {
+                              if (value.selectLocation) {
+                                LatLng location = LatLng(
+                                    argument.latitude, argument.longitude);
+                                _loadCustomMarker(location);
+                              }
+                              value.setSelectLocation(false);
+                            },
+                            mapType: MapType.normal,
+                            markers: value.markerList,
+                            initialCameraPosition:
+                                _initialPosition, // Dinamik başlangıç pozisyonu
+                            onMapCreated: (GoogleMapController controller) {
+                              _controller.complete(controller);
+                            },
+                          ),
                         ),
-                      )
-                    : SizedBox(),
-              ],
-            ): Center(child: CircularProgressIndicator(),)
-          ),
-          SizedBox(
+                        Provider.of<LoactionIconMapViewmodel>(context)
+                                .selectLocation
+                            ? Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Align(
+                                  alignment: Alignment.topRight,
+                                  child: Container(
+                                      padding: EdgeInsets.all(10),
+                                      color: Colors.white,
+                                      child: CircularProgressIndicator()),
+                                ),
+                              )
+                            : SizedBox(),
+                      ],
+                    )
+                  : Center(
+                      child: CircularProgressIndicator(),
+                    )),
+          Container(
             width: MediaQuery.sizeOf(context).width,
+
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  AppTheme.themeData.colorScheme.primary,
+                  Colors.white,
+                ],)
+            ),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -242,8 +267,8 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
           itemCount: value.modelList.length,
           itemBuilder: (context, index) => GestureDetector(
             onTap: () async {
-              _selectLocationIcon(value.modelList[index].iconPath!,showModalBottomSheetContext);
-
+              _selectLocationIcon(value.modelList[index].iconPath!,
+                  showModalBottomSheetContext);
             },
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

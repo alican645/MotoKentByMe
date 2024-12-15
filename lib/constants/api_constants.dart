@@ -34,6 +34,7 @@ class ApiConstants {
 
   static const String signalRExploreHubEndpoint = '$baseUrl/exploreHub';
   static const String signalRChatGroupEndpoint = '$baseUrl/chatHub';
+  static const String signalRLocationHubEndpoint = '$baseUrl/locationHub';
 
 
   static const String createChatGroup = '$baseUrl/api/ChatGroup/CreateChatGroup';
@@ -51,6 +52,8 @@ class ApiConstants {
 
   static const String getAllLocations = '$baseUrl/api/Location/GetAllLocations';
   static const String addLocation = '$baseUrl/api/Location/AddLocation';
+  static const String addUserLastLocation = '$baseUrl/api/Location/AddUserLastLocation';
+  static const String getNearbyUsers = '$baseUrl/api/Location/GetNearbyUsers';
 
 }
 //

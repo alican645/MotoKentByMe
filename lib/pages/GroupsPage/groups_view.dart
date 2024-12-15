@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/components/chat_group_item.dart';
 
 import 'package:moto_kent/pages/GroupsPage/groups_viewmodel.dart';
@@ -80,80 +81,99 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    return Padding(
-      padding: EdgeInsets.only(
-          left: width * 0.05, right: width * 0.05, top: width * 0.01),
-      child: Consumer<ChatGroupsViewmodel>(
-        builder: (context, value, child) => Column(
-          children: [
-            Visibility(
-              visible: value.showNewChatGroups,
-                child: GestureDetector(
-                  onTap: ()  async {
-                    await fethGroupList();
-                  },
-              child: Container(
-                width: 200,
-                height: 50,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(45),
-                  color: Colors.grey[300]
-                ),
-                child: Center(
-                  child: Text("Yeni Grupları Görüntüle"),
-                ),
-              ),
-            )),
-            Flexible(
-              child: ListView.builder(
-                itemCount: value.groupsList.length,
-                itemBuilder: (context, index) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2.50),
-                  child: ChatGroupItem(
-                    chatGroupModel: value.groupsList[index],
-                    onPressed: () {
-                      joinChatGropShowDialog(value.groupsList[index].uniqueId!);
-                    },
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      children: [
+        Flexible(
+          child: Padding(
+            padding: EdgeInsets.only(
+                left: width * 0.05, right: width * 0.05, top: width * 0.01),
+            child: Consumer<ChatGroupsViewmodel>(
+              builder: (context, value, child) => Column(
                 children: [
-                  _buildButton(
-                      onPressed: () {
-                        context.go("/chat_groups_page/my_groups");
-                      },
-                      icon: const Icon(
-                        Icons.person_2_outlined,
-                        size: 48,
+                  Visibility(
+                    visible: value.showNewChatGroups,
+                      child: GestureDetector(
+                        onTap: ()  async {
+                          await fethGroupList();
+                        },
+                    child: Container(
+                      width: 200,
+                      height: 50,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(45),
+                        color: Colors.grey[300]
                       ),
-                      content: "Gruplarım"),
-                  _buildButton(
-                      onPressed: () {
-                        context.go("/chat_groups_page/create_chat_group");
-                      },
-                      icon: const Icon(
-                        Icons.add,
-                        size: 48,
+                      child: Center(
+                        child: Text("Yeni Grupları Görüntüle"),
                       ),
-                      content: "Oluştur"),
-                  _buildButton(
-                      onPressed: () {},
-                      icon: const Icon(
-                        Icons.search_rounded,
-                        size: 48,
+                    ),
+                  )),
+                  Flexible(
+                    child: ListView.builder(
+                      itemCount: value.groupsList.length,
+                      itemBuilder: (context, index) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 2.50),
+                        child: ChatGroupItem(
+                          chatGroupModel: value.groupsList[index],
+                          onPressed: () {
+                            joinChatGropShowDialog(value.groupsList[index].uniqueId!);
+                          },
+                        ),
                       ),
-                      content: "Ara")
+                    ),
+                  ),
+          
                 ],
               ),
-            )
-          ],
+            ),
+          ),
         ),
-      ),
+        Container(
+          width: MediaQuery.sizeOf(context).width,
+          decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  AppTheme.themeData.colorScheme.primary,
+                  Colors.white,
+                ],)
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildButton(
+                    onPressed: () {
+                      context.go("/chat_groups_page/my_groups");
+                    },
+                    icon: const Icon(
+                      Icons.person_2_outlined,
+                      size: 48,
+                    ),
+                    content: "Gruplarım"),
+                _buildButton(
+                    onPressed: () {
+                      context.go("/chat_groups_page/create_chat_group");
+                    },
+                    icon: const Icon(
+                      Icons.add,
+                      size: 48,
+                    ),
+                    content: "Oluştur"),
+                _buildButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.search_rounded,
+                      size: 48,
+                    ),
+                    content: "Ara")
+              ],
+            ),
+          ),
+        )
+      ],
     );
   }
 
