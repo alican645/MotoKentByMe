@@ -6,6 +6,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/api_constants.dart';
 
 class DioService extends IApiService{
+  static final DioService _instance = DioService._internal();
+  factory DioService() => _instance;
+  DioService._internal();
   final Dio _dio = Dio(
     BaseOptions(
       baseUrl: ApiConstants.baseUrl,
@@ -76,6 +79,7 @@ class DioService extends IApiService{
         endpoint,
         options: Options(headers: {"Authorization": "Bearer $token"}),
       );
+
     } on DioException catch (e) {
       throw Exception('GET isteğinde hata oluştu: ${e.message}');
     }

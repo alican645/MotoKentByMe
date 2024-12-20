@@ -1,6 +1,6 @@
 class ApiConstants {
-  static const String baseUrl = 'http://10.0.2.2:8080';
-  //static const String baseUrl = 'https://www.friendly-vaughan.104-247-167-18.plesk.page';
+  //static const String baseUrl = 'http://10.0.2.2:8080';
+  static const String baseUrl = 'https://www.friendly-vaughan.104-247-167-18.plesk.page';
   //static const String baseUrl = 'http://192.168.2.78:8080';
 
 
@@ -13,6 +13,7 @@ class ApiConstants {
 
   static const String userProfileEndpoint = '$baseUrl/api/UserProfile/GetProfile';
   static const String updateProfileEndpoint = '$baseUrl/api/UserProfile/UpdateProfile';
+  static const String addDeviceTokenToUser = '$baseUrl/api/UserProfile/AddDeviceTokenToUser';
 
 
   static const String getUserPhotosEndpoint = '$baseUrl/api/Photo/GetUserPhotos';
@@ -42,6 +43,7 @@ class ApiConstants {
   static  String getUserChatGroups (String userId){
     return '$baseUrl/api/ChatGroup/GetUserChatGroups?userId=$userId';
   }
+
   static const String joinChatGroups = '$baseUrl/api/ChatGroup/JoinGroup';
   static const String senMessageChatGroups = '$baseUrl/api/ChatGroup/SendMessageGroup';
   static  String getMessagesChatGroup (String groupId){
@@ -49,11 +51,19 @@ class ApiConstants {
   }
 
   static const String getCustomMarkerItem = '$baseUrl/api/CustomLocationIcon/GetCustomLocationIcons';
-
   static const String getAllLocations = '$baseUrl/api/Location/GetAllLocations';
   static const String addLocation = '$baseUrl/api/Location/AddLocation';
   static const String addUserLastLocation = '$baseUrl/api/Location/AddUserLastLocation';
   static const String getNearbyUsers = '$baseUrl/api/Location/GetNearbyUsers';
 
+
+  static const String sendCallForHelp='$baseUrl/api/CallForHelp/SendCallForHelp';
+
+
+
+  static  String getAppMarkerIconTokenByUserId (String userId){
+    return '$baseUrl/api/AppMarkerIconToken/GetAppMarkerIconTokenByUserId?userId=$userId';
+  }
+  static const String createAppMarkerIconToken='$baseUrl/api/AppMarkerIconToken/CreateAppMarkerIconToken';
 }
 //

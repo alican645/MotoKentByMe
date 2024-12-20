@@ -29,7 +29,6 @@ class _ExploreViewState extends State<ExploreView> {
       viewModel.fetchPostList();
       viewModel.fetchPostCategoryList();
 
-      initializeSetLastLocation();
       // SignalR servisini başlat
       _signalRService = SignalRService(context);
       _signalRService.initializeSignalR();
@@ -52,9 +51,7 @@ class _ExploreViewState extends State<ExploreView> {
     });
   }
 
-  Future<void> initializeSetLastLocation() async{
-    await CurrentLacitonService().initialize();
-  }
+
 
   @override
   Widget build(BuildContext context) {

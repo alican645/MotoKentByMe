@@ -5,12 +5,16 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/models/custom_marker_model.dart';
 import 'package:moto_kent/models/location_model.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
 
 class LoactionIconMapViewmodel extends ChangeNotifier {
   final DioService _dio = DioService();
+
+  int _totalMarkerIconToken=0;
+  int get totalMarkerIconToken=>_totalMarkerIconToken;
 
   List<CustomMarkerModel> _modelList = [];
   List<CustomMarkerModel> get modelList => _modelList;
@@ -81,15 +85,11 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
   Future<Response> createMarker(LocationModel model) async {
 
     try {
-
       var response = await _dio.postRequest(ApiConstants.addLocation, model.toJson());
-
       if (response.statusCode == 200) {
-
-
-
+        fetchUserAppMarkerIconTotalToken();
+        notifyListeners();
       }
-
       return response;
     } catch (e) {
       throw Exception(e.toString());
@@ -107,5 +107,13 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
       //     height: 48, width: 48)
     ));
     notifyListeners();
+  }
+
+  Future<void> fetchUserAppMarkerIconTotalToken () async{
+    var sp=SharedPreferencesHelper();
+    var response =await _dio.getRequest(ApiConstants.getAppMarkerIconTokenByUserId(sp.getValue<String>("user_id")!));
+    if(response.statusCode==200){
+      _totalMarkerIconToken=(response.data as Map<String,dynamic>)["totalToken"];
+    }
   }
 }

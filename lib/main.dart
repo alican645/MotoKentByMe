@@ -1,8 +1,7 @@
-
-
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/init/Locator/locator.dart';
 import 'package:moto_kent/pages/CallForHelpPage/%20call_for_help_view.dart';
@@ -27,43 +26,64 @@ import 'package:moto_kent/pages/ProfilePage/profile_page.dart';
 import 'package:moto_kent/pages/ProfilePage/profile_viewmodel.dart';
 import 'package:moto_kent/pages/RegisterPage/register_page.dart';
 import 'package:moto_kent/pages/RegisterPage/register_viewmodel.dart';
-import 'package:moto_kent/services/current_laciton_service.dart';
 import 'package:moto_kent/services/firebase_notification_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:moto_kent/router.dart'; // Router dosya
-// sını import edin
+import 'package:moto_kent/router.dart';
+
+import 'init/Helpers/shared_preferences_helper.dart'; // Router dosya
 
 Color _categorySelectionBarColor = const Color(0xfff48a34);
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Bu satır async kullanımı için gerekli
-  String initialRoute = await getInitialRoute(); // İlk rotayı belirlemek için token kontrolü yapılacak
-  FirebaseNotificationService().connectNotification();
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Bu satır async kullanımı için gerekli
+  await Firebase.initializeApp();
+  await SharedPreferencesHelper().init();
+  FirebaseMessaging.onBackgroundMessage(FirebaseNotificationService.firebaseMessagingBackgroundHandler);
+  String initialRoute =
+      await getInitialRoute(); // İlk rotayı belirlemek için token kontrolü yapılacak
   setupLocator();
-  runApp(MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => ExploreViewmodel(),child: const ExploreView()),
-        ChangeNotifierProvider(create: (context) => PostSharingViewmodel(),child: const PostSharingView()),
-        ChangeNotifierProvider(create: (context) => LoginViewmodel(),child: LoginPage()),
-        ChangeNotifierProvider(create: (context) => RegisterViewmodel(),child: const RegisterPage()),
-        ChangeNotifierProvider(create: (context) => ProfileViewmodel(),child: const ProfilePage()),
-        ChangeNotifierProvider(create: (context) => CreateChatGroupViewmodel(),child: CreateChatGroupView()),
-        ChangeNotifierProvider(create: (context) => ChatGroupsViewmodel(),child: ChatGroupsView()),
-        ChangeNotifierProvider(create: (context) => MyGroupsViewmodel(),child: MyGroupsView()),
-        ChangeNotifierProvider(create: (context) => SendMessageViewmodel(),child: MessageView()),
-        ChangeNotifierProvider(create: (context) => LoactionIconMapViewmodel(),child: LocationIconMapView()),
-        ChangeNotifierProvider(create: (context) => CallForHelpViewmodel(),child: CallForHelpView()),
-      ],
-      child:  MyApp(initialRoute: initialRoute)));
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(
+        create: (context) => ExploreViewmodel(), child: const ExploreView()),
+    ChangeNotifierProvider(
+        create: (context) => PostSharingViewmodel(),
+        child: const PostSharingView()),
+    ChangeNotifierProvider(
+        create: (context) => LoginViewmodel(), child: LoginPage()),
+    ChangeNotifierProvider(
+        create: (context) => RegisterViewmodel(), child: const RegisterPage()),
+    ChangeNotifierProvider(
+        create: (context) => ProfileViewmodel(), child: const ProfilePage()),
+    ChangeNotifierProvider(
+        create: (context) => CreateChatGroupViewmodel(),
+        child: CreateChatGroupView()),
+    ChangeNotifierProvider(
+        create: (context) => ChatGroupsViewmodel(),
+        child: const ChatGroupsView()),
+    ChangeNotifierProvider(
+        create: (context) => MyGroupsViewmodel(), child: const MyGroupsView()),
+    ChangeNotifierProvider(
+        create: (context) => SendMessageViewmodel(), child: MessageView()),
+    ChangeNotifierProvider(
+        create: (context) => LoactionIconMapViewmodel(),
+        child: const LocationIconMapView()),
+    ChangeNotifierProvider(
+        create: (context) => CallForHelpViewmodel(),
+        child: const CallForHelpView()),
+  ], child: MyApp(initialRoute: initialRoute)));
 
   // Sistem UI ayarlarını uygulayın
   SystemChrome.setSystemUIOverlayStyle(
     SystemUiOverlayStyle(
       statusBarColor: Colors.transparent, // Durum çubuğunu şeffaf yapar
-      statusBarIconBrightness: Brightness.dark, // İkonların rengini ayarlar (örneğin: koyu)
-      systemNavigationBarColor: _categorySelectionBarColor, // Alt kısımda yer alan geri ve ana ekran tuşlarının arka plan rengini ayarlar
-      systemNavigationBarIconBrightness: Brightness.dark, // Alt kısımdaki ikonların rengini ayarlar (örneğin: kapalı)
+      statusBarIconBrightness:
+          Brightness.dark, // İkonların rengini ayarlar (örneğin: koyu)
+      systemNavigationBarColor:
+          _categorySelectionBarColor, // Alt kısımda yer alan geri ve ana ekran tuşlarının arka plan rengini ayarlar
+      systemNavigationBarIconBrightness: Brightness
+          .dark, // Alt kısımdaki ikonların rengini ayarlar (örneğin: kapalı)
     ),
   );
 }
@@ -83,7 +103,7 @@ Future<String> getInitialRoute() async {
 class MyApp extends StatelessWidget {
   final String initialRoute;
 
-   MyApp({required this.initialRoute, super.key});
+  const MyApp({required this.initialRoute, super.key});
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(

@@ -4,6 +4,7 @@ import 'package:moto_kent/components/my_button.dart';
 import 'package:moto_kent/components/my_textfile.dart';
 import 'package:moto_kent/models/register_model.dart';
 import 'package:moto_kent/pages/RegisterPage/register_viewmodel.dart';
+import 'package:moto_kent/services/firebase_notification_service.dart';
 import 'package:moto_kent/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
@@ -23,6 +24,10 @@ class RegisterPageState extends State<RegisterPage> {
 
 
 
+void initState(){
+  super.initState();
+
+}
 
   Future<void> registerUser () async{
     var registerModel = RegisterModel(
@@ -51,7 +56,6 @@ class RegisterPageState extends State<RegisterPage> {
       _showErrorDialog(context, "Başarısız", e.toString());
     }
   }
-
 
   void _showErrorDialog(BuildContext context, String title, String message) {
     showDialog(

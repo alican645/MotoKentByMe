@@ -1,6 +1,15 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:logging/logging.dart';
+import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/services/current_laciton_service.dart';
+import 'package:moto_kent/services/dio_service_3.dart';
 import 'package:moto_kent/services/firebase_notification_service.dart';
+import 'package:moto_kent/services/permission_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../App/app_theme.dart';
 
 class AppLayout extends StatefulWidget {
@@ -16,7 +25,7 @@ class AppLayout extends StatefulWidget {
 class _AppLayoutState extends State<AppLayout> {
   Key _navigationKey =
       UniqueKey(); // Sayfa yenilendiğinde widget'ı yeniden oluşturmak için key
-  //FirebaseNotificationService? _notificationService;
+  FirebaseNotificationService? _notificationService = FirebaseNotificationService();
   // Sayfa yenileme işlemi
   Future<void> _onRefresh() async {
     setState(() {
@@ -25,10 +34,46 @@ class _AppLayoutState extends State<AppLayout> {
     });
   }
 
+
   @override
   void initState() {
     super.initState();
-    //_notificationService!.connectNotification();
+    initializeSetLastLocation().then((value) {
+      _notificationService!.connectNotification().then((value) {
+        addDeviceTokenToUser();
+      },);
+    },);
+
+  }
+
+  Future<void> initializeSetLastLocation() async{
+    await CurrentLacitonService().initialize();
+  }
+
+  Future<void> addDeviceTokenToUser() async {
+    await Future.delayed(const Duration(seconds: 3));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userId=await prefs.getString("user_id");
+    DioService service = DioService();
+
+    try{
+      var response = await service.postRequest(ApiConstants.addDeviceTokenToUser,
+          jsonEncode( {
+            "userId": userId,
+            "deviceToken": _notificationService?.deviceToken
+          })
+      );
+      if(response.statusCode==200){
+        log("güncelleme başarılı",name: "isSuccess");
+      }else{
+        log(response.data,name: "isNotSuccess");
+      }
+    }catch(e){
+      log(e.toString(),name: "isNotSuccess");
+    }
+
+
+
   }
 
   @override
@@ -121,3 +166,4 @@ class _AppLayoutState extends State<AppLayout> {
     );
   }
 }
+

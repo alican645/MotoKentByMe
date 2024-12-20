@@ -4,84 +4,100 @@ import 'package:permission_handler/permission_handler.dart';
 
 class PermissionService {
   final BuildContext context;
+  bool _isRequestingPermission = false; // Tekrar eden istekleri engellemek için bayrak
 
   PermissionService(this.context);
 
-  Future<void> initializePermissions() async{
-    await requestStoragePermission();
-    await requestCameraPermission();
-    await requestMicrophonePermission();
-    await requestLocationPermission();
-    await requestContactsPermission();
-    await requestNotificationPermission();
-    await requestBackgroundLocationPermission();
+  Future<void> initializePermissions() async {
+    if (_isRequestingPermission) return; // Devam eden istek varsa engelle
+    _isRequestingPermission = true;
+
+    try {
+      await requestStoragePermission();
+      await requestCameraPermission();
+      await requestMicrophonePermission();
+      await requestLocationPermission();
+      await requestContactsPermission();
+      await requestNotificationPermission();
+      await requestBackgroundLocationPermission();
+    } catch (e) {
+      debugPrint("İzinler sırasında hata oluştu: $e");
+    } finally {
+      _isRequestingPermission = false; // Bayrağı sıfırla
+    }
   }
 
   Future<void> requestStoragePermission() async {
-    var status = await Permission.storage.status;
-    if (status.isDenied) {
-      await Permission.storage.request();
-    } else if (status.isPermanentlyDenied) {
-      _showSettingsDialog('Depolama izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.');
-    }
+    await _requestPermission(
+      permission: Permission.storage,
+      message: 'Depolama izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.',
+    );
   }
 
   Future<void> requestCameraPermission() async {
-    var status = await Permission.camera.status;
-    if (status.isDenied) {
-      await Permission.camera.request();
-    } else if (status.isPermanentlyDenied) {
-      _showSettingsDialog('Kamera izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.');
-    }
+    await _requestPermission(
+      permission: Permission.camera,
+      message: 'Kamera izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.',
+    );
   }
 
   Future<void> requestMicrophonePermission() async {
-    var status = await Permission.microphone.status;
-    if (status.isDenied) {
-      await Permission.microphone.request();
-    } else if (status.isPermanentlyDenied) {
-      _showSettingsDialog('Mikrofon izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.');
-    }
+    await _requestPermission(
+      permission: Permission.microphone,
+      message: 'Mikrofon izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.',
+    );
   }
 
   Future<void> requestLocationPermission() async {
-    var status = await Permission.location.status;
-    if (status.isDenied) {
-      await Permission.location.request();
-    } else if (status.isPermanentlyDenied) {
-      _showSettingsDialog('Konum izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.');
-    }
+    await _requestPermission(
+      permission: Permission.locationWhenInUse,
+      message: 'Konum izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.',
+    );
   }
 
   Future<void> requestContactsPermission() async {
-    var status = await Permission.contacts.status;
-    if (status.isDenied) {
-      await Permission.contacts.request();
-    } else if (status.isPermanentlyDenied) {
-      _showSettingsDialog('Rehber izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.');
-    }
+    await _requestPermission(
+      permission: Permission.contacts,
+      message: 'Rehber izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.',
+    );
   }
 
   Future<void> requestNotificationPermission() async {
-    if (Platform.isIOS || Platform.isAndroid) {
-      var status = await Permission.notification.status;
-      if (status.isDenied) {
-        await Permission.notification.request();
-      } else if (status.isPermanentlyDenied) {
-        _showSettingsDialog('Bildirim izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.');
-      }
+    if (Platform.isAndroid && Platform.version.compareTo('13') >= 0) {
+      await _requestPermission(
+        permission: Permission.notification,
+        message: 'Bildirim izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.',
+      );
     }
   }
 
   Future<void> requestBackgroundLocationPermission() async {
-    var status = await Permission.locationAlways.status;
-    if (status.isDenied) {
-      await Permission.locationAlways.request();
-    } else if (status.isPermanentlyDenied) {
-      _showSettingsDialog('Arka plan konum izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.');
+    var locationStatus = await Permission.locationWhenInUse.status;
+    if (locationStatus.isGranted) {
+      await _requestPermission(
+        permission: Permission.locationAlways,
+        message: 'Arka plan konum izni kalıcı olarak reddedilmiş. Ayarlardan izin verilmesi gerekiyor.',
+      );
+    } else {
+      debugPrint("Önce 'locationWhenInUse' izninin verilmesi gerekiyor.");
     }
   }
 
+  // Genel izin isteği işlemi
+  Future<void> _requestPermission({
+    required Permission permission,
+    required String message,
+  }) async {
+    var status = await permission.status;
+
+    if (status.isDenied) {
+      await permission.request();
+    } else if (status.isPermanentlyDenied) {
+      _showSettingsDialog(message);
+    }
+  }
+
+  // Ayarlar açma dialogu
   void _showSettingsDialog(String message) {
     showDialog(
       context: context,

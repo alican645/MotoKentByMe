@@ -5,13 +5,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/models/location_model.dart';
 import 'package:moto_kent/pages/LoactionIconMapPage/loaction_icon_map_viewmodel.dart';
 import 'package:moto_kent/services/generic_signalr_service.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// istek gönderirken ve alırken key uyuşmazlığı oluyor
+
 
 class LocationIconMapView extends StatefulWidget {
   const LocationIconMapView({super.key});
@@ -29,9 +30,9 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
 
   Uint8List? customMarkerIconBytes;
   String? iconPath;
+  int? iconPrice;
 
   LoactionIconMapViewmodel? viewmodel;
-
 
   // Dinamik başlangıç konumu
   CameraPosition _initialPosition = const CameraPosition(
@@ -67,6 +68,7 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
   Future<void> initialize() async {
     await viewmodel!.fetchCustomMarkerItem();
     await viewmodel!.fetchAllLocations();
+    await viewmodel!.fetchUserAppMarkerIconTotalToken();
     _setInitialLocation();
   }
 
@@ -74,8 +76,8 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
   Future<void> _loadCustomMarker(
     LatLng location,
   ) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = await prefs.getString("user_id");
+    var prefs = SharedPreferencesHelper();
+    String? userId = prefs.getValue<String>("user_id");
 
     LocationModel model = LocationModel()
       ..id = 0
@@ -85,14 +87,16 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
           "${location.latitude}/${location.longitude}/${DateTime.now()}"
       ..createdDate = DateTime.now()
       ..userId = userId
-      ..iconPath = iconPath;
+      ..iconPath = iconPath
+      ..iconPrice=iconPrice;
 
     await viewmodel!.createMarker(model);
   }
 
-  Future<void> _selectLocationIcon(
+  Future<void> _selectLocationIcon(int selectIconPrice,
       String selectIconPath, BuildContext selectContext) async {
     iconPath = selectIconPath;
+    iconPrice=selectIconPrice;
     Navigator.pop(selectContext);
     viewmodel!.setSelectLocation(true);
   }
@@ -192,16 +196,15 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
                     )),
           Container(
             width: MediaQuery.sizeOf(context).width,
-
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-                colors: [
-                  AppTheme.themeData.colorScheme.primary,
-                  Colors.white,
-                ],)
-            ),
+                gradient: LinearGradient(
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [
+                AppTheme.themeData.colorScheme.primary,
+                Colors.white,
+              ],
+            )),
             child: Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -264,47 +267,78 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
             crossAxisSpacing: 5.0,
             childAspectRatio: 1.0,
           ),
-          itemCount: value.modelList.length,
-          itemBuilder: (context, index) => GestureDetector(
-            onTap: () async {
-              _selectLocationIcon(value.modelList[index].iconPath!,
-                  showModalBottomSheetContext);
-            },
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Flexible(
-                    child: Image.network(
-                  '${ApiConstants.baseUrl}${value.modelList[index].iconPath}',
-                  fit: BoxFit.fitHeight,
-                )),
-                Text(value.modelList[index].iconName!),
-                value.modelList[index].price == 0
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                            Text(
-                              "Free",
-                              style: TextStyle(
-                                  color: AppTheme.themeData.primaryColor),
+          itemCount: value.modelList.length + 2,
+          itemBuilder: (context, index) {
+            if (index == 0) {
+              return Container(
+                child: IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.monetization_on_outlined,
+                      color: AppTheme.themeData.primaryColor,size: 36,
+                    )),
+              );
+            }
+            if (index == 1) {
+              return Container(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.monetization_on_outlined,
+                      color: AppTheme.themeData.primaryColor,
+                    ),
+                    Text(
+                      value.totalMarkerIconToken.toString(),
+                      style: TextStyle(color: AppTheme.themeData.primaryColor),
+                    )
+                  ],
+                ),
+              );
+            }
+
+            return GestureDetector(
+              onTap: () async {
+                _selectLocationIcon(value.modelList[index - 2].price!,value.modelList[index - 2].iconPath!,
+                    showModalBottomSheetContext);
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                      child: Image.network(
+                    '${ApiConstants.baseUrl}${value.modelList[index - 2].iconPath}',
+                    fit: BoxFit.fitHeight,
+                  )),
+                  Text(value.modelList[index - 2].iconName!),
+                  value.modelList[index - 2].price == 0
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                              Text(
+                                "Free",
+                                style: TextStyle(
+                                    color: AppTheme.themeData.primaryColor),
+                              ),
+                            ])
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(value.modelList[index - 2].price.toString(),
+                                style: TextStyle(
+                                    color: AppTheme.themeData.primaryColor)),
+                            SizedBox(
+                              width: 1,
                             ),
-                          ])
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(value.modelList[index].price.toString(),
-                              style: TextStyle(
-                                  color: AppTheme.themeData.primaryColor)),
-                          SizedBox(
-                            width: 1,
-                          ),
-                          Icon(Icons.monetization_on_outlined,
-                              size: 20, color: AppTheme.themeData.primaryColor)
-                        ],
-                      )
-              ],
-            ),
-          ),
+                            Icon(Icons.monetization_on_outlined,
+                                size: 20,
+                                color: AppTheme.themeData.primaryColor)
+                          ],
+                        )
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
