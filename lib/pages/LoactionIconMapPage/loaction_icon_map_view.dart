@@ -4,13 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:moto_kent/App/app_theme.dart';
+import 'package:moto_kent/components/custom_loading_widget.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/models/location_model.dart';
 import 'package:moto_kent/pages/LoactionIconMapPage/loaction_icon_map_viewmodel.dart';
+import 'package:moto_kent/pages/LoactionIconMapPage/widgets/gridview_bottom_modal_sheet.dart';
+import 'package:moto_kent/pages/LoactionIconMapPage/widgets/map_icon.dart';
 import 'package:moto_kent/services/generic_signalr_service.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 
 
@@ -35,10 +37,7 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
   LoactionIconMapViewmodel? viewmodel;
 
   // Dinamik başlangıç konumu
-  CameraPosition _initialPosition = const CameraPosition(
-    target: LatLng(37.42796133580664, -122.085749655962), // Varsayılan konum
-    zoom: 14.4746,
-  );
+  CameraPosition? _initialPosition  ;
 
   @override
   void initState() {
@@ -53,7 +52,7 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
           final json = arguments[0] as Map<String, dynamic>;
           LocationModel model = LocationModel.fromJson(json);
           viewmodel!.addMarker(model);
-          viewmodel!.setSelectLocation(false);
+
         };
       },
     );
@@ -77,7 +76,7 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
     LatLng location,
   ) async {
     var prefs = SharedPreferencesHelper();
-    String? userId = prefs.getValue<String>("user_id");
+    String? userId =await prefs.getValue<String>("user_id");
 
     LocationModel model = LocationModel()
       ..id = 0
@@ -89,8 +88,25 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
       ..userId = userId
       ..iconPath = iconPath
       ..iconPrice=iconPrice;
+try {
+  var response = await viewmodel!.createMarker(model);
 
-    await viewmodel!.createMarker(model);
+  if(response.statusCode!=200){
+    showDialog(context: context, builder: (sdcontext) {
+      
+      return AlertDialog(
+        title: Text(response.data),
+      );
+    },);
+  }
+}catch(e){
+  showDialog(context: context, builder: (sdcontext) {
+
+    return AlertDialog(
+      title: Text(e.toString()),
+    );
+  },);
+}
   }
 
   Future<void> _selectLocationIcon(int selectIconPrice,
@@ -120,15 +136,27 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
       setState(() {
         _initialPosition = CameraPosition(
           target: LatLng(position.latitude, position.longitude),
-          zoom: 14.5,
+          zoom: 19,
         );
+
+        LocationModel model =LocationModel(
+          latitude: position.latitude,
+          longitude: position.longitude,
+          markerId: "me",
+          iconPath: "/customLocationIconsFolder/Me.png"
+        );
+        context.read<LoactionIconMapViewmodel>().addMarker(model);
+
+
       });
 
       // Harita kontrolcüsünü kullanarak anlık konuma odaklan
       final GoogleMapController controller = await _controller.future;
       controller
-          .animateCamera(CameraUpdate.newCameraPosition(_initialPosition));
-    } catch (e) {}
+          .animateCamera(CameraUpdate.newCameraPosition(_initialPosition!));
+    } catch (e) {
+
+    }
   }
 
   Future<void> _goToCurrentLocation() async {
@@ -170,7 +198,7 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
                             mapType: MapType.normal,
                             markers: value.markerList,
                             initialCameraPosition:
-                                _initialPosition, // Dinamik başlangıç pozisyonu
+                                _initialPosition!, // Dinamik başlangıç pozisyonu
                             onMapCreated: (GoogleMapController controller) {
                               _controller.complete(controller);
                             },
@@ -183,16 +211,19 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
                                 child: Align(
                                   alignment: Alignment.topRight,
                                   child: Container(
-                                      padding: EdgeInsets.all(10),
+                                      padding: const EdgeInsets.all(10),
                                       color: Colors.white,
-                                      child: CircularProgressIndicator()),
+                                      child: SizedBox(
+                                          width: 50,
+                                          height: 50,
+                                          child: const CustomLoadingWidget())),
                                 ),
                               )
-                            : SizedBox(),
+                            : const SizedBox(),
                       ],
                     )
-                  : Center(
-                      child: CircularProgressIndicator(),
+                  : const Center(
+                      child: CustomLoadingWidget(),
                     )),
           Container(
             width: MediaQuery.sizeOf(context).width,
@@ -215,7 +246,9 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
                     iconData: Icons.my_location_outlined,
                   ),
                   GestureDetector(
-                    onTap: _showIconsModal,
+                    onTap: () {
+                      _showIconsModal(context);
+                    },
                     child: Container(
                       height: 50,
                       decoration: BoxDecoration(
@@ -254,118 +287,16 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
     );
   }
 
-  void _showIconsModal() {
+  void _showIconsModal(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      builder: (showModalBottomSheetContext) =>
-          Consumer<LoactionIconMapViewmodel>(
-        builder: (context, value, child) => GridView.builder(
-          padding: const EdgeInsets.all(25),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 5,
-            mainAxisSpacing: 5.0,
-            crossAxisSpacing: 5.0,
-            childAspectRatio: 1.0,
-          ),
-          itemCount: value.modelList.length + 2,
-          itemBuilder: (context, index) {
-            if (index == 0) {
-              return Container(
-                child: IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.monetization_on_outlined,
-                      color: AppTheme.themeData.primaryColor,size: 36,
-                    )),
-              );
-            }
-            if (index == 1) {
-              return Container(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      Icons.monetization_on_outlined,
-                      color: AppTheme.themeData.primaryColor,
-                    ),
-                    Text(
-                      value.totalMarkerIconToken.toString(),
-                      style: TextStyle(color: AppTheme.themeData.primaryColor),
-                    )
-                  ],
-                ),
-              );
-            }
-
-            return GestureDetector(
-              onTap: () async {
-                _selectLocationIcon(value.modelList[index - 2].price!,value.modelList[index - 2].iconPath!,
-                    showModalBottomSheetContext);
-              },
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Flexible(
-                      child: Image.network(
-                    '${ApiConstants.baseUrl}${value.modelList[index - 2].iconPath}',
-                    fit: BoxFit.fitHeight,
-                  )),
-                  Text(value.modelList[index - 2].iconName!),
-                  value.modelList[index - 2].price == 0
-                      ? Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                              Text(
-                                "Free",
-                                style: TextStyle(
-                                    color: AppTheme.themeData.primaryColor),
-                              ),
-                            ])
-                      : Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(value.modelList[index - 2].price.toString(),
-                                style: TextStyle(
-                                    color: AppTheme.themeData.primaryColor)),
-                            SizedBox(
-                              width: 1,
-                            ),
-                            Icon(Icons.monetization_on_outlined,
-                                size: 20,
-                                color: AppTheme.themeData.primaryColor)
-                          ],
-                        )
-                ],
-              ),
-            );
-          },
-        ),
+      builder: (modalContext) => IconPickerModal(
+        onIconSelected: (int price, String iconPath, BuildContext modalContext) {
+          _selectLocationIcon(price, iconPath, modalContext);
+        },
       ),
     );
   }
 }
 
-class MapIcon extends StatelessWidget {
-  const MapIcon({super.key, required this.iconData, required this.onPressed});
-  final IconData iconData;
-  final VoidCallback onPressed;
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      width: 50,
-      decoration: BoxDecoration(
-        color: AppTheme.themeData.primaryColor,
-        borderRadius: BorderRadius.circular(45),
-      ),
-      child: IconButton(
-        onPressed: onPressed,
-        icon: Icon(
-          iconData,
-          color: Colors.white,
-        ),
-      ),
-    );
-  }
-}

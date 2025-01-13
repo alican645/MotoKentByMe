@@ -1,16 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/services/iapi_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/api_constants.dart';
 
 class DioService extends IApiService{
   static final DioService _instance = DioService._internal();
   factory DioService() => _instance;
   DioService._internal();
+
   final Dio _dio = Dio(
     BaseOptions(
+      connectTimeout: const Duration(seconds: 20),
       baseUrl: ApiConstants.baseUrl,
       headers: {"Content-Type": "application/json"},
 
@@ -20,8 +22,8 @@ class DioService extends IApiService{
   // Token'in geçerliliğini kontrol eden fonksiyon
   @override
   Future<bool> isTokenExpired() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('jwt_token');
+
+    String? token =await SharedPreferencesHelper().getValue<String>('jwt_token');
     if (token == null) return true; // Eğer token yoksa geçersiz
     return JwtDecoder.isExpired(token);
   }
@@ -29,9 +31,9 @@ class DioService extends IApiService{
   // Token yenileyen fonksiyon
   @override
   Future<void> refreshToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? refreshToken = prefs.getString('refresh_token');
-    String? accessToken = prefs.getString('jwt_token');
+
+    String? refreshToken =await SharedPreferencesHelper().getValue<String>('refresh_token');
+    String? accessToken =await SharedPreferencesHelper().getValue<String>('jwt_token');
 
     if (refreshToken == null || accessToken == null) {
       throw Exception('Token bulunamadı.');
@@ -49,8 +51,8 @@ class DioService extends IApiService{
       final newAccessToken = response.data['accessToken'];
       final newRefreshToken = response.data['refreshToken'];
 
-      await prefs.setString('jwt_token', newAccessToken);
-      await prefs.setString('refresh_token', newRefreshToken);
+      await SharedPreferencesHelper().setValue<String>('jwt_token', newAccessToken);
+      await SharedPreferencesHelper().setValue<String>('refresh_token', newRefreshToken);
     } else {
       throw Exception('Token yenileme başarısız oldu: ${response.statusCode}');
     }
@@ -62,8 +64,7 @@ class DioService extends IApiService{
     if (await isTokenExpired()) {
       await refreshToken();
     }
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('jwt_token');
+    String? token =await SharedPreferencesHelper().getValue<String>('jwt_token');
     if (token == null) {
       throw Exception('Token alınamadı.');
     }
@@ -113,7 +114,7 @@ class DioService extends IApiService{
 
       );
     } on DioException catch (e) {
-      throw Exception('POST isteğinde hata oluştu: ${e.message}');
+      throw Exception('POST isteğinde hata oluştu: ${e.toString()}');
     }
   }
 

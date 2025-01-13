@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/constants/enums.dart';
 import 'package:moto_kent/pages/CallForHelpPage/call_for_help_viewmodel.dart';
+import 'package:moto_kent/pages/CallForHelpPage/widgets/call_for_help_view_item.dart';
+import 'package:moto_kent/pages/CallForHelpPage/widgets/call_for_help_view_item_progress_indicator.dart';
 import 'package:provider/provider.dart';
 
 class CallForHelpView extends StatefulWidget {
@@ -28,7 +29,7 @@ class _CallForHelpViewState extends State<CallForHelpView> {
         var count=(response.data as Map<String,dynamic>)["nearbyCountUser"];
         Fluttertoast.showToast(
             msg:
-                "Yardım çağırınız yakınınızda bulunan ${count} kişiye iletildi");
+                "Yardım çağırınız yakınınızda bulunan $count kişiye iletildi");
       }
     } catch (ex) {
       Fluttertoast.showToast(msg: 'Hata Yardım Çağırısı Gönderilemedi');
@@ -75,8 +76,6 @@ class _CallForHelpViewState extends State<CallForHelpView> {
                     path: "assets/images/sorun_yardimi.png",
                     explanation: "Kaza Yardımı",
                     onPressed: () async {
-                      print("Kaza yardımı");
-
 
                       sendCallForHelp(CallForHelpEnum.kazaYardim);
                     },
@@ -106,96 +105,6 @@ class _CallForHelpViewState extends State<CallForHelpView> {
   }
 }
 
-class CallForHelpViewItemProgressIndicator extends StatelessWidget {
-  const CallForHelpViewItemProgressIndicator({
-    super.key,
-  });
 
-  @override
-  Widget build(BuildContext context) {
-    return Flexible(
-      child: Container(
-        width: 150,
-        height: 200,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(45),
-            border:
-                Border.all(width: 2, color: AppTheme.themeData.primaryColor)),
-        child: const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
-      ),
-    );
-  }
-}
 
-class CallForHelpViewCountItem extends StatelessWidget {
-  const CallForHelpViewCountItem({
-    super.key,
-  });
 
-  @override
-  Widget build(BuildContext context) {
-    return Flexible(
-      child: Container(
-        width: 150,
-        height: 200,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(45),
-            border:
-                Border.all(width: 2, color: AppTheme.themeData.primaryColor)),
-        child: const Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class CallForHelpViewItem extends StatelessWidget {
-  const CallForHelpViewItem(
-      {super.key,
-      required this.path,
-      required this.explanation,
-      required this.onPressed});
-  final String path;
-  final String explanation;
-  final VoidCallback onPressed;
-  @override
-  Widget build(BuildContext context) {
-    return Flexible(
-      child: GestureDetector(
-        onTap: onPressed,
-        child: Container(
-          width: 150,
-          height: 200,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(45),
-              border:
-                  Border.all(width: 2, color: AppTheme.themeData.primaryColor)),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Flexible(
-                  child: Image.asset(
-                    path,
-                    fit: BoxFit.fill,
-                    width: MediaQuery.sizeOf(context).width / 4,
-                  ),
-                ),
-                Text(explanation)
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}

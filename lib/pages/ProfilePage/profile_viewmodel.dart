@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/models/user_model.dart';
 import 'package:moto_kent/models/user_photos_model.dart';
-import 'package:moto_kent/services/api_service.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
 
 class ProfileViewmodel extends ChangeNotifier {
@@ -43,7 +41,12 @@ class ProfileViewmodel extends ChangeNotifier {
     fetchUserPhoto3(guid);
   }
 
-
+  Future<void> initialize(String guid) async {
+   Future.wait([
+     fetchUserProfile(guid),
+     fetchUserPhoto3(guid)
+   ]);
+  }
 
 
 }

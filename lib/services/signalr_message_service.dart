@@ -5,9 +5,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:logging/logging.dart';
 import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/models/chat_group_message_model.dart';
 import 'package:moto_kent/pages/MessagePage/message_viewmodel.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:signalr_netcore/ihub_protocol.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 
@@ -31,17 +32,17 @@ class SignalRMessageService {
 
   // Token'in geçerliliğini kontrol eden fonksiyon
   Future<bool> isTokenExpired() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('jwt_token');
+
+    String? token =await SharedPreferencesHelper().getValue<String>('jwt_token');
     if (token == null) return true; // Eğer token yoksa geçersiz
     return JwtDecoder.isExpired(token);
   }
 
   // Token yenileyen fonksiyon
   Future<void> refreshToken() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? refreshToken = prefs.getString('refresh_token');
-    String? accessToken = prefs.getString('jwt_token');
+
+    String? refreshToken =await SharedPreferencesHelper().getValue<String>('refresh_token');
+    String? accessToken =await SharedPreferencesHelper().getValue<String>('jwt_token');
 
     if (refreshToken == null || accessToken == null) {
       throw Exception('Token bulunamadı.');
@@ -59,8 +60,8 @@ class SignalRMessageService {
       final newAccessToken = response.data['accessToken'];
       final newRefreshToken = response.data['refreshToken'];
 
-      await prefs.setString('jwt_token', newAccessToken);
-      await prefs.setString('refresh_token', newRefreshToken);
+      await SharedPreferencesHelper().setValue<String>('jwt_token', newAccessToken);
+      await SharedPreferencesHelper().setValue<String>('refresh_token', newRefreshToken);
     } else {
       throw Exception('Token yenileme başarısız oldu: ${response.statusCode}');
     }
@@ -71,8 +72,8 @@ class SignalRMessageService {
     if (await isTokenExpired()) {
       await refreshToken();
     }
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('jwt_token');
+
+    String? token =await SharedPreferencesHelper().getValue<String>('jwt_token');
     if (token == null) {
       throw Exception('Token alınamadı.');
     }
@@ -171,35 +172,6 @@ class SignalRMessageService {
       print("SignalR bağlantısı aktif değil.");
     }
   }
-
-  // /// Gruba yeni bir mesaj gönder
-  // Future<void> sendMessageToGroup(ChatGroupMessageModel message) async {
-  //   if (_connection.state == HubConnectionState.Connected) {
-  //     try {
-  //       await _connection
-  //           .invoke("NewChatGroupMessage1", args: [message.toJson()]);
-  //       print("Mesaj gruba gönderildi: ${message.content}");
-  //     } catch (e) {
-  //       print("Mesaj gönderme hatası: $e");
-  //     }
-  //   } else {
-  //     print("SignalR bağlantısı aktif değil.");
-  //   }
-  // }
-  //
-  // /// Tüm istemcilere yeni bir grup bildirimi gönder
-  // Future<void> notifyNewChatGroup(dynamic chatGroup) async {
-  //   if (_connection.state == HubConnectionState.Connected) {
-  //     try {
-  //       await _connection.invoke("NewChatGroupMessage1", args: [chatGroup]);
-  //       print("Yeni grup bildirimi gönderildi.");
-  //     } catch (e) {
-  //       print("Grup bildirimi gönderme hatası: $e");
-  //     }
-  //   } else {
-  //     print("SignalR bağlantısı aktif değil.");
-  //   }
-  // }
 
   /// Bağlantıyı durdur
   void dispose() {

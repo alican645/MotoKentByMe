@@ -1,14 +1,12 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/components/custom_app_button.dart';
+import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/models/post_model.dart';
-import 'package:moto_kent/pages/ExplorePage/explore_viewmodel.dart';
 import 'package:moto_kent/pages/PostSharing/post_sharing_viewmodel.dart';
 import 'package:moto_kent/utils/utils.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 
 
@@ -45,8 +43,8 @@ class _PostSharingViewState extends State<PostSharingView> {
   }
 
   Future<void> _submit() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId=await prefs.getString("user_id");
+
+    String? userId=await SharedPreferencesHelper().getValue<String>("user_id");
     String content = contentController.text;
     String contentTitle = contentTitleContreller.text;
     var postModel = PostModel(
@@ -99,6 +97,7 @@ class _PostSharingViewState extends State<PostSharingView> {
               ),
               const SizedBox(height: 20),
               TextFormField(
+                maxLength: 100,
                 controller: contentTitleContreller,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(

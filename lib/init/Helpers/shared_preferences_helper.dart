@@ -16,34 +16,23 @@ class SharedPreferencesHelper {
   }
 
   /// Veri yazma işlemi (Generic)
-  Future<void> setValue<T>(String key, T value) async {
-    if (_preferences == null) return;
-
-    if (value is String) {
-      await _preferences!.setString(key, value);
-    } else if (value is int) {
-      await _preferences!.setInt(key, value);
-    } else if (value is double) {
-      await _preferences!.setDouble(key, value);
-    } else if (value is bool) {
-      await _preferences!.setBool(key, value);
-    } else if (value is List<String>) {
-      await _preferences!.setStringList(key, value);
-    } else {
-      throw UnsupportedError("Bu veri tipi desteklenmiyor: ${T.runtimeType}");
-    }
+  Future<T?> getValue<T>(String key) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (T == String) return prefs.getString(key) as T?;
+    if (T == int) return prefs.getInt(key) as T?;
+    if (T == bool) return prefs.getBool(key) as T?;
+    if (T == double) return prefs.getDouble(key) as T?;
+    if (T == List<String>) return prefs.getStringList(key) as T?;
+    return null;
   }
 
-  /// Veri okuma işlemi (Generic)
-  T? getValue<T>(String key) {
-    if (_preferences == null) return null;
-
-    Object? value = _preferences!.get(key);
-
-    if (value is T) {
-      return value;
-    }
-    return null;
+  Future<void> setValue<T>(String key, T value) async {
+    final prefs = await SharedPreferences.getInstance();
+    if (value is String) await prefs.setString(key, value);
+    if (value is int) await prefs.setInt(key, value);
+    if (value is bool) await prefs.setBool(key, value);
+    if (value is double) await prefs.setDouble(key, value);
+    if (value is List<String>) await prefs.setStringList(key, value);
   }
 
   /// Anahtara bağlı değeri sil

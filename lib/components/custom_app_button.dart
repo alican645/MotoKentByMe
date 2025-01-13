@@ -24,10 +24,10 @@ class CustomAppButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(16)),
         child:  Center(
           child: Padding(
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Text(
               btnText,
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
           ),
         ),

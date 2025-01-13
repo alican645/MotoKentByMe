@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/models/chat_group_model.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
-import 'package:moto_kent/utils/data_objects.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:moto_kent/constants/data_objects.dart';
 
 class ChatGroupsViewmodel extends ChangeNotifier {
   List<ChatGroupModel> _groupsList = [];
@@ -39,11 +39,11 @@ class ChatGroupsViewmodel extends ChangeNotifier {
   }
 
   Future<Response> joinChatGroup(String groupId) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId= prefs.getString("user_id");
+
+    String? userId= await SharedPreferencesHelper().getValue<String>("user_id");
     var object=DataObjects.joinGroup(groupId, userId!);
-    var response=await apiService.postRequest(ApiConstants.joinChatGroups,object);
+    var response=await apiService.postRequest(ApiConstants.joinChatGroup,object);
     return response;
   }
 }
-//8a7480f4-dad5-48c5-dd3a-08dd14cd563e
+

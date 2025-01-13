@@ -1,12 +1,11 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:moto_kent/components/custom_app_button.dart';
 import 'package:moto_kent/components/custom_textfield.dart';
+import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/models/chat_group_model.dart';
 import 'package:moto_kent/pages/GroupsPage/CreateChatGroupPage/create_group_viewmodel.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CreateChatGroupView extends StatefulWidget {
   CreateChatGroupView({super.key});
@@ -29,8 +28,8 @@ class _CreateChatGroupViewState extends State<CreateChatGroupView> {
     context.read<CreateChatGroupViewmodel>().fetchPostCategoryList2();
 
     Future<void> createChatGroup() async {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? userId = prefs.getString("user_id");
+
+      String? userId = await SharedPreferencesHelper().getValue<String>("user_id");
       var chatGroupModel = ChatGroupModel();
       chatGroupModel.name = _nameController.text;
       chatGroupModel.groupDescription = _descriptionController.text;
@@ -65,18 +64,18 @@ class _CreateChatGroupViewState extends State<CreateChatGroupView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(
-                  width: 200,
-                  child: CustomTextField(
-                      controller: _memberCountController,
-                      labelText: "Maks Üye Sayısı")),
-              SizedBox(
-                width: 200,
+              Flexible(
+                child: CustomTextField(
+                    controller: _memberCountController,
+                    labelText: "Maks Üye Sayısı"),
+              ),
+              Flexible(
                 child: Consumer<CreateChatGroupViewmodel>(
                   builder: (BuildContext context, CreateChatGroupViewmodel vm,
                       Widget? child) {
                     return DropdownButtonFormField2<String>(
                       isExpanded: true,
+                
                       value: selectedPostKategori, // Tür PostCategoryModel
                       items: vm.postCategoryModelList.map(
                         (e) {

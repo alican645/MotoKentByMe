@@ -3,13 +3,15 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:moto_kent/App/app_theme.dart';
-import 'package:moto_kent/init/Locator/locator.dart';
+import 'package:moto_kent/init/Helpers/MediaQueryHelper.dart';
 import 'package:moto_kent/pages/CallForHelpPage/%20call_for_help_view.dart';
 import 'package:moto_kent/pages/CallForHelpPage/call_for_help_viewmodel.dart';
 import 'package:moto_kent/pages/ExplorePage/explore_view.dart';
 import 'package:moto_kent/pages/ExplorePage/explore_viewmodel.dart';
 import 'package:moto_kent/pages/GroupsPage/CreateChatGroupPage/create_chat_group_view.dart';
 import 'package:moto_kent/pages/GroupsPage/CreateChatGroupPage/create_group_viewmodel.dart';
+import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/group_setting_view.dart';
+import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/group_setting_view_nodel.dart';
 import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_view.dart';
 import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_viewmodel.dart';
 import 'package:moto_kent/pages/GroupsPage/groups_view.dart';
@@ -20,15 +22,22 @@ import 'package:moto_kent/pages/LoginView/login_page.dart';
 import 'package:moto_kent/pages/LoginView/login_viewmodel.dart';
 import 'package:moto_kent/pages/MessagePage/message_view.dart';
 import 'package:moto_kent/pages/MessagePage/message_viewmodel.dart';
+import 'package:moto_kent/pages/MyFavoritePostsPage/my_favorite_posts_view.dart';
+import 'package:moto_kent/pages/MyFavoritePostsPage/my_favorite_posts_viewmodel.dart';
+import 'package:moto_kent/pages/OtherProfilePage/other_profile_view.dart';
+import 'package:moto_kent/pages/OtherProfilePage/other_profile_viewmodel.dart';
+import 'package:moto_kent/pages/PostDetailPage/post_detail_view.dart';
+import 'package:moto_kent/pages/PostDetailPage/post_detail_viewmodel.dart';
 import 'package:moto_kent/pages/PostSharing/post_sharing_view.dart';
 import 'package:moto_kent/pages/PostSharing/post_sharing_viewmodel.dart';
 import 'package:moto_kent/pages/ProfilePage/profile_page.dart';
 import 'package:moto_kent/pages/ProfilePage/profile_viewmodel.dart';
 import 'package:moto_kent/pages/RegisterPage/register_page.dart';
 import 'package:moto_kent/pages/RegisterPage/register_viewmodel.dart';
+import 'package:moto_kent/pages/SearchPage/search_view.dart';
+import 'package:moto_kent/pages/SearchPage/search_viewmodel.dart';
 import 'package:moto_kent/services/firebase_notification_service.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:moto_kent/router.dart';
 
 import 'init/Helpers/shared_preferences_helper.dart'; // Router dosya
@@ -43,7 +52,7 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(FirebaseNotificationService.firebaseMessagingBackgroundHandler);
   String initialRoute =
       await getInitialRoute(); // İlk rotayı belirlemek için token kontrolü yapılacak
-  setupLocator();
+
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(
         create: (context) => ExploreViewmodel(), child: const ExploreView()),
@@ -62,8 +71,12 @@ void main() async {
     ChangeNotifierProvider(
         create: (context) => ChatGroupsViewmodel(),
         child: const ChatGroupsView()),
-    ChangeNotifierProvider(
-        create: (context) => MyGroupsViewmodel(), child: const MyGroupsView()),
+    ChangeNotifierProvider(create: (context) => MyGroupsViewmodel(), child: const MyGroupsView()),
+    ChangeNotifierProvider(create: (context) => PostDetailViewmodel(), child: const PostDetailView()),
+    ChangeNotifierProvider(create: (context) => SearchViewmodel(), child:  const SearchView()),
+    ChangeNotifierProvider(create: (context) => OtherProfileViewmodel(), child:  const OtherProfileView()),
+    ChangeNotifierProvider(create: (context) => GroupSettingViewmodel(), child:  const GroupSettingView()),
+    ChangeNotifierProvider(create: (context) => MyFavoritePostsViewmodel(), child:  const MyFavoritePostsView()),
     ChangeNotifierProvider(
         create: (context) => SendMessageViewmodel(), child: MessageView()),
     ChangeNotifierProvider(
@@ -89,8 +102,8 @@ void main() async {
 }
 
 Future<String> getInitialRoute() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  String? token = prefs.getString('jwt_token');
+
+  String? token =await SharedPreferencesHelper().getValue<String>('jwt_token');
 
   // Eğer token varsa, anasayfaya yönlendir
   if (token != null && token.isNotEmpty) {
@@ -106,6 +119,7 @@ class MyApp extends StatelessWidget {
   const MyApp({required this.initialRoute, super.key});
   @override
   Widget build(BuildContext context) {
+    MediaQueryHelper.init(context,designHeight: 830,designWidth:393 );
     return MaterialApp.router(
       routerConfig: router, // Router'ı kullanarak uygulamayı başlatın
       title: 'MotoKent',

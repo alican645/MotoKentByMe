@@ -2,10 +2,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/constants/enums.dart';
+import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/models/call_for_help_model.dart';
-import 'package:moto_kent/models/last_location_model.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CallForHelpViewmodel extends ChangeNotifier {
   final _dio = DioService();
@@ -31,10 +30,9 @@ class CallForHelpViewmodel extends ChangeNotifier {
       _isLoadingKY = false;
     }
     notifyListeners();
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId = prefs.getString("user_id");
-    double? latitude = prefs.getDouble("last_location_latidue");
-    double? longitude = prefs.getDouble("last_location_longitude");
+    String? userId =await SharedPreferencesHelper().getValue<String>("user_id");
+    double? latitude =await SharedPreferencesHelper().getValue<double>("last_location_latidue");
+    double? longitude =await SharedPreferencesHelper().getValue<double>("last_location_longitude");
     //print('Anlık Konum: ${position.latitude}, ${position.longitude}');
     var callForHelpModel = CallForHelpModel(
         userId: userId,

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/components/my_button.dart';
 import 'package:moto_kent/components/my_textfile.dart';
 import 'package:moto_kent/models/register_model.dart';
 import 'package:moto_kent/pages/RegisterPage/register_viewmodel.dart';
-import 'package:moto_kent/services/firebase_notification_service.dart';
 import 'package:moto_kent/widgets/loading_overlay.dart';
 import 'package:provider/provider.dart';
 
@@ -22,38 +22,38 @@ class RegisterPageState extends State<RegisterPage> {
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
 
+  void initState() {
+    super.initState();
+  }
 
-
-void initState(){
-  super.initState();
-
-}
-
-  Future<void> registerUser () async{
+  Future<void> registerUser() async {
     var registerModel = RegisterModel(
-      password: passwordController.text,
-      email: emailController.text,
-      confirmPassword: confirmPasswordController.text,
-      fullName: fullNameController.text
-    );
+        password: passwordController.text,
+        email: emailController.text,
+        confirmPassword: confirmPasswordController.text,
+        fullName: fullNameController.text);
 
     if (registerModel.password != registerModel.confirmPassword) {
       _showErrorDialog(context, 'Hata', 'Şifreler eşleşmiyor.');
       return;
     }
 
-    try{
-      var response=await context.read<RegisterViewmodel>().registerRequest(registerModel.toJson());
+    try {
+      var response = await context
+          .read<RegisterViewmodel>()
+          .registerRequest(registerModel.toJson());
 
-      if(!mounted) return;
+      if (!mounted) return;
 
       if (response.statusCode == 201) {
-        _showSuccessDialog(context,"Başarılı","Kayıt Başarılı");
+        _showSuccessDialog(context, "Başarılı", "Kayıt Başarılı");
       } else {
-        _showErrorDialog(context, "Başarısız", "Kayıt Bşarısız lütfen tekrar deneyiniz");
+        _showErrorDialog(
+            context, "Başarısız", "Kayıt Bşarısız lütfen tekrar deneyiniz");
       }
-    }catch(e){
-      _showErrorDialog(context, "Başarısız", e.toString());
+    } catch (e) {
+      _showErrorDialog(
+          context, "Başarısız", "Kayıt Bşarısız lütfen tekrar deneyiniz");
     }
   }
 
@@ -98,41 +98,24 @@ void initState(){
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[300],
-      body: SafeArea(
-        child: Consumer<RegisterViewmodel>(builder: (context, value, child) =>
-           LoadingOverlay(
-            isLoading: value.isCompleted,
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 50.0), // Alt kısma ek boşluk
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: LoadingOverlay(
+        isLoading: context.watch<RegisterViewmodel>().isCompleted,
+        child: Scaffold(
+          backgroundColor: AppTheme.themeData.primaryColor,
+          body: SafeArea(
+            child: Consumer<RegisterViewmodel>(
+              builder: (context, value, child) => SingleChildScrollView(
+                physics: NeverScrollableScrollPhysics(),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 50),
-
                     // Logo
                     const Icon(
                       Icons.person_add,
                       size: 100,
                     ),
-
-                    const SizedBox(height: 50),
-
-                    // "MotoKent'e hoş geldiniz" başlığı
-                    const Text(
-                      "MotoKent'e Hoşgeldiniz!",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 24, // Daha büyük font boyutu
-                        fontWeight: FontWeight.bold, // Kalın yazı stili
-                      ),
-                    ),
-
-                    const SizedBox(height: 50),
-
-                    // Hoş geldiniz
                     Text(
                       "Yeni bir hesap oluşturun",
                       style: TextStyle(
@@ -142,78 +125,65 @@ void initState(){
                     ),
 
                     const SizedBox(height: 25),
-
-                    // Ad soyad textfield
-                    MyTextField(
-                      controller: fullNameController,
-                      hintText: 'Ad Soyad',
-                      obscureText: false,
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // Email textfield
-                    MyTextField(
-                      controller: emailController,
-                      hintText: 'Email',
-                      obscureText: false,
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // Şifre textfield
-                    MyTextField(
-                      controller: passwordController,
-                      hintText: 'Şifre',
-                      obscureText: true,
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    // Şifre tekrar textfield
-                    MyTextField(
-                      controller: confirmPasswordController,
-                      hintText: 'Şifre Tekrar',
-                      obscureText: true,
-                    ),
-
-                    const SizedBox(height: 25),
-
-                    // Kayıt ol butonu
-                    MyButton(
-                      onTap: () async {
-                        await registerUser();
-                      },
-                      text: "Kayıt Ol",
-                    ),
-                    TextButton(onPressed: () async  {
-                      await registerUser();
-                    }, child: const Text("Kayıt Ol")),
-                    const SizedBox(height: 50),
-
-                    // Zaten üye misiniz? Giriş yapın
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Zaten üye misiniz?',
-                          style: TextStyle(color: Colors.grey[700]),
+                    Container(
+                      height: MediaQuery.sizeOf(context).height,
+                      width: MediaQuery.sizeOf(context).width,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(16),
+                          topRight: const Radius.circular(16),
                         ),
-                        const SizedBox(width: 4),
-                        GestureDetector(
-                          onTap: () {
-                            context.go('/login_page');
-                          },
-                          child: const Text(
-                            'Kayıt Ol!',
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontWeight: FontWeight.bold,
-                            ),
+                      ),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 50,),
+                          MyTextField(
+                          controller: fullNameController,
+                          hintText: 'Ad Soyad',
+                          obscureText: false,
+                        ),
+
+                          const SizedBox(height: 10),
+
+                          // Email textfield
+                          MyTextField(
+                            controller: emailController,
+                            hintText: 'Email',
+                            obscureText: false,
                           ),
-                        ),
-                      ],
+
+                          const SizedBox(height: 10),
+
+                          // Şifre textfield
+                          MyTextField(
+                            controller: passwordController,
+                            hintText: 'Şifre',
+                            obscureText: true,
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // Şifre tekrar textfield
+                          MyTextField(
+                            controller: confirmPasswordController,
+                            hintText: 'Şifre Tekrar',
+                            obscureText: true,
+                          ),
+
+                          const SizedBox(height: 25),
+
+                          // Kayıt ol butonu
+                          MyButton(
+                            onTap: () async {
+                              await registerUser();
+                            },
+                            text: "Kayıt Ol",
+                          ),],
+                      ),
                     ),
+                    // Ad soyad textfield
+
                   ],
                 ),
               ),

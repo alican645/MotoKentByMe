@@ -1,9 +1,9 @@
+
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/components/chat_group_item.dart';
 
 import 'package:moto_kent/pages/GroupsPage/groups_viewmodel.dart';
+import 'package:moto_kent/pages/GroupsPage/widgets/bottom_butons_bar.dart';
 import 'package:moto_kent/services/signalr_service2.dart';
 import 'package:provider/provider.dart';
 
@@ -37,7 +37,7 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
       if (response.statusCode == 200) {
         showDialog(
           context: context,
-          builder: (context) => AlertDialog(
+          builder: (context) => const AlertDialog(
             title: Text("Gruba Katıldınız"),
           ),
         );
@@ -56,19 +56,19 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
     showDialog(
       context: context,
       builder: (joinChatGropShowDialogContext) => AlertDialog(
-        title: Text("Bu gruba katılmak ister misiniz?"),
+        title: const Text("Bu gruba katılmak ister misiniz?"),
         actions: [
           TextButton(
               onPressed: () {
                 Navigator.pop(joinChatGropShowDialogContext);
               },
-              child: Text("İptal")),
+              child: const Text("İptal")),
           TextButton(
               onPressed: () async {
                 Navigator.pop(joinChatGropShowDialogContext);
                 await joinChatGroup(groupId);
               },
-              child: Text("Katıl")),
+              child: const Text("Katıl")),
         ],
       ),
     );
@@ -103,7 +103,7 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
                         borderRadius: BorderRadius.circular(45),
                         color: Colors.grey[300]
                       ),
-                      child: Center(
+                      child: const Center(
                         child: Text("Yeni Grupları Görüntüle"),
                       ),
                     ),
@@ -128,74 +128,12 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
             ),
           ),
         ),
-        Container(
-          width: MediaQuery.sizeOf(context).width,
-          decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.bottomCenter,
-                end: Alignment.topCenter,
-                colors: [
-                  AppTheme.themeData.colorScheme.primary,
-                  Colors.white,
-                ],)
-          ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildButton(
-                    onPressed: () {
-                      context.go("/chat_groups_page/my_groups");
-                    },
-                    icon: const Icon(
-                      Icons.person_2_outlined,
-                      size: 48,
-                    ),
-                    content: "Gruplarım"),
-                _buildButton(
-                    onPressed: () {
-                      context.go("/chat_groups_page/create_chat_group");
-                    },
-                    icon: const Icon(
-                      Icons.add,
-                      size: 48,
-                    ),
-                    content: "Oluştur"),
-                _buildButton(
-                    onPressed: () {},
-                    icon: const Icon(
-                      Icons.search_rounded,
-                      size: 48,
-                    ),
-                    content: "Ara")
-              ],
-            ),
-          ),
-        )
+        const BottomButonsBar()
       ],
     );
   }
 
-  GestureDetector _buildButton(
-      {required VoidCallback onPressed,
-      required Icon icon,
-      required String content}) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Column(
-        children: [
-          CircleAvatar(
-            radius: 30,
-            backgroundColor: Theme.of(context).colorScheme.secondary,
-            child: icon,
-          ),
-          Text(
-            content,
-            style: Theme.of(context).textTheme.headlineSmall,
-          )
-        ],
-      ),
-    );
-  }
+
 }
+
+

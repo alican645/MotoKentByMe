@@ -5,114 +5,7 @@ import 'package:moto_kent/models/paginated_posts_model.dart';
 import 'package:moto_kent/models/post_model.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
 
-// class ExploreViewmodel extends ChangeNotifier {
-//   List<dynamic> _postCategoryModelList = [];
-//   List<dynamic> get postCategoryModelList => _postCategoryModelList;
-//
-//   final List<PostModel> _posts = [];
-//   List<PostModel> get posts => _posts;
-//
-//   int _currentPage = 1;
-//   int get currentPage =>_currentPage ;
-//   void changeCurrentPage(int value){
-//     _currentPage=value;
-//     notifyListeners();
-//   }
-//
-//   int _totalPages=1;
-//   int get totalPages=>_totalPages;
-//
-//   bool _isLoading = false;
-//   bool get isLoading => _isLoading;
-//
-//
-//
-//   final DioService3 _dio = DioService3();
-//
-//   Future<void> fetchPostCategoryList() async {
-//     var response = await _dio.getRequest(ApiConstants.getAllPostCategoriesFormFile);
-//     _postCategoryModelList=response.data.map((item) => CategoryFormFileModel.fromJson(item)).toList();
-//     notifyListeners();
-//   }
-//
-//   void resetPagination() {
-//     _currentPage = 1;
-//     _totalPages = 1;
-//     _posts.clear();
-//     notifyListeners();
-//   }
-//
-//
-//   bool _isAllOrByCategory=true;
-//   bool get isAllOrByCategory=>_isAllOrByCategory;
-//   void changeisAllOrByCategory(){
-//     _isAllOrByCategory=!_isAllOrByCategory;
-//     notifyListeners();
-//   }
-//
-//   Future<void> fetchAllOrCategoryId() async{
-//     if(_isAllOrByCategory){
-//       fetchPostList();
-//     }else{
-//       fetchPostListByCategoryId(categoryID);
-//     }
-//
-//   }
-//
-//
-//   Future<void> fetchPostList() async {
-//     _isAllOrByCategory=true;
-//     if (isLoading || _currentPage > _totalPages) return;
-//     _isLoading = true;
-//     notifyListeners();
-//
-//     try{
-//       var response=await _dio.getRequest('${ApiConstants.getPaginatedPosts}$_currentPage');
-//       var model = PaginatedPostsModel.fromJson(response.data);
-//       _posts.addAll(model.items!);
-//       _currentPage++;
-//       _totalPages = model.totalPages!;
-//     }catch(e){
-//       print('Hata: $e');
-//     }finally {
-//       _isLoading = false;
-//       notifyListeners();
-//     }
-//   }
-//
-//
-//   int categoryID=0;
-//   Future<void> fetchPostListByCategoryId(int categoryId) async{
-//     _isAllOrByCategory=false;
-//     categoryID=categoryId;
-//     if (isLoading || _currentPage > _totalPages) return;
-//     _isLoading = true;
-//     notifyListeners();
-//
-//     try{
-//       var response=await _dio.getRequest(ApiConstants.getPaginatedPostsByCategoryId(_currentPage, categoryId));
-//       var model = PaginatedPostsModel.fromJson(response.data);
-//       _posts.addAll(model.items!);
-//       _currentPage++;
-//       _totalPages = model.totalPages!;
-//     }catch(e){
-//       print('Hata: $e');
-//     }finally {
-//       _isLoading = false;
-//       notifyListeners();
-//     }
-//   }
-//
-//
-//
-//
-//   bool _showNewPostBtn=false;
-//   bool get showNewPostBtn=>_showNewPostBtn;
-//   void changeShowNewPostBtn(){
-//     _showNewPostBtn=!_showNewPostBtn;
-//     notifyListeners();
-//   }
-// }
+
 
 class ExploreViewmodel extends ChangeNotifier {
   List<dynamic> _postCategoryModelList = [];
@@ -177,7 +70,7 @@ class ExploreViewmodel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      var response = await _dio.getRequest('${ApiConstants.getPaginatedPostsByPageSize(_currentPage, 5)}');
+      var response = await _dio.getRequest(ApiConstants.getPaginatedPostsByPageSize(_currentPage, 5));
       var model = PaginatedPostsModel.fromJson(response.data);
       _posts.addAll(model.items!);
       _currentPage++;

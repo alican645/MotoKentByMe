@@ -16,10 +16,10 @@ class CategoryFormFileModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['id'] = this.id;
-    data['photoPath'] = this.photoPath;
-    data['uploadedDate'] = this.uploadedDate;
-    data['categoryName'] = this.categoryName;
+    data['id'] = id;
+    data['photoPath'] = photoPath;
+    data['uploadedDate'] = uploadedDate;
+    data['categoryName'] = categoryName;
     return data;
   }
 }

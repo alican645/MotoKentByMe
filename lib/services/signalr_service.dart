@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:moto_kent/constants/api_constants.dart';
-import 'package:moto_kent/main.dart';
-import 'package:moto_kent/models/post_model.dart';
 import 'package:moto_kent/pages/ExplorePage/explore_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:signalr_netcore/signalr_client.dart';

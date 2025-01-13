@@ -6,16 +6,22 @@ import 'package:moto_kent/services/dio_service_3.dart';
 
 class RegisterViewmodel extends ChangeNotifier{
   final DioService _dio = DioService();
-  bool _isCompleted=false;
+  bool _isCompleted=true;
   bool get isCompleted=>_isCompleted;
 
 
   Future<Response> registerRequest(Object object) async{
-    _isCompleted=false;
-    notifyListeners();
-    var response = await _dio.postRequestWithoutToken(ApiConstants.registerEndpoint,object);
-    _isCompleted=true;
-    notifyListeners();
-    return response;
+    try{
+      _isCompleted=false;
+      notifyListeners();
+      var response = await _dio.postRequestWithoutToken(ApiConstants.registerEndpoint,object);
+      _isCompleted=true;
+      notifyListeners();
+      return response;
+    }catch(ex){
+      _isCompleted=true;
+      notifyListeners();
+      throw Exception("Tekrar deneyiniz ");
+    }
   }
 }

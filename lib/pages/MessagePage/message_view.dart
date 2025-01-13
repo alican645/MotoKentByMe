@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:moto_kent/components/custom_textfield.dart';
+import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/models/chat_group_message_model.dart';
 import 'package:moto_kent/pages/MessagePage/message_viewmodel.dart';
+import 'package:moto_kent/pages/MessagePage/widgets/message_item.dart';
+import 'package:moto_kent/services/generic_signalr_service.dart';
 import 'package:moto_kent/services/signalr_message_service.dart';
-import 'package:moto_kent/utils/utils.dart';
 import 'package:provider/provider.dart';
 
 class MessageView extends StatefulWidget {
-  MessageView({super.key, this.groupId, this.userId, this.userName});
-  String? groupId;
-  String? userId;
-  String? userName;
+  const MessageView({super.key, this.groupId, this.userId, this.userName,this.groupName});
+  final String? groupId;
+  final String? userId;
+  final String? userName;
+  final String? groupName;
 
   @override
   State<MessageView> createState() => _MessageViewState();
@@ -20,15 +24,21 @@ class _MessageViewState extends State<MessageView> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _textEditingController = TextEditingController();
   late SignalRMessageService messageService;
+  //late GenericSignalRService messageService2;
+
+  late final String? groupName=widget.groupName;
+  late final String? groupId=widget.groupId;
+  late final String? userName=widget.userName;
+  late final String? userId=widget.userId;
 
   @override
   void initState() {
     super.initState();
 
     // Sayfa açıldığında listeyi en sona kaydır
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async  {
       firstScrollToBottom();
-      context.read<SendMessageViewmodel>().fetchMessageList(widget.groupId!);
+      context.read<SendMessageViewmodel>().fetchMessageList(groupId!);
 
       joinGroup();
 
@@ -36,23 +46,43 @@ class _MessageViewState extends State<MessageView> {
         setState(() {
           firstScrollToBottom();
         });
+
+        //   messageService2.onReceiveMessage=(arguments) async {
+        //     final json = arguments[0] as Map<String, dynamic>;
+        //     ChatGroupMessageModel message = ChatGroupMessageModel.fromJson(json);
+        //     await context.read<SendMessageViewmodel>().addLastMessage(message);
+        // };
+        //});
       };
-    });
-  }
+    }
+    );}
+
 
   @override
   void dispose() {
     super.dispose();
-    messageService.leaveGroup(widget.groupId!);
+    messageService.leaveGroup(groupId!);
+    //messageService2.invokeNameLeaveGroup;
   }
 
   Future<void> joinGroup() async {
     var viewmodel = context.read<SendMessageViewmodel>();
     messageService = SignalRMessageService(vm: viewmodel);
+    // messageService2 = GenericSignalRService(
+    //   invokeNameJoinGroup: 'CreateGroupChatConnection',
+    //   methodName: 'CreateGroupChatConnection',
+    //   endpoint: ApiConstants.signalRChatGroupEndpoint,
+    //   invokeNameLeaveGroup: 'BrokeGroupChatConnection'
+    // );
+
+    // messageService2.initializeSignalR().then((value) {
+    //   messageService2.initializeSignalR();
+    // },);
+
 
     messageService.initializeSignalR().then(
       (value) {
-        messageService.joinGroup(widget.groupId!);
+        messageService.joinGroup(groupId!);
       },
     );
   }
@@ -88,10 +118,10 @@ class _MessageViewState extends State<MessageView> {
 
   Future<void> sendMessage() async {
     var messageModel = ChatGroupMessageModel()
-      ..groupId = widget.groupId
+      ..groupId = groupId
       ..content = _textEditingController.text
-      ..senderUserId = widget.userId
-      ..senderUserName = widget.userName
+      ..senderUserId = userId
+      ..senderUserName = userName
       ..sentAt = DateTime.now();
 
     var response = await context
@@ -108,7 +138,12 @@ class _MessageViewState extends State<MessageView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("GroupName"),
+        title: Text(groupName!),
+        actions: [
+          IconButton(onPressed: () {
+            context.push("/chat_groups_page/my_groups/message_page/group_setting_page",extra: widget.groupId  );
+          }, icon: const Icon(Icons.settings))
+        ],
       ),
       body: Column(
         children: [
@@ -120,8 +155,8 @@ class _MessageViewState extends State<MessageView> {
                 itemCount: value.messageList.length,
                 itemBuilder: (context, index) => MessageItem(
                   messageModel: value.messageList[index],
-                  userId: widget.userId!,
-                  userName: widget.userName!,
+                  userId: userId!,
+                  userName: userName!,
                 ),
               ),
             ),
@@ -150,39 +185,3 @@ class _MessageViewState extends State<MessageView> {
   }
 }
 
-class MessageItem extends StatelessWidget {
-  const MessageItem(
-      {super.key,
-      required this.userId,
-      required this.userName,
-      required this.messageModel});
-  final String userId;
-  final String userName;
-  final ChatGroupMessageModel messageModel;
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: userId == messageModel.senderUserId
-          ? Alignment.centerRight
-          : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.all(10),
-        width: MediaQuery.sizeOf(context).width / 1.5,
-        decoration: BoxDecoration(
-            color: Colors.grey[300], borderRadius: BorderRadius.circular(16)),
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(messageModel.senderUserName!),
-            Text(messageModel.content!),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(Utils.getCurrentTime(messageModel.sentAt!)),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-}

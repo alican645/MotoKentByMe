@@ -21,12 +21,12 @@ class ChatGroupMessageModel {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['groupId'] = this.groupId;
-    data['senderUserId'] = this.senderUserId;
-    data['senderUserName'] = this.senderUserName;
-    data['content'] = this.content;
-    data['sentAt'] = this.sentAt?.toIso8601String();
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['groupId'] = groupId;
+    data['senderUserId'] = senderUserId;
+    data['senderUserName'] = senderUserName;
+    data['content'] = content;
+    data['sentAt'] = sentAt?.toIso8601String();
     return data;
   }
 }

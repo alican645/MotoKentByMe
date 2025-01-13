@@ -3,13 +3,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:logging/logging.dart';
 import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/services/current_laciton_service.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
 import 'package:moto_kent/services/firebase_notification_service.dart';
-import 'package:moto_kent/services/permission_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../App/app_theme.dart';
 
 class AppLayout extends StatefulWidget {
@@ -25,7 +23,7 @@ class AppLayout extends StatefulWidget {
 class _AppLayoutState extends State<AppLayout> {
   Key _navigationKey =
       UniqueKey(); // Sayfa yenilendiğinde widget'ı yeniden oluşturmak için key
-  FirebaseNotificationService? _notificationService = FirebaseNotificationService();
+  final FirebaseNotificationService _notificationService = FirebaseNotificationService();
   // Sayfa yenileme işlemi
   Future<void> _onRefresh() async {
     setState(() {
@@ -52,8 +50,8 @@ class _AppLayoutState extends State<AppLayout> {
 
   Future<void> addDeviceTokenToUser() async {
     await Future.delayed(const Duration(seconds: 3));
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? userId=await prefs.getString("user_id");
+
+    String? userId=await SharedPreferencesHelper().getValue<String>("user_id");
     DioService service = DioService();
 
     try{
@@ -102,7 +100,9 @@ class _AppLayoutState extends State<AppLayout> {
             elevation: 0,
             actions: [
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  context.push('/search_page');
+                },
                 icon: const Icon(Icons.search),
                 tooltip: 'Search',
               ),
@@ -112,7 +112,9 @@ class _AppLayoutState extends State<AppLayout> {
                 tooltip: 'Menu',
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  context.push('/my_favorite_posts');
+                },
                 icon: const Icon(Icons.star),
                 tooltip: 'Favorites',
               ),

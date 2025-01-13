@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -72,8 +71,8 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
       _markerList.add(Marker(
           position: LatLng(location.latitude!, location.longitude!),
           markerId: MarkerId(location.markerId!),
-          // icon: BitmapDescriptor.bytes(customMarkerIconBytes,
-          //     height: 48, width: 48)
+          icon: BitmapDescriptor.bytes(customMarkerIconBytes,
+              height: 48, width: 48)
       )
       );
     }).toList();
@@ -103,15 +102,15 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
     markerList.add(Marker(
       position: LatLng(model.latitude!, model.longitude!),
       markerId: MarkerId(model.markerId!),
-      // icon: BitmapDescriptor.bytes(customMarkerIconBytes,
-      //     height: 48, width: 48)
+      icon: BitmapDescriptor.bytes(customMarkerIconBytes,
+          height: 48, width: 48)
     ));
     notifyListeners();
   }
 
   Future<void> fetchUserAppMarkerIconTotalToken () async{
-    var sp=SharedPreferencesHelper();
-    var response =await _dio.getRequest(ApiConstants.getAppMarkerIconTokenByUserId(sp.getValue<String>("user_id")!));
+    var userID=await SharedPreferencesHelper().getValue<String>("user_id");
+    var response =await _dio.getRequest(ApiConstants.getAppMarkerIconTokenByUserId(userID!));
     if(response.statusCode==200){
       _totalMarkerIconToken=(response.data as Map<String,dynamic>)["totalToken"];
     }

@@ -1,11 +1,11 @@
 
-import 'dart:convert';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/models/last_location_model.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
 
 class CurrentLacitonService {
 
@@ -46,8 +46,8 @@ class CurrentLacitonService {
         accuracy: LocationAccuracy.high
       )
       );
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? userId= prefs.getString("user_id");
+
+      String? userId=await SharedPreferencesHelper().getValue<String>("user_id");
       //print('Anlık Konum: ${position.latitude}, ${position.longitude}');
 
       var lastLocation = LastLocationModel(
@@ -57,8 +57,8 @@ class CurrentLacitonService {
         lng: position.longitude
       );
 
-      await prefs.setDouble("last_location_latidue", position.latitude);
-      await prefs.setDouble("last_location_longitude", position.longitude);
+      await SharedPreferencesHelper().setValue<double>("last_location_latidue", position.latitude);
+      await SharedPreferencesHelper().setValue<double>("last_location_longitude", position.longitude);
       DioService().postRequest(ApiConstants.addUserLastLocation, lastLocation.toJson());
     } catch (e) {
       //print('Konum alınırken hata oluştu: $e');
