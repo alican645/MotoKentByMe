@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/components/custom_app_bar.dart';
 import 'package:moto_kent/components/custom_loading_widget.dart';
+import 'package:moto_kent/components/fallow_button.dart';
 import 'package:moto_kent/constants/api_constants.dart';
-import 'package:moto_kent/init/Helpers/MediaQueryHelper.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/pages/OtherProfilePage/other_profile_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -68,6 +68,17 @@ class _OtherProfileViewState extends State<OtherProfileView> {
     initialize();
  }
 
+  Future<void> startConversation(BuildContext context) async {
+    var response = await context.read<OtherProfileViewmodel>().startPrivateConversation(widget.userID!);
+    if(response.statusCode==200){
+      final Map<String, dynamic> args = {
+        "userId":widget.userID,
+        "connectionId":response.data["connectionId"],
+        "privateConversationId":response.data["privateConversationId"]
+      };
+      context.push("/private_chat_page",extra:args);
+    }
+  }
 
 
   @override
@@ -75,7 +86,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
 
     double width = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: const CustomAppBar(),
+      appBar:  CustomAppBar(),
       body: Consumer<OtherProfileViewmodel>(
         builder: (context, value, child) {
           if (value.userModel == null || value.userPhotosModel==null) {
@@ -97,8 +108,12 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                       // Profil Fotoğrafı ve Kullanıcı Bilgileri
                       Row(
                         children: [
-                          SizedBox(
-                            height: 100,
+                          Container(
+                            decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade300,width: 1.5),
+                                borderRadius: BorderRadius.circular(16)
+                            ),
+                            height: 130,
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(16),
                               child: Image.network(
@@ -139,15 +154,21 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                   ],
                                 ),
                                 const SizedBox(height: 10,),
+                                PostDetailPageButton(onPressed: () {
+                                    startConversation(context);
+                                },content: "Mesaj At",),
+                                const SizedBox(
+                                  height: 20,
+                                ),
                                 value.isFollow?
-                                OtherProfileViewRouteButton(
+                                PostDetailPageButton(
                                   onPressed: () async {
                                     await followOrUnfollowUser(context,false);
                                   },
                                   content: "Takipten Çık",
                                 )
                                     :
-                                OtherProfileViewRouteButton(
+                                PostDetailPageButton(
                                   onPressed: () async {
                                     //await followUser(context);
                                     await followOrUnfollowUser(context,true);
@@ -155,6 +176,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                   content: "Takip Et",
                                 ),
                                 const SizedBox(height: 10,),
+
 
                               ],
                             ),
@@ -235,43 +257,4 @@ class _OtherProfileViewState extends State<OtherProfileView> {
   }
 }
 
-class OtherProfileViewRouteButton extends StatelessWidget {
-  final String content;
-  final VoidCallback onPressed;
-  const OtherProfileViewRouteButton(
-      {super.key, required this.content, required this.onPressed});
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: onPressed,
-        child: Container(
-          width: MediaQueryHelper.height(150),
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(45),
-              color: AppTheme.themeData.primaryColor),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Flexible(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                    Text(content,style: const TextStyle(
-                      color: Colors.white
-                    ),)
-                  ],),
-                ),
-                Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(45),
-                        color: Colors.white),
-                    child: const Icon(Icons.chevron_right))
-              ],
-            ),
-          ),
-        ));
-  }
-}

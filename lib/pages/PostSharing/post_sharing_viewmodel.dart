@@ -10,12 +10,11 @@ import 'package:moto_kent/services/dio_service_3.dart';
 class PostSharingViewmodel extends ChangeNotifier {
   List<dynamic> _postCategoryModelList = [];
   List<dynamic> get postCategoryModelList => _postCategoryModelList;
-  final apiService = ApiService();
-
+  DioService _dio=DioService();
 
 
   Future<void> fetchPostCategoryList2() async {
-    var response = await DioService().getRequest(
+    var response = await _dio.getRequest(
         ApiConstants.getAllPostCategoriesFormFile,
        );
     _postCategoryModelList=response.data.map((item) => CategoryFormFileModel.fromJson(item)).toList();
@@ -26,7 +25,7 @@ class PostSharingViewmodel extends ChangeNotifier {
 
   Future<Response> AddPost(Object requestBody) async {
     var result =
-        await DioService().postRequest(ApiConstants.addPost, requestBody);
+        await _dio.postRequest(ApiConstants.sharePost, requestBody);
     return result;
   }
 }

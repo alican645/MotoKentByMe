@@ -19,10 +19,23 @@ class DataObjects{
     };
     return object;
   }
-  static Object quotePost(int postId,String userId){
+  static Object favoritePost(int postId,String userId){
     var object={
-      "quotedPostId": postId,
+      "postId": postId,
       "userId": userId
+    };
+    return object;
+  }
+  static Object onlyUserIdObject(String userId){
+    var object={
+      "userId": userId
+    };
+    return object;
+  }
+  static Object privateConversationObject(String userId1,String userId2){
+    var object={
+      "user1Id": userId1,
+      "user2Id": userId2
     };
     return object;
   }

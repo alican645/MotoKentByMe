@@ -2,47 +2,45 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
+import 'package:moto_kent/pages/MyFavoritePostsPage/my_favorite_posts_viewmodel.dart';
 import 'package:moto_kent/services/current_laciton_service.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
 import 'package:moto_kent/services/firebase_notification_service.dart';
+import 'package:provider/provider.dart';
 import '../App/app_theme.dart';
 
 class AppLayout extends StatefulWidget {
   final StatefulNavigationShell statefulNavigationShell;
 
-  AppLayout({Key? key, required this.statefulNavigationShell})
-      : super(key: key);
+  const AppLayout({super.key, required this.statefulNavigationShell});
 
   @override
   _AppLayoutState createState() => _AppLayoutState();
 }
 
 class _AppLayoutState extends State<AppLayout> {
-  Key _navigationKey =
-      UniqueKey(); // Sayfa yenilendiğinde widget'ı yeniden oluşturmak için key
+
   final FirebaseNotificationService _notificationService = FirebaseNotificationService();
-  // Sayfa yenileme işlemi
-  Future<void> _onRefresh() async {
-    setState(() {
-      // Yeni bir key atayarak tüm `statefulNavigationShell` widget'ını yeniden oluşturuyoruz
-      _navigationKey = UniqueKey();
-    });
-  }
+
 
 
   @override
   void initState() {
     super.initState();
     initializeSetLastLocation().then((value) {
-      _notificationService!.connectNotification().then((value) {
+      _notificationService.connectNotification().then((value) {
         addDeviceTokenToUser();
+
       },);
     },);
 
   }
+
+
 
   Future<void> initializeSetLastLocation() async{
     await CurrentLacitonService().initialize();
@@ -58,7 +56,7 @@ class _AppLayoutState extends State<AppLayout> {
       var response = await service.postRequest(ApiConstants.addDeviceTokenToUser,
           jsonEncode( {
             "userId": userId,
-            "deviceToken": _notificationService?.deviceToken
+            "deviceToken": _notificationService.deviceToken
           })
       );
       if(response.statusCode==200){
@@ -119,7 +117,9 @@ class _AppLayoutState extends State<AppLayout> {
                 tooltip: 'Favorites',
               ),
               IconButton(
-                onPressed: () {},
+                onPressed: () {
+                  context.push('/my_private_messages_page');
+                },
                 icon: const Icon(Icons.message),
                 tooltip: 'Messages',
               ),
@@ -129,10 +129,7 @@ class _AppLayoutState extends State<AppLayout> {
       ),
 
       // Tüm sayfalarda yenileme özelliği için RefreshIndicator ile sarılı body
-      body: Container(
-        color: Colors.white,
-        child: widget.statefulNavigationShell,
-      ),
+      body: widget.statefulNavigationShell,
 
       // Gradient arka planlı BottomNavigationBar
       bottomNavigationBar: Container(

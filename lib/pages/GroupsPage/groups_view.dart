@@ -1,10 +1,10 @@
 
+
 import 'package:flutter/material.dart';
 import 'package:moto_kent/components/chat_group_item.dart';
 
 import 'package:moto_kent/pages/GroupsPage/groups_viewmodel.dart';
 import 'package:moto_kent/pages/GroupsPage/widgets/bottom_butons_bar.dart';
-import 'package:moto_kent/services/signalr_service2.dart';
 import 'package:provider/provider.dart';
 
 class ChatGroupsView extends StatefulWidget {
@@ -14,7 +14,7 @@ class ChatGroupsView extends StatefulWidget {
 }
 
 class _ChatGroupsViewState extends State<ChatGroupsView> {
-  late SignalRService2 _signalRService;
+
 
   @override
   void initState() {
@@ -24,9 +24,9 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
           Provider.of<ChatGroupsViewmodel>(context, listen: false);
       viewModel.fetchChatGropsList();
 
-      // SignalR servisini başlat
-      _signalRService = SignalRService2(context);
-      _signalRService.initializeSignalR();
+
+
+
     });
   }
 
@@ -39,6 +39,13 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
           context: context,
           builder: (context) => const AlertDialog(
             title: Text("Gruba Katıldınız"),
+          ),
+        );
+      }else{
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(response.data),
           ),
         );
       }
@@ -74,9 +81,7 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
     );
   }
 
-  Future<void> fethGroupList() async{
-    context.read<ChatGroupsViewmodel>().fetchChatGropsList();
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -90,30 +95,14 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
             child: Consumer<ChatGroupsViewmodel>(
               builder: (context, value, child) => Column(
                 children: [
-                  Visibility(
-                    visible: value.showNewChatGroups,
-                      child: GestureDetector(
-                        onTap: ()  async {
-                          await fethGroupList();
-                        },
-                    child: Container(
-                      width: 200,
-                      height: 50,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(45),
-                        color: Colors.grey[300]
-                      ),
-                      child: const Center(
-                        child: Text("Yeni Grupları Görüntüle"),
-                      ),
-                    ),
-                  )),
+
                   Flexible(
                     child: ListView.builder(
                       itemCount: value.groupsList.length,
                       itemBuilder: (context, index) => Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2.50),
                         child: ChatGroupItem(
+                          amIAdmin: value.groupsList[index].amIAdmin,
                           chatGroupModel: value.groupsList[index],
                           onPressed: () {
                             joinChatGropShowDialog(value.groupsList[index].uniqueId!);

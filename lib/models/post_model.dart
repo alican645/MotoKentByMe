@@ -1,22 +1,25 @@
-import 'package:moto_kent/models/post_category_model.dart';
 import 'package:moto_kent/models/user_model.dart';
 
 class PostModel {
   int? id;
   String? userId;
-  String? userPhotoPath;
+  String? userProfilePhotoPath;
   String? userFullName;
   String? postContentTitle;
   String? postContent;
-  String? postCategoryIconPath;
-  String? postCategoryName;
+  String? postCategoryPhotoPath;
+  String? postCategoryCategoryName;
+  bool?isOriginalPost;
   DateTime? postDate;
   String? postLocation;
   int? postCategoryId;
   int? likes;
   int? dislikes;
-  int? quotedPostId;
+  int?commentCount;
+  bool? isMyFavorite;
 
+  String? sharedUserId;
+  String? sharedUserFullName;
 
   PostModel(
       {this.userId,
@@ -28,49 +31,56 @@ class PostModel {
       this.postDate,
       this.postLocation,
       this.postCategoryId,
-      this.userPhotoPath,
+      this.userProfilePhotoPath,
       this.userFullName,
-      this.postCategoryIconPath,
-      this.postCategoryName,
-
-      this.quotedPostId});
+      this.isOriginalPost,
+      this.postCategoryPhotoPath,
+      this.postCategoryCategoryName,
+      this.isMyFavorite,
+      this.sharedUserId,
+      this.sharedUserFullName,this.commentCount});
 
   PostModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     userId = json['userId'];
-    quotedPostId = json['quotedPostId'];
+    isOriginalPost = json['isOriginalPost'];
+    isMyFavorite = json['isMyFavorite'];
+    sharedUserId = json['sharedUserId'];
+    sharedUserFullName = json['sharedUserFullName'];
     likes = json['likes'];
     dislikes = json['dislikes'];
+    commentCount = json['commentCount'];
     userFullName = json['userFullName'];
-    userPhotoPath = json['userPhotoPath'];
-
+    userProfilePhotoPath = json['userProfilePhotoPath'];
     postContentTitle = json['postContentTitle'];
     postContent = json['postContent'];
     postDate = DateTime.tryParse(json['postDate']);
     postLocation = json['postLocation'];
     postCategoryId = json['postCategoryId'];
-    postCategoryIconPath = json['postCategoryIconPath'];
-    postCategoryName = json['postCategoryName'];
-
+    postCategoryPhotoPath = json['postCategoryPhotoPath'];
+    postCategoryCategoryName = json['postCategoryCategoryName'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['userId'] = userId;
-    data['quotedPostId'] = quotedPostId;
+    data['isMyFavorite'] = isMyFavorite;
+    data['isOriginalPost'] = isOriginalPost;
+    data['sharedUserId'] = sharedUserId;
+    data['sharedUserFullName'] = sharedUserFullName;
     data['likes'] = likes;
     data['dislikes'] = dislikes;
+    data['commentCount'] = commentCount;
     data['userFullName'] = userFullName;
-    data['userPhotoPath'] = userPhotoPath;
+    data['userProfilePhotoPath'] = userProfilePhotoPath;
     data['id'] = id;
-
     data['postContentTitle'] = postContentTitle;
     data['postContent'] = postContent;
     data['postDate'] = postDate?.toIso8601String();
     data['postLocation'] = postLocation;
     data['postCategoryId'] = postCategoryId;
-    data['postCategoryIconPath'] = postCategoryIconPath;
-    data['postCategoryName'] = postCategoryName;
+    data['postCategoryPhotoPath'] = postCategoryPhotoPath;
+    data['postCategoryCategoryName'] = postCategoryCategoryName;
 
     return data;
   }

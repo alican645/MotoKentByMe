@@ -1,183 +1,149 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:moto_kent/App/app_theme.dart';
+import 'package:moto_kent/components/custom_error_widget.dart';
 import 'package:moto_kent/components/custom_loading_widget.dart';
-import 'package:moto_kent/constants/api_constants.dart';
-import 'package:moto_kent/constants/data_objects.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
+import 'package:moto_kent/models/complaint_model.dart';
 import 'package:moto_kent/models/user_model.dart';
 import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/group_setting_view_nodel.dart';
-import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_viewmodel.dart';
-import 'package:moto_kent/pages/GroupsPage/groups_viewmodel.dart';
+import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/widget/action_button.dart';
+import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/widget/follow_stats.dart';
+import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/widget/group_header_widget.dart';
+import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/widget/member_card_item.dart';
+import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/widget/options_widget.dart';
+import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/widget/show_member_dialog.dart';
+import 'package:moto_kent/router.dart';
+import 'package:moto_kent/utils/complaint_dialog.dart';
 import 'package:provider/provider.dart';
 
-class GroupSettingView extends StatelessWidget {
+class GroupSettingView extends StatefulWidget {
   final String? groupId;
   const GroupSettingView({super.key, this.groupId});
 
+  @override
+  State<GroupSettingView> createState() => _GroupSettingViewState();
+}
 
-
+class _GroupSettingViewState extends State<GroupSettingView> {
   @override
   Widget build(BuildContext context) {
-    Future<void> leaveGroup() async{
-      String? userId=await SharedPreferencesHelper().getValue<String>("user_id");
-      var response=await context.read<GroupSettingViewmodel>().leaveGroup(DataObjects.joinGroup(groupId!, userId!));
-      if(response.statusCode==200){
-        await context.read<MyGroupsViewmodel>().fetchMyChatGroups();
-        await Future.delayed(const Duration(seconds: 1));
-        await context.read<ChatGroupsViewmodel>().fetchChatGropsList();
-        Navigator.popUntil(context, (route) => route.settings.name == "my_groups");
-      }
-    }
-    String groupIdd = groupId as String;
+    final viewModel = context.read<GroupSettingViewmodel>();
+    final groupIdd = widget.groupId as String;
+    final mediaQuery = MediaQuery.of(context);
 
-    return Scaffold(
-      appBar: AppBar(),
-      body: FutureBuilder(
-        future: context.read<GroupSettingViewmodel>().fetchGroupData(groupIdd),
-        builder: (context, snapshot) {
-          if (snapshot.data == null) {
-            return const Center(
-              child: const CustomLoadingWidget(),
-            );
-          }
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+    return FutureBuilder(
+      future: viewModel.initialize(groupIdd),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CustomLoadingWidget();
+        }
 
-            children: [
-              GroupIconWidget(
-                iconPath: snapshot.data!.groupIconPath!,
-              ),
-              Text(
-                snapshot.data!.name!,
-                style: const TextStyle(fontSize: 25),
-              ),
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: SizedBox(
-                    width: MediaQuery.sizeOf(context).width,
-                    child: ListView.builder(
-                      itemCount: snapshot.data!.users!.length,
-                        itemBuilder: (context, index) => MemberCardItem(
-                              userModel: snapshot.data!.users![index],
-                              onPressed: () {},
-                            )),
-                  ),
-                ),
-              ),
+        if (snapshot.hasError) {
+          return CustomErrorWidget(
+            errorMessage: 'Grup bilgileri yüklenemedi: ${snapshot.error}',
+            onRetry: () {
+              viewModel.initialize(groupIdd);
+            },
+          );
+        }
+
+        final groupData = snapshot.data!["chatGroupModel"]!;
+        final myUserId = snapshot.data!["myUserId"]!;
+        return Scaffold(
+          appBar: AppBar(
+            actions: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GestureDetector(
-                  onTap: () async {
-                    await leaveGroup();
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.red,
-                      borderRadius: BorderRadius.circular(90)
-                    ),
-                    child: const Text("Gruptan Ayrıl",style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.white
-                    ),),
-                  ),
+                padding: EdgeInsets.symmetric(
+                  horizontal: mediaQuery.size.width * 0.02,
+                  vertical: 8,
                 ),
+                child: OptionsWidget(gorupId: groupData.uniqueId!),
               )
             ],
-          );
-        },
-      ),
-    );
-  }
-}
-
-class GroupIconWidget extends StatelessWidget {
-  const GroupIconWidget({super.key, required this.iconPath});
-  final String iconPath;
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: CircleAvatar(
-        radius: 50,
-        backgroundImage: NetworkImage(
-          '${ApiConstants.baseUrl}/$iconPath',
-        ),
-        child: Container(
-          width: 102,
-          height: 102,
-          decoration: BoxDecoration(
-              border:
-                  Border.all(color: AppTheme.themeData.primaryColor, width: 3),
-              borderRadius: BorderRadius.circular(90)),
-        ),
-      ),
-    );
-  }
-}
-
-class MemberCardItem extends StatelessWidget {
-  const MemberCardItem({
-    super.key,
-    required this.userModel,
-    required this.onPressed,
-  });
-  final UserModel userModel;
-  final VoidCallback onPressed;
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: GestureDetector(
-        onTap: onPressed,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(90),
           ),
-          child: Row(
+          body: Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(8),
-                child: CircleAvatar(
-                  backgroundColor: Theme.of(context).colorScheme.primary,
-                  radius: 30,
-                  child: CircleAvatar(
-                    radius: 30,
-                    backgroundImage: NetworkImage('${ApiConstants.baseUrl}/${userModel.profilePhotoPath}'),
+              GroupHeaderWidget(groupData:groupData ,),
+             Expanded(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.separated(
+            itemCount: groupData.users!.length,
+            separatorBuilder: (ctx, i) =>
+                Divider(height: 1, color: Colors.grey[400]),
+            itemBuilder: (context, index) {
+              final user = groupData.users![index];
 
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        userModel.fullName!,
-                        style: Theme.of(context).textTheme.headlineLarge),
-                    const SizedBox(height: 4.0),
-                  ],
-                ),
-              ),
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: CircleAvatar(
-                    radius: 20,
-                    backgroundColor: Colors.white,
-                    child: Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.grey,
-                    )),
-              ),
+              return MemberCardItem(
+                key: ValueKey(user.userId),
+                isAdmin: groupData.groupAdminUserId == user.userId,
+                userModel: user,
+                onPressed: () =>
+                    ShowMemberDialog.show(
+                      contextt: context,
+                      isMe: user.userId==myUserId,
+                      user: user,
+                      onPressedReport: () async {
+                        
+                      },
+                      onPressedSendMessage: ()async {
+                        _sendMessage(user, context);
+                      },
+                      onPressedViewProfile: ()async {
+                        _viewProfile(user, context, user.userId==myUserId,);
+                      },
+
+                    )
+              );
+            },
+          ),
+        ),
+      )
             ],
           ),
-        ),
+        );
+      },
+    );
+  }
+
+
+
+
+
+
+
+Future<void> _viewProfile(UserModel user, BuildContext context, isMe) async{
+  if (isMe) {
+    context.go(AppRoutes.profilePage);
+  } else {
+    context.push(AppRoutes.otherUserProfile, extra: user.userId);
+  }
+}
+
+Future<void> _sendMessage(UserModel user, BuildContext context) async {
+  try {
+    var response = await context
+        .read<GroupSettingViewmodel>()
+        .startPrivateConversation(user.userId!);
+    if (response.statusCode == 200) {
+      final Map<String, dynamic> args = {
+        "userId": user.userId!,
+        "connectionId": response.data["connectionId"],
+        "privateConversationId": response.data["privateConversationId"]
+      };
+      context.push("/private_chat_page", extra: args);
+    }
+  } catch (e) {
+    log("GrupSettingPage_to_private_chat_page", error: e.toString());
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Sohbet başlatılamadı'),
+        behavior: SnackBarBehavior.floating,
       ),
     );
   }
+}
 }

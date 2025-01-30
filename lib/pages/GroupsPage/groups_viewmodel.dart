@@ -20,10 +20,11 @@ class ChatGroupsViewmodel extends ChangeNotifier {
   DioService apiService = DioService();
 
   Future<void> fetchChatGropsList() async {
-    var response = await apiService.getRequest(ApiConstants.getAllChatGroups);
+    String? userId= await SharedPreferencesHelper().getValue<String>("user_id");
+    var response = await apiService.getRequest(ApiConstants.getAllChatGroups(userId!));
 
 
-    if(response.statusCode==200){// Dönüşümü doğru şekilde yapın
+    if(response.statusCode==200){
       if (response.data is List) {
         _groupsList = (response.data as List)
             .map((item) => ChatGroupModel.fromJson(item))

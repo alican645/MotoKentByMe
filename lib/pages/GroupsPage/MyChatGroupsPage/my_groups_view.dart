@@ -17,46 +17,60 @@ class _MyGroupsView extends State<MyGroupsView> {
   @override
   void initState() {
     super.initState();
-    context.read<MyGroupsViewmodel>().fetchMyChatGroups();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      context.read<MyGroupsViewmodel>().fetchMyChatGroups();
+    },);
+
   }
 
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
-    return Padding(
-      padding: EdgeInsets.only(
-          left: width * 0.05, right: width * 0.05, top: width * 0.01),
-      child: Column(
-        children: [
-          Flexible(
-            child: Consumer<MyGroupsViewmodel>(
-              builder: (contextt, value, child) => ListView.builder(
-                itemCount: value.groupsList.length,
-                itemBuilder: (contextt, index) => Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 2.50),
-                  child: ChatGroupItem(
-                    chatGroupModel: value.groupsList[index],
-                    onPressed: () async {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Grup Sohbetlerim"),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: EdgeInsets.only(
+            left: width * 0.05, right: width * 0.05, top: width * 0.01),
+        child: Column(
+          children: [
+            Flexible(
+              child: Consumer<MyGroupsViewmodel>(
+                builder: (contextt, value, child) {
 
-                      goToMessagePage(value, index, context);
+                  return ListView.builder(
+                  itemCount: value.groupsList.length,
+                  itemBuilder: (contextt, index) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 2.50),
+                    child: ChatGroupItem(
+                      amIAdmin: value.groupsList[index].amIAdmin,
+                      chatGroupModel: value.groupsList[index],
+                      onPressed: () async {
 
-                    },
+                        goToMessagePage(value, index, context);
+
+                      },
+                    ),
                   ),
-                ),
+                );
+                },
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   void goToMessagePage(MyGroupsViewmodel value, int index, BuildContext context) async {
      String? userId= await SharedPreferencesHelper().getValue<String>("user_id");
+     String? username= await SharedPreferencesHelper().getValue<String>("userfullname");
     Map<String, String> object = {
       "userId": userId!,
       "groupId": value.groupsList[index].uniqueId!,
-      "userName": 'Ali Can Aydin',
+      "userName": username!,
       "groupName": value.groupsList[index].name!
     };
     context.push('/chat_groups_page/my_groups/message_page',

@@ -16,7 +16,7 @@ class SearchView extends StatelessWidget {
         context.read<SearchViewmodel>().clearSearchItemList();
       },
       child: Scaffold(
-          appBar: const CustomAppBar(),
+          appBar:  CustomAppBar(data: "Kullanıcı Arayın...",),
           body: Column(
             children: [
               Flexible(
@@ -48,7 +48,7 @@ class SearchView extends StatelessWidget {
                     itemCount: value.searchItemList.length,
                     itemBuilder: (context, index) => SearchUserItem(
                       onPressed: () {
-                        context.push("/search_page/other_user_profile",
+                        context.push("/other_user_profile",
                             extra: value.searchItemList[index].id);
                       },
                       userSearchItemModel: value.searchItemList[index],

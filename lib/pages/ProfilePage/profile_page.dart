@@ -345,6 +345,6 @@ class _ProfilePageState extends State<ProfilePage> {
   void logOut(BuildContext context) {
     SharedPreferencesHelper().remove("username");
     SharedPreferencesHelper().remove("password");
-                      context.go("/login_page");
+    context.go("/login_page");
   }
 }

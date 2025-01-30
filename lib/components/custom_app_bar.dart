@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize;
+  String? data;
+  List<Widget>? actions;
 
-  const CustomAppBar({super.key})
+   CustomAppBar({super.key,this.data,this.actions})
       : preferredSize = const Size.fromHeight(60.0);
 
   @override
@@ -24,13 +26,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       decoration: appBarBoxDecoration,
       child: AppBar(
-        title: Image.asset(
-          'assets/images/moto_kent_logo.png', // Resminizin assets klasöründeki yolu
-          height: 60, // Resim yüksekliğini ayarlayın
-          fit: BoxFit.fitWidth,
-        ),
+        centerTitle: true,
+        title: data==null?const Text(""):Text(data!),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: actions,
       ),
     );
   }

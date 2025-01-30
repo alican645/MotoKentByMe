@@ -18,6 +18,7 @@ class SearchViewmodel extends ChangeNotifier{
 
   Future<void> fetchUsers(String parameter) async {
     String? userId=await SharedPreferencesHelper().getValue<String>("user_id");
+    if(parameter=="") return;
     var response = await _dio.getRequest(ApiConstants.searchUserProfiles(parameter,userId!));
     if(response.statusCode==200){
       _searchItemList=[];

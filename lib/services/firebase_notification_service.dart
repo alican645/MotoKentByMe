@@ -59,6 +59,7 @@ class FirebaseNotificationService {
     messaging.setForegroundNotificationPresentationOptions(
         alert: true, badge: true, sound: true);
 
+
     // Local Notification'ı başlat
     await initializeNotifications();
 

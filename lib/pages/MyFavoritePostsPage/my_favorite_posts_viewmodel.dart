@@ -1,40 +1,61 @@
-import 'dart:developer';
-import 'dart:js_interop';
+
 
 import 'package:flutter/material.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
+import 'package:moto_kent/models/paginated_posts_model.dart';
 import 'package:moto_kent/models/post_model.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
 
 class MyFavoritePostsViewmodel extends ChangeNotifier {
-  DioService _dio = DioService();
+  final DioService _dio = DioService();
 
-  List<PostModel> _postList = [];
-  List<PostModel> get postList => _postList;
+  int _currentPage = 1;
+  int get currentPage => _currentPage;
 
-  Future<List<PostModel>> fetchMyFavoritePosts() async {
-    String? userId =
-        await SharedPreferencesHelper().getValue<String>("user_id");
-    var response =
-        await _dio.getRequest(ApiConstants.getMyFavoritePosts(userId!));
-    try{
-      if (response.statusCode == 200) {
-        if (response.data is List) {
-          _postList = (response.data as List)
-              .map((item) => PostModel.fromJson(item))
-              .toList();
+  int _totalPages = 1;
+  int get totalPages => _totalPages;
 
-        } else {
-          throw Exception('Unexpected data format: Expected a list');
-        }
-      }
-      return _postList;
-    }catch(ex){
-      log(ex.toString(),name: "Error");
-      throw Exception("");
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+
+  final List<PostModel> _posts = [];
+  List<PostModel> get posts => _posts;
+
+
+  // Tüm postları getir
+  Future<void> fetchFavoritePostList() async {
+    String? userId=await SharedPreferencesHelper().getValue<String>("user_id");
+    if (_isLoading || _currentPage > _totalPages) return;
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+
+      var response = await _dio.getRequest(ApiConstants.getFavoritePostsByUserId(_currentPage,userId!));
+      var model = PaginatedPostsModel.fromJson(response.data);
+      _posts.addAll(model.items!);
+      _currentPage++;
+      _totalPages = model.totalPages!;
+    } catch (e) {
+      print('Hata: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
-
-
   }
+
+  // Pagination ve post listesini sıfırla
+  void resetPagination() {
+    _currentPage = 1;
+    _totalPages = 1;
+    _posts.clear();
+    fetchFavoritePostList();
+    notifyListeners();
+  }
+
+
+
 }

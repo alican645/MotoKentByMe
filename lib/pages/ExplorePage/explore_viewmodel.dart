@@ -1,5 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/models/baanner_model.dart';
 import 'package:moto_kent/models/category_form_file_model.dart';
 import 'package:moto_kent/models/paginated_posts_model.dart';
 import 'package:moto_kent/models/post_model.dart';
@@ -11,8 +14,14 @@ class ExploreViewmodel extends ChangeNotifier {
   List<dynamic> _postCategoryModelList = [];
   List<dynamic> get postCategoryModelList => _postCategoryModelList;
 
+  String? _selectedCategoryName;
+  String? get selectedCategoryName=>_selectedCategoryName;
+
   final List<PostModel> _posts = [];
   List<PostModel> get posts => _posts;
+
+  List<BannerModel> _banners = [];
+  List<BannerModel> get banners => _banners;
 
   int _currentPage = 1;
   int get currentPage => _currentPage;
@@ -51,12 +60,21 @@ class ExploreViewmodel extends ChangeNotifier {
     notifyListeners();
   }
 
+
+  Future<void> fetchAllCurrentBanner() async {
+    var response = await _dio.getRequest(ApiConstants.getAllCurrentBanner);
+    _banners =(response.data as List)
+        .map((item) => BannerModel.fromJson(item)).toList();
+    notifyListeners();
+  }
+
   // Pagination ve post listesini sıfırla
   void resetPagination() {
     _currentPage = 1;
     _totalPages = 1;
     _posts.clear();
     _isAllOrByCategory = true; // Tüm postlara dönecek
+    _selectedCategoryName=null;
     _selectedCategoryId = null; // Seçili kategori kaldırılacak
     _showNewPostBtn = false; // Yeni post düğmesi gizlenecek
     notifyListeners();
@@ -76,7 +94,7 @@ class ExploreViewmodel extends ChangeNotifier {
       _currentPage++;
       _totalPages = model.totalPages!;
     } catch (e) {
-      print('Hata: $e');
+      log("fetchPost",error: e.toString());
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -98,7 +116,6 @@ class ExploreViewmodel extends ChangeNotifier {
       _currentPage++;
       _totalPages = model.totalPages!;
     } catch (e) {
-      print('Hata: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -121,6 +138,5 @@ class ExploreViewmodel extends ChangeNotifier {
     _selectedCategoryId = categoryId;
     notifyListeners();
   }
-
 
 }

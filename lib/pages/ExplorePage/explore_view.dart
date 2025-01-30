@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moto_kent/pages/ExplorePage/explore_viewmodel.dart';
+import 'package:moto_kent/pages/ExplorePage/widgets/banner_widget.dart';
 import 'package:moto_kent/pages/ExplorePage/widgets/category_selection_bar.dart';
 import 'package:moto_kent/pages/ExplorePage/widgets/post_item.dart';
 import 'package:moto_kent/services/signalr_service.dart';
@@ -26,6 +27,7 @@ class _ExploreViewState extends State<ExploreView> {
       await viewModel.fetchPostList();
       await viewModel.fetchPostCategoryList();
 
+
       // SignalR servisini başlat
       _signalRService = SignalRService(context);
       _signalRService.initializeSignalR();
@@ -49,17 +51,13 @@ class _ExploreViewState extends State<ExploreView> {
     double width = MediaQuery.of(context).size.width;
     return Column(
       children: [
-        SizedBox(
+        AdSlider(
           width: width,
-          child: Image.asset(
-            "assets/images/motorlar2.png",
-            fit: BoxFit.fill,
-          ),
         ),
         Flexible(
           child: Padding(
             padding: EdgeInsets.only(
-                right: width * 0.05, left: width * 0.05, top: width * 0.05),
+                right: width * 0.05, left: width * 0.05, top: width * 0.01),
             child: Column(
               children: [
                 const CategorySelectionBar(),
@@ -72,8 +70,12 @@ class _ExploreViewState extends State<ExploreView> {
                       final viewModel = context.read<ExploreViewmodel>();
 
                       viewModel.resetPagination(); // Pagination sıfırlanır
+
                       await viewModel
-                          .fetchPostList(); // Tüm postlar yeniden yüklenir
+                          .fetchAllOrCategoryId();// Tüm postlar yeniden yüklenir
+                      setState(() {
+
+                      });
                     },
                     child: Consumer<ExploreViewmodel>(
                       builder: (context, viewModel, child) {

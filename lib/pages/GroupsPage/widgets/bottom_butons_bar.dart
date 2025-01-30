@@ -4,7 +4,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/App/app_theme.dart';
+import 'package:moto_kent/pages/GroupsPage/groups_viewmodel.dart';
 import 'package:moto_kent/pages/GroupsPage/widgets/build_button.dart';
+import 'package:provider/provider.dart';
 
 class BottomButonsBar extends StatelessWidget {
   const BottomButonsBar({
@@ -41,6 +43,7 @@ class BottomButonsBar extends StatelessWidget {
             BuildButton(
                 onPressed: () {
                   context.go("/chat_groups_page/create_chat_group");
+
                 },
                 icon: const Icon(
                   Icons.add,
@@ -48,12 +51,23 @@ class BottomButonsBar extends StatelessWidget {
                 ),
                 content: "Oluştur"),
             BuildButton(
-                onPressed: () {},
+                onPressed: () {
+                  context.push("/search_chat_group_page");
+                },
                 icon: const Icon(
                   Icons.search_rounded,
                   size: 48,
                 ),
-                content: "Ara")
+                content: "Ara"),
+            BuildButton(
+                onPressed: () {
+                  context.read<ChatGroupsViewmodel>().fetchChatGropsList();
+                },
+                icon: const Icon(
+                  Icons.refresh_outlined,
+                  size: 48,
+                ),
+                content: "Yenile"),
           ],
         ),
       ),

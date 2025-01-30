@@ -80,7 +80,7 @@ class SignalRMessageService {
     return token;
   }
 
-  Future<void> initializeSignalR() async {
+  Future<void> initializeSignalR(String hubUrl) async {
     String token = await ensureValidToken();
     MessageHeaders headers = MessageHeaders();
     Logger.root.level = Level.ALL;
@@ -90,7 +90,7 @@ class SignalRMessageService {
     headers.setHeaderValue("Authorization", "Bearer $token");
     // Hub bağlantısını başlat
     _connection = HubConnectionBuilder()
-        .withUrl(ApiConstants.signalRChatGroupEndpoint,
+        .withUrl(hubUrl,
             options: HttpConnectionOptions(
               headers: headers,
                 accessTokenFactory: () async=>

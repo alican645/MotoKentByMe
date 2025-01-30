@@ -5,7 +5,6 @@ import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/models/chat_group_message_model.dart';
 import 'package:moto_kent/pages/MessagePage/message_viewmodel.dart';
 import 'package:moto_kent/pages/MessagePage/widgets/message_item.dart';
-import 'package:moto_kent/services/generic_signalr_service.dart';
 import 'package:moto_kent/services/signalr_message_service.dart';
 import 'package:provider/provider.dart';
 
@@ -47,12 +46,6 @@ class _MessageViewState extends State<MessageView> {
           firstScrollToBottom();
         });
 
-        //   messageService2.onReceiveMessage=(arguments) async {
-        //     final json = arguments[0] as Map<String, dynamic>;
-        //     ChatGroupMessageModel message = ChatGroupMessageModel.fromJson(json);
-        //     await context.read<SendMessageViewmodel>().addLastMessage(message);
-        // };
-        //});
       };
     }
     );}
@@ -62,25 +55,15 @@ class _MessageViewState extends State<MessageView> {
   void dispose() {
     super.dispose();
     messageService.leaveGroup(groupId!);
-    //messageService2.invokeNameLeaveGroup;
+
   }
 
   Future<void> joinGroup() async {
     var viewmodel = context.read<SendMessageViewmodel>();
     messageService = SignalRMessageService(vm: viewmodel);
-    // messageService2 = GenericSignalRService(
-    //   invokeNameJoinGroup: 'CreateGroupChatConnection',
-    //   methodName: 'CreateGroupChatConnection',
-    //   endpoint: ApiConstants.signalRChatGroupEndpoint,
-    //   invokeNameLeaveGroup: 'BrokeGroupChatConnection'
-    // );
-
-    // messageService2.initializeSignalR().then((value) {
-    //   messageService2.initializeSignalR();
-    // },);
 
 
-    messageService.initializeSignalR().then(
+    messageService.initializeSignalR(ApiConstants.signalRChatGroupEndpoint).then(
       (value) {
         messageService.joinGroup(groupId!);
       },
@@ -168,7 +151,7 @@ class _MessageViewState extends State<MessageView> {
                 Flexible(
                     child: CustomTextField(
                         controller: _textEditingController,
-                        labelText: "Mesajınızı giriniz")),
+                        hintText: "Mesajınızı giriniz")),
                 IconButton(
                     onPressed: () async {
                       await sendMessage().then((value) {

@@ -7,23 +7,30 @@ import 'package:logging/logging.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/models/chat_group_message_model.dart';
+import 'package:moto_kent/models/private_message_model.dart';
+import 'package:moto_kent/pages/MessagePage/message_viewmodel.dart';
+import 'package:moto_kent/pages/PrivateChatPage/private_chat_viewmodel.dart';
 
 import 'package:signalr_netcore/ihub_protocol.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 
-class SignalRMessageService {
+class SignalRMessageService2 {
   late HubConnection _connection;
   final VoidCallback? onMessageReceived;
+  final VoidCallback? onGroupJoined;
+  final VoidCallback? onGroupLeft;
+  final PrivateChatViewmodel? vm;
 
-
-  SignalRMessageService({
+  SignalRMessageService2({
     this.onMessageReceived,
-
+    this.onGroupJoined,
+    this.onGroupLeft,
+    this.vm
   });
 
   VoidCallback? onReceivePost;
   late Logger _logger;
-
+  late StreamSubscription<LogRecord> _logMessagesSub;
 
   // Token'in geçerliliğini kontrol eden fonksiyon
   Future<bool> isTokenExpired() async {
@@ -75,7 +82,7 @@ class SignalRMessageService {
     return token;
   }
 
-  Future<void> initializeSignalR() async {
+  Future<void> initializeSignalR(String hubUrl) async {
     String token = await ensureValidToken();
     MessageHeaders headers = MessageHeaders();
     Logger.root.level = Level.ALL;
@@ -85,7 +92,7 @@ class SignalRMessageService {
     headers.setHeaderValue("Authorization", "Bearer $token");
     // Hub bağlantısını başlat
     _connection = HubConnectionBuilder()
-        .withUrl(ApiConstants.signalRChatGroupEndpoint,
+        .withUrl(hubUrl,
         options: HttpConnectionOptions(
             headers: headers,
             accessTokenFactory: () async=>
@@ -110,19 +117,27 @@ class SignalRMessageService {
       if (arguments != null && arguments.isNotEmpty) {
         try {
           final json = arguments[0] as Map<String, dynamic>;
-          ChatGroupMessageModel message = ChatGroupMessageModel.fromJson(json);
-
+          PrivateMessageModel message = PrivateMessageModel.fromJson(json);
+          vm?.addLastMessage(message);
           onReceivePost?.call();
-          print("Yeni mesaj alındı: ${message.content}");
+          print("Yeni mesaj alındı: ${message.messageContent}");
         } catch (e) {
           print("Mesaj işlenirken hata: $e");
         }
       }
     });
 
+    // Bir kullanıcı gruba katıldığında çağrılır
+    _connection.on("CreateGroupChatConnection", (arguments) {
+      print("Bir kullanıcı gruba katıldı: $arguments");
+      onGroupJoined?.call();
+    });
 
-
-
+    // Bir kullanıcı gruptan ayrıldığında çağrılır
+    _connection.on("BrokeGroupChatConnection", (arguments) {
+      print("Bir kullanıcı gruptan ayrıldı: $arguments");
+      onGroupLeft?.call();
+    });
 
     try {
       await _connection.start();
@@ -159,35 +174,6 @@ class SignalRMessageService {
       print("SignalR bağlantısı aktif değil.");
     }
   }
-
-  // /// Gruba yeni bir mesaj gönder
-  // Future<void> sendMessageToGroup(ChatGroupMessageModel message) async {
-  //   if (_connection.state == HubConnectionState.Connected) {
-  //     try {
-  //       await _connection
-  //           .invoke("NewChatGroupMessage1", args: [message.toJson()]);
-  //       print("Mesaj gruba gönderildi: ${message.content}");
-  //     } catch (e) {
-  //       print("Mesaj gönderme hatası: $e");
-  //     }
-  //   } else {
-  //     print("SignalR bağlantısı aktif değil.");
-  //   }
-  // }
-  //
-  // /// Tüm istemcilere yeni bir grup bildirimi gönder
-  // Future<void> notifyNewChatGroup(dynamic chatGroup) async {
-  //   if (_connection.state == HubConnectionState.Connected) {
-  //     try {
-  //       await _connection.invoke("NewChatGroupMessage1", args: [chatGroup]);
-  //       print("Yeni grup bildirimi gönderildi.");
-  //     } catch (e) {
-  //       print("Grup bildirimi gönderme hatası: $e");
-  //     }
-  //   } else {
-  //     print("SignalR bağlantısı aktif değil.");
-  //   }
-  // }
 
   /// Bağlantıyı durdur
   void dispose() {

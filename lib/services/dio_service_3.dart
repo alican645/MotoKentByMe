@@ -82,7 +82,7 @@ class DioService extends IApiService{
       );
 
     } on DioException catch (e) {
-      throw Exception('GET isteğinde hata oluştu: ${e.message}');
+      throw Exception(e);
     }
   }
 
@@ -91,13 +91,23 @@ class DioService extends IApiService{
   Future<Response> postRequest(String endpoint, Object data) async {
     try {
       final token = await ensureValidToken();
-      return await _dio.post(
+      var response = await _dio.post(
         endpoint,
         data: data,
         options: Options(headers: {"Authorization": "Bearer $token"}),
       );
+      if(response.statusCode==200 || response.statusCode==201){
+        return response;
+      }
+      return response;
     } on DioException catch (e) {
-      throw Exception('POST isteğinde hata oluştu: ${e.message}');
+      if(e.response!=null){
+        String errorMessage = e.response?.data??"Sunucu Hatası Oluştu";
+        throw Exception(errorMessage);
+      }else{
+        throw Exception('İstek gönderilirken bir hata oluştu: ${e.message}');
+      }
+
     }
   }
 

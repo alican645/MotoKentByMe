@@ -1,13 +1,15 @@
 
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/pages/LoactionIconMapPage/loaction_icon_map_viewmodel.dart';
+import 'package:moto_kent/pages/ProfilePage/profile_page.dart';
 import 'package:provider/provider.dart';
 
 class IconPickerModal extends StatelessWidget {
-  final Function(int price, String iconPath, BuildContext context)
+  final Function(int id, String iconPath, BuildContext context)
   onIconSelected;
 
   const IconPickerModal({required this.onIconSelected, Key? key})
@@ -28,7 +30,11 @@ class IconPickerModal extends StatelessWidget {
         itemBuilder: (context, index) {
           if (index == 0) {
             return IconButton(
-              onPressed: () {},
+              onPressed: () {
+                context.push(
+                  "/buy_coin_page"
+                );
+              },
               icon: Icon(
                 Icons.monetization_on_outlined,
                 color: AppTheme.themeData.primaryColor,
@@ -55,7 +61,7 @@ class IconPickerModal extends StatelessWidget {
           return GestureDetector(
             onTap: () {
               onIconSelected(
-                value.modelList[index - 2].price!,
+                value.modelList[index - 2].id!,
                 value.modelList[index - 2].iconPath!,
                 context,
               );

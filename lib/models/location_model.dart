@@ -8,6 +8,7 @@ class LocationModel {
   String? markerId;
   String? userId;
   DateTime? createdDate;
+  int? customLocationIconId;
 
 
 
@@ -19,12 +20,14 @@ class LocationModel {
     this.markerId,
     this.userId,
     this.createdDate,
-    this.iconPrice
+    this.iconPrice,
+    this.customLocationIconId
   });
 
   /// JSON'dan Model Nesnesi Oluşturma
   LocationModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    customLocationIconId = json['customLocationIconId'];
     iconPrice = json['iconPrice'];
     latitude = json['latitude'];
     longitude = json['longitude'];
@@ -41,6 +44,7 @@ class LocationModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
+    data['customLocationIconId'] = customLocationIconId;
     data['iconPrice'] = iconPrice;
     data['latitude'] = latitude;
     data['longitude'] = longitude;

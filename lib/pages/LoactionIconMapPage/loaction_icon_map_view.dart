@@ -5,13 +5,11 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/components/custom_loading_widget.dart';
-import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/models/location_model.dart';
 import 'package:moto_kent/pages/LoactionIconMapPage/loaction_icon_map_viewmodel.dart';
 import 'package:moto_kent/pages/LoactionIconMapPage/widgets/gridview_bottom_modal_sheet.dart';
 import 'package:moto_kent/pages/LoactionIconMapPage/widgets/map_icon.dart';
-import 'package:moto_kent/services/generic_signalr_service.dart';
 import 'package:provider/provider.dart';
 
 
@@ -24,51 +22,34 @@ class LocationIconMapView extends StatefulWidget {
 }
 
 class _LocationIconMapViewState extends State<LocationIconMapView> {
-  final Completer<GoogleMapController> _controller =
-      Completer<GoogleMapController>();
-  GenericSignalRService signalRService = GenericSignalRService(
-      endpoint: ApiConstants.signalRLocationHubEndpoint,
-      methodName: "AddLocation");
 
   Uint8List? customMarkerIconBytes;
   String? iconPath;
-  int? iconPrice;
+  int? iconId;
 
-  LoactionIconMapViewmodel? viewmodel;
-
-  // Dinamik başlangıç konumu
-  CameraPosition? _initialPosition  ;
 
   @override
   void initState() {
     super.initState();
-    viewmodel = context.read<LoactionIconMapViewmodel>();
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
-        initialize();
-        signalRService.initializeSignalR();
 
-        signalRService.onReceiveMessage = (arguments) {
-          final json = arguments[0] as Map<String, dynamic>;
-          LocationModel model = LocationModel.fromJson(json);
-          viewmodel!.addMarker(model);
 
-        };
-      },
-    );
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+
+      initialize();
+    },);
   }
 
   @override
   dispose() {
     super.dispose();
-    viewmodel!.dispose();
+
   }
 
   Future<void> initialize() async {
-    await viewmodel!.fetchCustomMarkerItem();
-    await viewmodel!.fetchAllLocations();
-    await viewmodel!.fetchUserAppMarkerIconTotalToken();
-    _setInitialLocation();
+
+    await context.read<LoactionIconMapViewmodel>().initialize(context);
+
+
   }
 
   /// Marker'ı özelleştirme ve ekleme
@@ -79,27 +60,30 @@ class _LocationIconMapViewState extends State<LocationIconMapView> {
     String? userId =await prefs.getValue<String>("user_id");
 
     LocationModel model = LocationModel()
-      ..id = 0
       ..longitude = location.longitude
       ..latitude = location.latitude
       ..markerId =
           "${location.latitude}/${location.longitude}/${DateTime.now()}"
-      ..createdDate = DateTime.now()
       ..userId = userId
-      ..iconPath = iconPath
-      ..iconPrice=iconPrice;
+      ..customLocationIconId=iconId;
 try {
-  var response = await viewmodel!.createMarker(model);
+  if(!mounted) return;
+  var response = await context.read<LoactionIconMapViewmodel>().createMarker(model);
 
-  if(response.statusCode!=200){
+  if(response.statusCode!=200) {
+    if(!mounted) return;
     showDialog(context: context, builder: (sdcontext) {
-      
+
       return AlertDialog(
         title: Text(response.data),
       );
     },);
+  }else{
+    if(!mounted) return;
+    await context.read<LoactionIconMapViewmodel>().addMarker(model,iconPath!);
   }
 }catch(e){
+  if(!mounted) return;
   showDialog(context: context, builder: (sdcontext) {
 
     return AlertDialog(
@@ -109,71 +93,32 @@ try {
 }
   }
 
-  Future<void> _selectLocationIcon(int selectIconPrice,
+  Future<void> _selectLocationIcon(int selectIconId,
       String selectIconPath, BuildContext selectContext) async {
     iconPath = selectIconPath;
-    iconPrice=selectIconPrice;
+    iconId=selectIconId;
     Navigator.pop(selectContext);
-    viewmodel!.setSelectLocation(true);
+    context.read<LoactionIconMapViewmodel>().setSelectLocation(true);
   }
 
-  /// Telefon un anlık konumunu alıp harita başlangıç konumunu ayarlar
-  Future<void> _setInitialLocation() async {
-    // Konum izinlerini kontrol et ve iste
-    LocationPermission permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      return;
-    }
-
-    try {
-      // Telefonun anlık konumunu al
-      Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      // Anlık konumu başlangıç pozisyonu olarak ayarla
-      setState(() {
-        _initialPosition = CameraPosition(
-          target: LatLng(position.latitude, position.longitude),
-          zoom: 19,
-        );
-
-        LocationModel model =LocationModel(
-          latitude: position.latitude,
-          longitude: position.longitude,
-          markerId: "me",
-          iconPath: "/customLocationIconsFolder/Me.png"
-        );
-        context.read<LoactionIconMapViewmodel>().addMarker(model);
-
-
-      });
-
-      // Harita kontrolcüsünü kullanarak anlık konuma odaklan
-      final GoogleMapController controller = await _controller.future;
-      controller
-          .animateCamera(CameraUpdate.newCameraPosition(_initialPosition!));
-    } catch (e) {
-
-    }
-  }
 
   Future<void> _goToCurrentLocation() async {
     try {
       Position position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
 
-      final GoogleMapController controller = await _controller.future;
+      );
+      if(!mounted) return;
+      final GoogleMapController controller = await context.read<LoactionIconMapViewmodel>().controller.future;
 
       controller.animateCamera(CameraUpdate.newCameraPosition(
         CameraPosition(
           target: LatLng(position.latitude, position.longitude),
-          zoom: 14.5,
+          zoom: 20,
         ),
       ));
-    } catch (e) {}
+    } catch (e) {
+
+    }
   }
 
   @override
@@ -182,11 +127,15 @@ try {
       body: Column(
         children: [
           Flexible(
-              child: viewmodel!.isLoadingAllMarker
-                  ? Stack(
+              child:
+                  Stack(
                       children: [
                         Consumer<LoactionIconMapViewmodel>(
-                          builder: (context, value, child) => GoogleMap(
+                          builder: (context, value, child) {
+                            if(value.initialPosition==null || value.initialFlag==false){
+                              return const CustomLoadingWidget();
+                            }
+                            return GoogleMap(
                             onTap: (argument) {
                               if (value.selectLocation) {
                                 LatLng location = LatLng(
@@ -198,11 +147,13 @@ try {
                             mapType: MapType.normal,
                             markers: value.markerList,
                             initialCameraPosition:
-                                _initialPosition!, // Dinamik başlangıç pozisyonu
+                            value.initialPosition!, // Dinamik başlangıç pozisyonu
                             onMapCreated: (GoogleMapController controller) {
-                              _controller.complete(controller);
+
+                              value.controller.complete(controller);
                             },
-                          ),
+                          );
+                          },
                         ),
                         Provider.of<LoactionIconMapViewmodel>(context)
                                 .selectLocation
@@ -213,18 +164,16 @@ try {
                                   child: Container(
                                       padding: const EdgeInsets.all(10),
                                       color: Colors.white,
-                                      child: SizedBox(
+                                      child: const SizedBox(
                                           width: 50,
                                           height: 50,
-                                          child: const CustomLoadingWidget())),
+                                          child: CustomLoadingWidget())),
                                 ),
                               )
                             : const SizedBox(),
                       ],
                     )
-                  : const Center(
-                      child: CustomLoadingWidget(),
-                    )),
+                 ),
           Container(
             width: MediaQuery.sizeOf(context).width,
             decoration: BoxDecoration(
@@ -276,7 +225,10 @@ try {
                   ),
                   MapIcon(
                     iconData: Icons.refresh_outlined,
-                    onPressed: () {},
+                    onPressed: () async {
+                        await context.read<LoactionIconMapViewmodel>().resetMap(context);
+
+                    },
                   )
                 ],
               ),
@@ -291,8 +243,8 @@ try {
     showModalBottomSheet(
       context: context,
       builder: (modalContext) => IconPickerModal(
-        onIconSelected: (int price, String iconPath, BuildContext modalContext) {
-          _selectLocationIcon(price, iconPath, modalContext);
+        onIconSelected: (int id, String iconPath, BuildContext modalContext) {
+          _selectLocationIcon(id, iconPath, modalContext);
         },
       ),
     );

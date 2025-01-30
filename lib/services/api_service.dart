@@ -13,8 +13,8 @@ class ApiService {
 
   // Token'in geçerliliğini kontrol eden fonksiyon
   Future<bool> isTokenExpired() async {
-
-    String? token =await SharedPreferencesHelper().getValue<String>('jwt_token');
+    String? token =
+        await SharedPreferencesHelper().getValue<String>('jwt_token');
     if (token == null) return true; // Eğer token yoksa geçersiz
 
     return JwtDecoder.isExpired(token);
@@ -22,9 +22,10 @@ class ApiService {
 
   // Token yenileyen fonksiyon
   Future<void> refreshToken() async {
-
-    String? refreshToken =await SharedPreferencesHelper().getValue<String>('refresh_token');
-    String? accessToken =await SharedPreferencesHelper().getValue<String>('jwt_token');
+    String? refreshToken =
+        await SharedPreferencesHelper().getValue<String>('refresh_token');
+    String? accessToken =
+        await SharedPreferencesHelper().getValue<String>('jwt_token');
 
     if (refreshToken == null || accessToken == null) {
       throw Exception('Token bulunamadı.');
@@ -45,17 +46,18 @@ class ApiService {
       String newAccessToken = jsonResponse['accessToken'];
       String newRefreshToken = jsonResponse['refreshToken'];
 
-      await SharedPreferencesHelper().setValue<String>('jwt_token', newAccessToken);
-      await SharedPreferencesHelper().setValue<String>('refresh_token', newRefreshToken);
+      await SharedPreferencesHelper()
+          .setValue<String>('jwt_token', newAccessToken);
+      await SharedPreferencesHelper()
+          .setValue<String>('refresh_token', newRefreshToken);
     } else {
       throw Exception('Token yenileme başarısız oldu.');
     }
   }
 
   // API isteği yapan genel fonksiyon
-  Future<http.Response> makeAuthenticatedRequest(
-      String endpoint, String method, {Map<String, dynamic>? body}) async {
-
+  Future<http.Response> makeAuthenticatedRequest(String endpoint, String method,
+      {Map<String, dynamic>? body}) async {
     bool isExpired = await isTokenExpired();
 
     if (isExpired) {
@@ -63,7 +65,8 @@ class ApiService {
       await refreshToken();
     }
 
-    String? token =await SharedPreferencesHelper().getValue<String>('jwt_token');
+    String? token =
+        await SharedPreferencesHelper().getValue<String>('jwt_token');
     var url = Uri.parse(endpoint);
     var headers = {
       "Content-Type": "application/json",
@@ -81,8 +84,8 @@ class ApiService {
 
   Future<Map<String, dynamic>> makeMultipartRequest(
       String endpoint, XFile photo, Map<String, String> fields) async {
-
-    String? token =await SharedPreferencesHelper().getValue<String>('jwt_token');
+    String? token =
+        await SharedPreferencesHelper().getValue<String>('jwt_token');
 
     if (token == null) {
       throw Exception('Oturum açılmadı.');
@@ -103,10 +106,10 @@ class ApiService {
 
     if (response.statusCode == 200) {
       final responseData = await response.stream.bytesToString();
-      return jsonDecode(responseData);  // json verisini döndürüyoruz ve işlem burada bitiyor
+      return jsonDecode(
+          responseData); // json verisini döndürüyoruz ve işlem burada bitiyor
     } else {
       throw Exception('Fotoğraf yüklenemedi: ${response.statusCode}');
     }
   }
-
 }
