@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:moto_kent/models/user_model.dart';
 import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/widget/action_button.dart';
 import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/widget/follow_stats.dart';
 
@@ -33,12 +32,17 @@ class ShowMemberDialog {
                   context: context,
                   text: "Şikayet Et",
                   icon: Icons.report,
-                  onPressed: () => onPressedReport,
+                  onPressed: () async {
+
+                     onPressedReport();
+                  },
                 ),
           ActionButton(
             text: "Profili Görüntüle",
             icon: Icons.person,
-            onPressed: () => onPressedViewProfile,
+            onPressed: () async {
+              onPressedViewProfile();
+            },
             context: context,
           ),
           isMe
@@ -46,7 +50,9 @@ class ShowMemberDialog {
               : ActionButton(
                   text: "Mesaj At",
                   icon: Icons.message,
-                  onPressed: () => onPressedSendMessage,
+                  onPressed: () async {
+                    onPressedSendMessage();
+                  },
                   context: context,
                 ),
         ],

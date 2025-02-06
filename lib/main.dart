@@ -13,6 +13,8 @@ import 'package:moto_kent/pages/GroupsPage/CreateChatGroupPage/create_chat_group
 import 'package:moto_kent/pages/GroupsPage/CreateChatGroupPage/create_group_viewmodel.dart';
 import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/group_setting_view.dart';
 import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/group_setting_view_nodel.dart';
+import 'package:moto_kent/pages/GroupsPage/JoinGroupRequestPage/join_group_request_view.dart';
+import 'package:moto_kent/pages/GroupsPage/JoinGroupRequestPage/join_group_request_viewmodel.dart';
 import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_view.dart';
 import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_viewmodel.dart';
 import 'package:moto_kent/pages/GroupsPage/SearchChatGroupPage/search_chat_group_view.dart';
@@ -27,6 +29,8 @@ import 'package:moto_kent/pages/MessagePage/message_view.dart';
 import 'package:moto_kent/pages/MessagePage/message_viewmodel.dart';
 import 'package:moto_kent/pages/MyFavoritePostsPage/my_favorite_posts_view.dart';
 import 'package:moto_kent/pages/MyFavoritePostsPage/my_favorite_posts_viewmodel.dart';
+import 'package:moto_kent/pages/MyNotificationsPage/my_notifications_view.dart';
+import 'package:moto_kent/pages/MyNotificationsPage/my_notifications_viewmodel.dart';
 import 'package:moto_kent/pages/MyPrivateMessagesPage/my_private_messages_view.dart';
 import 'package:moto_kent/pages/MyPrivateMessagesPage/my_private_messages_viewmodel.dart';
 import 'package:moto_kent/pages/OtherProfilePage/other_profile_view.dart';
@@ -88,6 +92,8 @@ void main() async {
     ChangeNotifierProvider(create: (context) => SearchChatGroupViewmodel(), child:  const SearchChatGroupView()),
     ChangeNotifierProvider(create: (context) => PrivateChatViewmodel(), child:  const PrivateChatView()),
     ChangeNotifierProvider(create: (context) => MyPrivateMessagesViewmodel(), child:  const MyPrivateMessagesView()),
+    ChangeNotifierProvider(create: (context) => JoinGroupRequestViewmodel(), child:  const JoinGroupRequestView()),
+    ChangeNotifierProvider(create: (context) => MyNotificationsViewmodel(), child:  const MyNotificationsView()),
     ChangeNotifierProvider(
         create: (context) => SendMessageViewmodel(), child: const MessageView()),
     ChangeNotifierProvider(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/components/chat_group_item.dart';
+import 'package:moto_kent/constants/app_routes.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -67,13 +68,13 @@ class _MyGroupsView extends State<MyGroupsView> {
   void goToMessagePage(MyGroupsViewmodel value, int index, BuildContext context) async {
      String? userId= await SharedPreferencesHelper().getValue<String>("user_id");
      String? username= await SharedPreferencesHelper().getValue<String>("userfullname");
-    Map<String, String> object = {
+    Map<String, dynamic> object = {
       "userId": userId!,
-      "groupId": value.groupsList[index].uniqueId!,
+      "groupId": value.groupsList[index].chatGroupId!,
       "userName": username!,
       "groupName": value.groupsList[index].name!
     };
-    context.push('/chat_groups_page/my_groups/message_page',
+    context.push(AppRoutes.messagePage,
         extra: object);
 
   }

@@ -1,4 +1,3 @@
-import 'package:moto_kent/models/user_model.dart';
 
 class PostModel {
   int? id;

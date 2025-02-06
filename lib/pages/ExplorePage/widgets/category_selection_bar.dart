@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/pages/ExplorePage/explore_viewmodel.dart';
+import 'package:moto_kent/pages/ExplorePage/widgets/filter_dialog.dart';
 import 'package:provider/provider.dart';
 
 class CategorySelectionBar extends StatelessWidget {
@@ -52,7 +53,17 @@ class CategorySelectionBar extends StatelessWidget {
                 ),
               ),
 
-              const CategoryDropdown()
+              //const CategoryDropdown()
+              IconButton(
+                onPressed:(){
+                  showDialog(context: context, builder:  (context) => FilterDialog(onApplyFilters:  (p0) {
+                    
+                  },),
+                  
+                  );
+                },
+                icon:const Icon(Icons.filter_list,color: Colors.white,size: 30,)
+              )
             ],
           ),
         ),
@@ -79,16 +90,17 @@ class CategoryDropdown extends StatelessWidget {
 
     return Flexible(
       child: SizedBox(
-        width: 200,
+      
         child: Consumer<ExploreViewmodel>(builder: (context, viewmodel, child) =>
            DropdownButtonFormField2<String>(
             isExpanded: true,
-            hint: Text("Kategoriler"),
+            //hint: Text("Kategoriler"),
+            decoration: const InputDecoration(labelText: "Ka>tegori"),
             value: viewmodel.selectedCategoryName,
             items: viewmodel.postCategoryModelList.map(
                   (e) {
                 return DropdownMenuItem<String>(
-
+                  
                   onTap: () async {
 
                     viewmodel
@@ -96,6 +108,7 @@ class CategoryDropdown extends StatelessWidget {
                     await viewmodel.fetchAllOrCategoryId();
                   },
                   value: e.categoryName,
+                  
                   child: Row(
                     children: [
                       // İkonu internetten çekiyoruz
@@ -112,6 +125,7 @@ class CategoryDropdown extends StatelessWidget {
                       Text(e.categoryName ?? ''),
                     ],
                   ),
+                  
                 );
               },
             ).toList(),
@@ -124,16 +138,16 @@ class CategoryDropdown extends StatelessWidget {
                 await viewmodel.fetchAllOrCategoryId();
               }
             },
-            decoration: InputDecoration(
-              iconColor: Colors.white70,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
+ //           decoration: InputDecoration(
+   //           iconColor: Colors.white70,
+   //           border: OutlineInputBorder(
+    //            borderRadius: BorderRadius.circular(10),
+//
+     //         ),
+        //      contentPadding: const EdgeInsets.only(left: 60),
+       //       enabledBorder: InputBorder.none
 
-              ),
-              contentPadding: const EdgeInsets.only(left: 60),
-              enabledBorder: InputBorder.none
-
-            ),
+        //    ),
           ),
         ),
       ),

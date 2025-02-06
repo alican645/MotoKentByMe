@@ -1,11 +1,8 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:moto_kent/components/custom_loading_widget.dart';
 import 'package:moto_kent/components/custom_textfield.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
-import 'package:moto_kent/main.dart';
 import 'package:moto_kent/models/post_comment_model.dart';
 import 'package:moto_kent/pages/PostDetailPage/post_detail_viewmodel.dart';
 import 'package:provider/provider.dart';

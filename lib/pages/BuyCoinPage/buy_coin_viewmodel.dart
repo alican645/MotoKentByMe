@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/models/app_marker_coin_price_and_count_model.dart';
-import 'package:moto_kent/services/api_service.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
 
 class BuyCoinViewmodel extends ChangeNotifier {

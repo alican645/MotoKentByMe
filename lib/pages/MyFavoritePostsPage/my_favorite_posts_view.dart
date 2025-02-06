@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moto_kent/components/custom_app_bar.dart';
 import 'package:moto_kent/components/custom_loading_widget.dart';
-import 'package:moto_kent/main.dart';
 import 'package:moto_kent/pages/ExplorePage/widgets/post_item.dart';
 import 'package:moto_kent/pages/MyFavoritePostsPage/my_favorite_posts_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +27,7 @@ class _MyFavoritePostsViewState extends State<MyFavoritePostsView> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: CustomAppBar(data: "Favorilerim",),
+      appBar: CustomAppBar(title: "Favorilerim",),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Consumer<MyFavoritePostsViewmodel>(

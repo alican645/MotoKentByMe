@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:moto_kent/components/chat_group_item.dart';
 
@@ -14,8 +12,6 @@ class ChatGroupsView extends StatefulWidget {
 }
 
 class _ChatGroupsViewState extends State<ChatGroupsView> {
-
-
   @override
   void initState() {
     super.initState();
@@ -23,43 +19,41 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
       final viewModel =
           Provider.of<ChatGroupsViewmodel>(context, listen: false);
       viewModel.fetchChatGropsList();
-
-
-
-
     });
   }
 
-  Future<void> joinChatGroup(String groupId) async {
+  Future<void> joinChatGroup(int groupId) async {
     try {
-      var response =
-          await context.read<ChatGroupsViewmodel>().joinChatGroup(groupId);
+      var response = await context
+          .read<ChatGroupsViewmodel>()
+          .joinRequestChatGroup(groupId);
       if (response.statusCode == 200) {
-        showDialog(
-          context: context,
-          builder: (context) => const AlertDialog(
-            title: Text("Gruba Katıldınız"),
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            backgroundColor: Colors.green,
+            content: Text("Katılma İsteği Gönderildi"),
           ),
         );
-      }else{
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text(response.data),
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(
+            backgroundColor: Colors.orange,
+            content: Text(response.data),
           ),
         );
+        
       }
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(e.toString()),
-        ),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(
+           SnackBar(
+            backgroundColor: Colors.orange,
+            content: Text(e.toString()),
+          ),
+        );
     }
   }
 
-  void joinChatGropShowDialog(String groupId) {
+  void joinChatGropShowDialog(int groupId) {
     showDialog(
       context: context,
       builder: (joinChatGropShowDialogContext) => AlertDialog(
@@ -81,8 +75,6 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
     );
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -95,7 +87,6 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
             child: Consumer<ChatGroupsViewmodel>(
               builder: (context, value, child) => Column(
                 children: [
-
                   Flexible(
                     child: ListView.builder(
                       itemCount: value.groupsList.length,
@@ -105,13 +96,13 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
                           amIAdmin: value.groupsList[index].amIAdmin,
                           chatGroupModel: value.groupsList[index],
                           onPressed: () {
-                            joinChatGropShowDialog(value.groupsList[index].uniqueId!);
+                            joinChatGropShowDialog(
+                                value.groupsList[index].chatGroupId!);
                           },
                         ),
                       ),
                     ),
                   ),
-          
                 ],
               ),
             ),
@@ -121,8 +112,4 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
       ],
     );
   }
-
-
 }
-
-

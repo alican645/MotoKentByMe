@@ -1,10 +1,20 @@
 
 class DataObjects{
   DataObjects._();
-  static Object joinGroup(String groupId,String userId){
+  static Object joinGroup(int groupId,String userId){
     var object={
 
-        "groupId": groupId,
+        "chatGroupId": groupId,
+        "userId": userId
+
+    };
+    return object;
+  }
+
+    static Object groupJoinRequest(int groupId,String userId){
+    var object={
+
+        "chatGroupId": groupId,
         "userId": userId
 
     };

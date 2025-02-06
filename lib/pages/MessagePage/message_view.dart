@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:moto_kent/components/custom_app_bar.dart';
 import 'package:moto_kent/components/custom_textfield.dart';
 import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/constants/app_routes.dart';
 import 'package:moto_kent/models/chat_group_message_model.dart';
 import 'package:moto_kent/pages/MessagePage/message_viewmodel.dart';
 import 'package:moto_kent/pages/MessagePage/widgets/message_item.dart';
@@ -10,7 +12,7 @@ import 'package:provider/provider.dart';
 
 class MessageView extends StatefulWidget {
   const MessageView({super.key, this.groupId, this.userId, this.userName,this.groupName});
-  final String? groupId;
+  final int? groupId;
   final String? userId;
   final String? userName;
   final String? groupName;
@@ -26,7 +28,7 @@ class _MessageViewState extends State<MessageView> {
   //late GenericSignalRService messageService2;
 
   late final String? groupName=widget.groupName;
-  late final String? groupId=widget.groupId;
+  late final int?   groupId=widget.groupId;
   late final String? userName=widget.userName;
   late final String? userId=widget.userId;
 
@@ -101,7 +103,7 @@ class _MessageViewState extends State<MessageView> {
 
   Future<void> sendMessage() async {
     var messageModel = ChatGroupMessageModel()
-      ..groupId = groupId
+      ..chatGroupId = groupId
       ..content = _textEditingController.text
       ..senderUserId = userId
       ..senderUserName = userName
@@ -120,11 +122,11 @@ class _MessageViewState extends State<MessageView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(groupName!),
+      appBar: CustomAppBar(
+        title: groupName!,
         actions: [
           IconButton(onPressed: () {
-            context.push("/chat_groups_page/my_groups/message_page/group_setting_page",extra: widget.groupId  );
+            context.push("${AppRoutes.messagePage}/${AppRoutes.groupSettingPage}",extra: widget.groupId  );
           }, icon: const Icon(Icons.settings))
         ],
       ),

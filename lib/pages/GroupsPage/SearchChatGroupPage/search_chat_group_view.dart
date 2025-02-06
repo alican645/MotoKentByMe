@@ -1,5 +1,4 @@
 import"package:flutter/material.dart";
-import "package:go_router/go_router.dart";
 import "package:moto_kent/components/chat_group_item.dart";
 import "package:moto_kent/components/custom_app_bar.dart";
 import "package:moto_kent/pages/GroupsPage/SearchChatGroupPage/search_chat_group_viewmodel.dart";
@@ -8,7 +7,7 @@ import "package:provider/provider.dart";
 class SearchChatGroupView extends StatelessWidget {
   const SearchChatGroupView({super.key});
 
-  Future<void> joinChatGroup(String groupId,BuildContext context) async {
+  Future<void> joinChatGroup(int groupId,BuildContext context) async {
     try {
       var response =
       await context.read<SearchChatGroupViewmodel>().joinChatGroup(groupId);
@@ -30,7 +29,7 @@ class SearchChatGroupView extends StatelessWidget {
     }
   }
 
-  void joinChatGropShowDialog(String groupId,BuildContext context) {
+  void joinChatGropShowDialog(int groupId,BuildContext context) {
     showDialog(
       context: context,
       builder: (joinChatGropShowDialogContext) => AlertDialog(
@@ -59,7 +58,7 @@ class SearchChatGroupView extends StatelessWidget {
         context.read<SearchChatGroupViewmodel>().clearSearchItemList();
       },
       child: Scaffold(
-          appBar:  CustomAppBar(data: "Sohbet Grubu Arayın...",),
+          appBar:  CustomAppBar(title: "Sohbet Grubu Arayın...",),
           body: Column(
             children: [
               Flexible(
@@ -97,7 +96,7 @@ class SearchChatGroupView extends StatelessWidget {
                         amIAdmin:value.searchItemList[index].amIAdmin ,
                         chatGroupModel: value.searchItemList[index],
                         onPressed: () {
-                          joinChatGropShowDialog(value.searchItemList[index].uniqueId!,context);
+                          joinChatGropShowDialog(value.searchItemList[index].chatGroupId!,context);
                         },
                       ),
                     ),

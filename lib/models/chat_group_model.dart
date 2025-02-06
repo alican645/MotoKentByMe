@@ -3,7 +3,7 @@ import 'package:moto_kent/models/user_model.dart';
 class ChatGroupModel {
 
   String? name;
-  String? uniqueId;
+  int? chatGroupId;
   String? groupDescription;
   String? groupIconPath;
   String? groupAdminUserId;
@@ -14,7 +14,7 @@ class ChatGroupModel {
 
   ChatGroupModel(
       {this.name,
-        this.uniqueId,
+        this.chatGroupId,
         this.groupDescription,
         this.groupIconPath,
         this.groupAdminUserId,
@@ -25,7 +25,7 @@ class ChatGroupModel {
 
   ChatGroupModel.fromJson(Map<String, dynamic> json) {
     name = json['name'];
-    uniqueId = json['uniqueId'];
+    chatGroupId = json['chatGroupId'];
     groupDescription = json['groupDescription'];
     groupIconPath = json['groupIconPath'];
     groupAdminUserId = json['groupAdminUserId'];
@@ -43,7 +43,7 @@ class ChatGroupModel {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = Map<String, dynamic>();
     data['name'] = name;
-    data['uniqueId'] = uniqueId;
+    data['chatGroupId'] = chatGroupId;
     data['groupDescription'] = groupDescription;
     data['amIAdmin'] = amIAdmin;
     data['groupIconPath'] = groupIconPath;

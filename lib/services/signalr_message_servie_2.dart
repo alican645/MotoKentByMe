@@ -1,16 +1,12 @@
 import 'dart:async';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:logging/logging.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
-import 'package:moto_kent/models/chat_group_message_model.dart';
 import 'package:moto_kent/models/private_message_model.dart';
-import 'package:moto_kent/pages/MessagePage/message_viewmodel.dart';
 import 'package:moto_kent/pages/PrivateChatPage/private_chat_viewmodel.dart';
-
 import 'package:signalr_netcore/ihub_protocol.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 
@@ -30,7 +26,7 @@ class SignalRMessageService2 {
 
   VoidCallback? onReceivePost;
   late Logger _logger;
-  late StreamSubscription<LogRecord> _logMessagesSub;
+  //late StreamSubscription<LogRecord> _logMessagesSub;
 
   // Token'in geçerliliğini kontrol eden fonksiyon
   Future<bool> isTokenExpired() async {

@@ -78,17 +78,35 @@ class ApiConstants {
   }  static  String getAllChatGroups (String userId){
     return '$baseUrl/api/ChatGroup/GetAllChatGroups?userId=$userId';
   }
-  static  getChatGroupByGroupId(String grupId,String userId){
+  static  getChatGroupByGroupId(int grupId,String userId){
     return '$baseUrl/api/ChatGroup/GetChatGroupByGroupId?groupId=$grupId&userId=$userId';
   }
 
   static const String joinChatGroup = '$baseUrl/api/ChatGroup/JoinGroup';
   static const String leaveChatGroup = '$baseUrl/api/ChatGroup/LeaveGroup';
   static const String senMessageChatGroups = '$baseUrl/api/ChatGroup/SendMessageGroup';
-  static  String getMessagesChatGroup (String groupId){
-    return '$baseUrl/api/ChatGroup/GetGroupMessagesByGroupId?groupId=$groupId';
+  static  String getMessagesChatGroup (int groupId,String userId){
+    return '$baseUrl/api/ChatGroup/GetGroupMessagesByGroupId?groupId=$groupId&userId=$userId';
     ///api/ChatGroup/GetChatGroupByGroupId?groupId=7477f709-beed-48bf-b8ba-85f32fee0284
   }
+
+  static const String groupJoinRequest = '$baseUrl/api/JoinGroupRequest/GroupJoinRequest';
+  static const String acceptGroupJoinRequest = '$baseUrl/api/JoinGroupRequest/AcceptGroupJoinRequest';
+    static  String getAllJoinRequestByGroupId (int chatGroupUniqueId){
+    return '$baseUrl/api/JoinGroupRequest/GetAllJoinRequestByGroupId?chatGroupId=$chatGroupUniqueId';
+    ///api/ChatGroup/GetChatGroupByGroupId?groupId=7477f709-beed-48bf-b8ba-85f32fee0284
+  }
+    static  String getAllJoinRequestByAdminId (String userId){
+    return '$baseUrl/api/JoinGroupRequest/GetAllJoinRequestByAdminId?adminId=$userId';
+    ///api/ChatGroup/GetAllJoinRequestByAdminId?adminId=7477f709-beed-48bf-b8ba-85f32fee0284
+  }
+    static  String getAllNotificationByAdminId (String userId){
+    return '$baseUrl/api/JoinGroupRequest/GetAllNotification?adminId=$userId';
+    ///api/ChatGroup/GetAllJoinRequestByAdminId?adminId=7477f709-beed-48bf-b8ba-85f32fee0284
+  }
+
+ 
+  
 
   static const String getCustomMarkerItem = '$baseUrl/api/CustomLocationIcon/GetCustomLocationIcons';
   static const String getAllLocations = '$baseUrl/api/Location/GetAllLocations';

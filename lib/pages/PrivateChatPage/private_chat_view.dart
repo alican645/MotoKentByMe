@@ -91,7 +91,7 @@ class _PrivateChatViewState extends State<PrivateChatView> {
           builder: (context, value, child) {
           return Scaffold(
             appBar: CustomAppBar(
-              data:  value.userModel!=null?value.userModel!.fullName!:"",
+              title:  value.userModel!=null?value.userModel!.fullName!:"",
               actions: [
                 IconButton(onPressed: () {
 

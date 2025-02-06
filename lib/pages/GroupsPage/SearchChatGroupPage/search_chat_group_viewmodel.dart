@@ -34,7 +34,7 @@ class SearchChatGroupViewmodel extends ChangeNotifier {
     }
   }
 
-  Future<Response> joinChatGroup(String groupId) async {
+  Future<Response> joinChatGroup(int groupId) async {
 
     String? userId= await SharedPreferencesHelper().getValue<String>("user_id");
     var object=DataObjects.joinGroup(groupId, userId!);

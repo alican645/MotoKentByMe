@@ -1,8 +1,7 @@
-
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/models/chat_group_message_model.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
 
@@ -20,8 +19,9 @@ class SendMessageViewmodel extends ChangeNotifier{
     return response;
   }
 
-  Future<void> fetchMessageList(String groupId) async {
-    var response = await apiService.getRequest(ApiConstants.getMessagesChatGroup(groupId));
+  Future<void> fetchMessageList(int groupId) async {
+    String? userId=await SharedPreferencesHelper().getValue<String>("user_id");
+    var response = await apiService.getRequest(ApiConstants.getMessagesChatGroup(groupId,userId!));
     // Dönüşümü doğru şekilde yapın
     if (response.data is List) {
       _messageList = (response.data as List)

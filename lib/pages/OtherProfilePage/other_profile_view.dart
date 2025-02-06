@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/components/custom_app_bar.dart';
 import 'package:moto_kent/components/custom_loading_widget.dart';
 import 'package:moto_kent/components/fallow_button.dart';

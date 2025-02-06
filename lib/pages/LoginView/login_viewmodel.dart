@@ -12,6 +12,14 @@ class LoginViewmodel extends ChangeNotifier{
   final DioService _dio = DioService();
   bool _isCompleted=true;
   bool get isCompleted=>_isCompleted;
+  
+  int _notificationCount=0;
+  int get notificationCount =>_notificationCount;
+
+  void set0NotificationCount(){
+    _notificationCount=0;
+    notifyListeners();
+  }
 
 
   Future<Response> loginRequest (Object object) async{
@@ -26,7 +34,9 @@ class LoginViewmodel extends ChangeNotifier{
         String refreshToken = loginResponseData.refreshToken!;
         String expiration = loginResponseData.expiration!.toString();
         String userId = loginResponseData.userId!; // Kullanıcı ID'sini aldık
-        await SharedPreferencesHelper().setValue<String>('jwt_token', token);
+        _notificationCount=0;
+        await SharedPreferencesHelper()
+          .setValue<String>('jwt_token', token);
         await SharedPreferencesHelper()
             .setValue<String>('refresh_token', refreshToken);
         await SharedPreferencesHelper()

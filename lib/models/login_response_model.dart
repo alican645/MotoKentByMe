@@ -5,9 +5,16 @@ class LoginResponseModel {
   DateTime? expiration;
   String? userId;
   String? deviceToken;
+  int? totalNotificationCount;
 
   LoginResponseModel(
-      {this.token, this.refreshToken, this.expiration, this.userId,this.deviceToken});
+      {
+        this.token, 
+        this.refreshToken, 
+        this.expiration, 
+        this.userId,
+        this.deviceToken,
+        this.totalNotificationCount});
 
   LoginResponseModel.fromJson(Map<String, dynamic> json) {
     token = json['token'];
@@ -15,6 +22,7 @@ class LoginResponseModel {
     refreshToken = json['refreshToken'];
     expiration = DateTime.tryParse(json['expiration']);
     userId = json['userId'];
+    totalNotificationCount = json['totalNotificationCount'];
   }
 
   Map<String, dynamic> toJson() {
@@ -24,6 +32,7 @@ class LoginResponseModel {
     data['refreshToken'] = refreshToken;
     data['expiration'] = expiration?.toIso8601String();
     data['userId'] = userId;
+    data['totalNotificationCount'] = totalNotificationCount;
     return data;
   }
 }

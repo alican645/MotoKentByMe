@@ -1,7 +1,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 
 

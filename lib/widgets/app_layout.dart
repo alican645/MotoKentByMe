@@ -1,17 +1,18 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/constants/app_routes.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
-import 'package:moto_kent/pages/MyFavoritePostsPage/my_favorite_posts_viewmodel.dart';
+import 'package:moto_kent/pages/LoginView/login_viewmodel.dart';
 import 'package:moto_kent/services/current_laciton_service.dart';
 import 'package:moto_kent/services/dio_service_3.dart';
 import 'package:moto_kent/services/firebase_notification_service.dart';
 import 'package:provider/provider.dart';
 import '../App/app_theme.dart';
+import 'package:badges/badges.dart' as badges;
+
 
 class AppLayout extends StatefulWidget {
   final StatefulNavigationShell statefulNavigationShell;
@@ -23,53 +24,49 @@ class AppLayout extends StatefulWidget {
 }
 
 class _AppLayoutState extends State<AppLayout> {
-
-  final FirebaseNotificationService _notificationService = FirebaseNotificationService();
-
-
+  final FirebaseNotificationService _notificationService =
+      FirebaseNotificationService();
 
   @override
   void initState() {
     super.initState();
-    initializeSetLastLocation().then((value) {
-      _notificationService.connectNotification().then((value) {
-        addDeviceTokenToUser();
-
-      },);
-    },);
-
+    initializeSetLastLocation().then(
+      (value) {
+        _notificationService.connectNotification().then(
+          (value) {
+            addDeviceTokenToUser();
+          },
+        );
+      },
+    );
   }
 
-
-
-  Future<void> initializeSetLastLocation() async{
+  Future<void> initializeSetLastLocation() async {
     await CurrentLacitonService().initialize();
   }
 
   Future<void> addDeviceTokenToUser() async {
     await Future.delayed(const Duration(seconds: 3));
 
-    String? userId=await SharedPreferencesHelper().getValue<String>("user_id");
+    String? userId =
+        await SharedPreferencesHelper().getValue<String>("user_id");
     DioService service = DioService();
 
-    try{
-      var response = await service.postRequest(ApiConstants.addDeviceTokenToUser,
-          jsonEncode( {
+    try {
+      var response = await service.postRequest(
+          ApiConstants.addDeviceTokenToUser,
+          jsonEncode({
             "userId": userId,
             "deviceToken": _notificationService.deviceToken
-          })
-      );
-      if(response.statusCode==200){
-        log("güncelleme başarılı",name: "isSuccess");
-      }else{
-        log(response.data,name: "isNotSuccess");
+          }));
+      if (response.statusCode == 200) {
+        log("güncelleme başarılı", name: "isSuccess");
+      } else {
+        log(response.data, name: "isNotSuccess");
       }
-    }catch(e){
-      log(e.toString(),name: "isNotSuccess");
+    } catch (e) {
+      log(e.toString(), name: "isNotSuccess");
     }
-
-
-
   }
 
   @override
@@ -104,11 +101,26 @@ class _AppLayoutState extends State<AppLayout> {
                 icon: const Icon(Icons.search),
                 tooltip: 'Search',
               ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.menu),
-                tooltip: 'Menu',
+              GestureDetector(
+                onTap: () {
+                  context.push(AppRoutes.myNotificationsPage);
+                },
+                child: badges.Badge(
+                  showBadge:  Provider.of<LoginViewmodel>(context).notificationCount ==
+                            0
+                        ? false
+                        : true,
+                  badgeContent: Text(
+                      Provider.of<LoginViewmodel>(context).notificationCount ==
+                              0
+                          ? ""
+                          : Provider.of<LoginViewmodel>(context)
+                              .notificationCount
+                              .toString()),
+                  child: Icon(Icons.notifications),
+                ),
               ),
+              SizedBox(width: 5,),
               IconButton(
                 onPressed: () {
                   context.push('/my_favorite_posts');
@@ -165,4 +177,3 @@ class _AppLayoutState extends State<AppLayout> {
     );
   }
 }
-

@@ -1,9 +1,6 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
-import 'package:moto_kent/components/custom_loading_widget.dart';
 import 'package:moto_kent/constants/api_constants.dart';
-import 'package:moto_kent/models/baanner_model.dart';
 import 'package:moto_kent/pages/ExplorePage/explore_viewmodel.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -103,8 +100,7 @@ class _AdSliderState extends State<AdSlider> {
     try{
       final Uri uri = Uri.parse(url);
 
-      // Tarayıcı ayarları
-      const mode = LaunchMode.externalApplication; // Harici tarayıcı
+
 
       if (await canLaunchUrl(uri)) {
         await launchUrl(

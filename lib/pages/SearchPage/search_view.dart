@@ -16,7 +16,7 @@ class SearchView extends StatelessWidget {
         context.read<SearchViewmodel>().clearSearchItemList();
       },
       child: Scaffold(
-          appBar:  CustomAppBar(data: "Kullanıcı Arayın...",),
+          appBar:  CustomAppBar(title: "Kullanıcı Arayın...",),
           body: Column(
             children: [
               Flexible(

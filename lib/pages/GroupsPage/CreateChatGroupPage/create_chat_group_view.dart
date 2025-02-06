@@ -1,6 +1,5 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
-import 'package:moto_kent/components/custom_app_bar.dart';
 import 'package:moto_kent/components/custom_app_button.dart';
 import 'package:moto_kent/components/custom_textfield.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';

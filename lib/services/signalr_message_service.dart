@@ -27,8 +27,8 @@ class SignalRMessageService {
   });
 
   VoidCallback? onReceivePost;
-  late Logger _logger;
-  late StreamSubscription<LogRecord> _logMessagesSub;
+  late Logger logger;
+  late StreamSubscription<LogRecord> logMessagesSub;
 
   // Token'in geçerliliğini kontrol eden fonksiyon
   Future<bool> isTokenExpired() async {
@@ -85,7 +85,7 @@ class SignalRMessageService {
     MessageHeaders headers = MessageHeaders();
     Logger.root.level = Level.ALL;
 
-    _logger = Logger("SignalRMessageService");
+    logger = Logger("SignalRMessageService");
     headers.setHeaderValue("Content-Type", "application/json");
     headers.setHeaderValue("Authorization", "Bearer $token");
     // Hub bağlantısını başlat
@@ -146,7 +146,7 @@ class SignalRMessageService {
   }
 
 
-  Future<void> joinGroup(String groupId) async {
+  Future<void> joinGroup(int groupId) async {
     if (_connection.state == HubConnectionState.Connected) {
       try {
         await _connection.invoke("CreateGroupChatConnection", args: [groupId]);
@@ -160,7 +160,7 @@ class SignalRMessageService {
   }
 
   /// Kullanıcıyı bir gruptan çıkar
-  Future<void> leaveGroup(String groupId) async {
+  Future<void> leaveGroup(int groupId) async {
     if (_connection.state == HubConnectionState.Connected) {
       try {
         await _connection.invoke("BrokeGroupChatConnection", args: [groupId]);

@@ -7,6 +7,7 @@ class LocationModel {
   String? iconPath;
   String? markerId;
   String? userId;
+  String? comment;
   DateTime? createdDate;
   int? customLocationIconId;
 
@@ -21,7 +22,8 @@ class LocationModel {
     this.userId,
     this.createdDate,
     this.iconPrice,
-    this.customLocationIconId
+    this.customLocationIconId,
+    this.comment
   });
 
   /// JSON'dan Model Nesnesi Oluşturma
@@ -29,6 +31,7 @@ class LocationModel {
     id = json['id'];
     customLocationIconId = json['customLocationIconId'];
     iconPrice = json['iconPrice'];
+    comment = json['comment'];
     latitude = json['latitude'];
     longitude = json['longitude'];
     iconPath = json['iconPath'];
@@ -46,6 +49,7 @@ class LocationModel {
     data['id'] = id;
     data['customLocationIconId'] = customLocationIconId;
     data['iconPrice'] = iconPrice;
+    data['comment'] = comment;
     data['latitude'] = latitude;
     data['longitude'] = longitude;
     data['iconPath'] = iconPath;

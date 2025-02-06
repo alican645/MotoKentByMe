@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/components/custom_app_bar.dart';
 import 'package:moto_kent/components/custom_loading_widget.dart';
-import 'package:moto_kent/main.dart';
 import 'package:moto_kent/models/app_marker_coin_price_and_count_model.dart';
 import 'package:moto_kent/pages/BuyCoinPage/buy_coin_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +13,7 @@ class BuyCoinView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        data: "Jeton Satın Al",
+        title: "Jeton Satın Al",
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -51,7 +50,7 @@ class BuyCoinButtonWidget extends StatelessWidget {
   final AppMarkerCoinPriceAndCountModel model;
   @override
   Widget build(BuildContext context) {
-    TextStyle style = TextStyle(fontSize: 18);
+    TextStyle style = const TextStyle(fontSize: 18);
     return Container(
       height: 200,
       width: 200,
@@ -72,7 +71,7 @@ class BuyCoinButtonWidget extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 25,),
+          const SizedBox(height: 25,),
           Text("${model.appMarkerCoinPrice} TL",style: style,)
         ],
       ),

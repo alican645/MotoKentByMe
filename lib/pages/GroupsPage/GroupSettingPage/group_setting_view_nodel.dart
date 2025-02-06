@@ -22,7 +22,7 @@ class GroupSettingViewmodel extends ChangeNotifier{
   List<ComplaintReasonModel> get list=>_list;
 
 
-  Future<ChatGroupModel?> fetchGroupData(String groupId) async {
+  Future<ChatGroupModel?> fetchGroupData(int groupId) async {
     _myUserId= await SharedPreferencesHelper().getValue<String>("user_id");
     var response= await _dioService.getRequest(ApiConstants.getChatGroupByGroupId(groupId,_myUserId!));
     if(response.statusCode==200){
@@ -65,7 +65,7 @@ class GroupSettingViewmodel extends ChangeNotifier{
     return response;
   }
 
-  Future<Map<String,dynamic>> initialize(String groupId) async{
+  Future<Map<String,dynamic>> initialize(int groupId) async{
     await fetchGroupData(groupId);
     await fetchComplaintReason();
     Map<String,dynamic> result= {

@@ -1,19 +1,19 @@
 class ChatGroupMessageModel {
-  String? groupId;
+  int? chatGroupId;
   String? senderUserId;
   String? senderUserName;
   String? content;
   DateTime? sentAt;
 
   ChatGroupMessageModel(
-      {this.groupId,
+      {this.chatGroupId,
         this.senderUserId,
         this.senderUserName,
         this.content,
         this.sentAt});
 
   ChatGroupMessageModel.fromJson(Map<String, dynamic> json) {
-    groupId = json['groupId'];
+    chatGroupId = json['chatGroupId'];
     senderUserId = json['senderUserId'];
     senderUserName = json['senderUserName'];
     content = json['content'];
@@ -22,7 +22,7 @@ class ChatGroupMessageModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['groupId'] = groupId;
+    data['chatGroupId'] = chatGroupId;
     data['senderUserId'] = senderUserId;
     data['senderUserName'] = senderUserName;
     data['content'] = content;

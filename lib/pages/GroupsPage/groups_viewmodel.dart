@@ -39,11 +39,19 @@ class ChatGroupsViewmodel extends ChangeNotifier {
 
   }
 
-  Future<Response> joinChatGroup(String groupId) async {
+  Future<Response> joinChatGroup(int groupId) async {
 
     String? userId= await SharedPreferencesHelper().getValue<String>("user_id");
     var object=DataObjects.joinGroup(groupId, userId!);
     var response=await apiService.postRequest(ApiConstants.joinChatGroup,object);
+    return response;
+  }
+
+    Future<Response> joinRequestChatGroup(int groupId) async {
+
+    String? userId= await SharedPreferencesHelper().getValue<String>("user_id");
+    var object=DataObjects.groupJoinRequest(groupId, userId!);
+    var response=await apiService.postRequest(ApiConstants.groupJoinRequest,object);
     return response;
   }
 }

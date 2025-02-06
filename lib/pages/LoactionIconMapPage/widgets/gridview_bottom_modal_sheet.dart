@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/pages/LoactionIconMapPage/loaction_icon_map_viewmodel.dart';
-import 'package:moto_kent/pages/ProfilePage/profile_page.dart';
 import 'package:provider/provider.dart';
 
 class IconPickerModal extends StatelessWidget {

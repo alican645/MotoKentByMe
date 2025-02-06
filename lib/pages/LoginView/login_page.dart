@@ -6,6 +6,7 @@ import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/components/custom_loading_widget.dart';
 import 'package:moto_kent/components/my_button.dart';
 import 'package:moto_kent/components/my_textfile.dart';
+import 'package:moto_kent/constants/app_routes.dart';
 import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
 import 'package:moto_kent/pages/LoginView/login_viewmodel.dart';
 import 'package:moto_kent/services/permission_service.dart';
@@ -68,7 +69,7 @@ class _LoginPageState extends State<LoginPage> {
       if (response.statusCode == 200) {
         await SharedPreferencesHelper().setValue<String>("username", username);
         await SharedPreferencesHelper().setValue<String>("password", password);
-        context.go('/profile_page'); // Ana sayfaya yönlendirin
+        context.go(AppRoutes.profilePage); // Ana sayfaya yönlendirin
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Giriş başarısız. Lütfen tekrar deneyin.')),

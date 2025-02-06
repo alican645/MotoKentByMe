@@ -2,7 +2,7 @@ class ComplaintModel {
   int? id;
   int? complaintReasonId;
   String? complainingUserId;
-  String? reportedChatGroupUniqueId;
+  int? reportedChatGroupId;
   String? reportedUserId;
 
 
@@ -11,7 +11,7 @@ class ComplaintModel {
       this.complainingUserId,
       this.complaintReasonId,
       this.reportedUserId,
-        this.reportedChatGroupUniqueId,
+        this.reportedChatGroupId,
     });
 
   ComplaintModel.fromJson(Map<String, dynamic> json) {
@@ -19,7 +19,7 @@ class ComplaintModel {
     complaintReasonId = json['complaintReasonId'];
     complainingUserId = json['complainingUserId'];
     reportedUserId = json['reportedUserId'];
-    reportedChatGroupUniqueId = json['reportedChatGroupUniqueId'];
+    reportedChatGroupId = json['reportedChatGroupUniqueId'];
 
   }
 
@@ -29,7 +29,7 @@ class ComplaintModel {
     data['complaintReasonId'] = complaintReasonId;
     data['complainingUserId'] = complainingUserId;
     data['reportedUserId'] = reportedUserId;
-    data['reportedChatGroupUniqueId'] = reportedChatGroupUniqueId;
+    data['reportedChatGroupUniqueId'] = reportedChatGroupId;
 
     return data;
   }
