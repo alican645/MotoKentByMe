@@ -5,9 +5,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final Size preferredSize;
   final String? title;
   final List<Widget>? actions;
+  final PreferredSizeWidget? bottom;
 
-   CustomAppBar({super.key,this.title,this.actions})
-      : preferredSize = const Size.fromHeight(60.0);
+   CustomAppBar({super.key,this.title,this.actions,this.bottom})
+      : preferredSize = bottom==null?const Size.fromHeight(60.0):Size.fromHeight(60.0 + bottom.preferredSize.height);
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +28,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       decoration: appBarBoxDecoration,
       child: AppBar(
         centerTitle: true,
+        bottom:bottom ,
         title: title==null?const Text(""):Text(title!),
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -35,3 +37,5 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
+
+

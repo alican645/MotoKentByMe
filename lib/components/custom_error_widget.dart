@@ -34,6 +34,7 @@ class CustomErrorWidget extends StatelessWidget {
             Text(
               errorMessage,
               textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
 
             ),
             const SizedBox(height: 25),

@@ -2,28 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/constants/app_routes.dart';
 import 'package:moto_kent/models/post_model.dart';
-import 'package:moto_kent/pages/BuyCoinPage/buy_coin_view.dart';
-import 'package:moto_kent/pages/CallForHelpPage/%20call_for_help_view.dart';
-import 'package:moto_kent/pages/ExplorePage/explore_view.dart';
-import 'package:moto_kent/pages/GroupsPage/CreateChatGroupPage/create_chat_group_view.dart';
-import 'package:moto_kent/pages/GroupsPage/GroupSettingPage/group_setting_view.dart';
-import 'package:moto_kent/pages/GroupsPage/JoinGroupRequestPage/join_group_request_view.dart';
-import 'package:moto_kent/pages/GroupsPage/MyChatGroupsPage/my_groups_view.dart';
-import 'package:moto_kent/pages/GroupsPage/SearchChatGroupPage/search_chat_group_view.dart';
-import 'package:moto_kent/pages/GroupsPage/groups_view.dart';
-import 'package:moto_kent/pages/LoactionIconMapPage/loaction_icon_map_view.dart';
-import 'package:moto_kent/pages/LoginView/login_page.dart';
-import 'package:moto_kent/pages/MessagePage/message_view.dart';
-import 'package:moto_kent/pages/MyFavoritePostsPage/my_favorite_posts_view.dart';
-import 'package:moto_kent/pages/MyNotificationsPage/my_notifications_view.dart';
-import 'package:moto_kent/pages/MyPrivateMessagesPage/my_private_messages_view.dart';
-import 'package:moto_kent/pages/OtherProfilePage/other_profile_view.dart';
-import 'package:moto_kent/pages/PostDetailPage/post_detail_view.dart';
-import 'package:moto_kent/pages/PostSharing/post_sharing_view.dart';
-import 'package:moto_kent/pages/PrivateChatPage/private_chat_view.dart';
-import 'package:moto_kent/pages/RegisterPage/register_page.dart'; // RegisterPage import edildi
-import 'package:moto_kent/pages/ProfilePage/profile_page.dart';
-import 'package:moto_kent/pages/SearchPage/search_view.dart';
+import 'package:moto_kent/models/register_model.dart';
+import 'package:moto_kent/pages/GroupChatModule/MessagePage/message_view.dart';
+import 'package:moto_kent/pages/LoginModule/RegisterPage/register_view.dart';
+import 'package:moto_kent/pages/LoginModule/RegisterUserProfile/register_user_profile_view.dart';
+import 'package:moto_kent/pages/ProfileModule/AboutPage/about_view.dart';
+import 'package:moto_kent/pages/ProfileModule/AccountSecurityPage/account_security_view.dart';
+import 'package:moto_kent/pages/MapModule/BuyCoinPage/buy_coin_view.dart';
+import 'package:moto_kent/pages/CallForHelpModule/CallForHelpPage/%20call_for_help_view.dart';
+import 'package:moto_kent/pages/ProfileModule/ChangeEmailPage/change_email_view.dart';
+import 'package:moto_kent/pages/ProfileModule/ChangePasswordPage/change_password_view.dart';
+import 'package:moto_kent/pages/ProfileModule/EditProfilePage/edit_profile_view.dart';
+import 'package:moto_kent/pages/ExploreModule/ExplorePage/explore_view.dart';
+import 'package:moto_kent/pages/GroupChatModule/CreateChatGroupPage/create_chat_group_view.dart';
+import 'package:moto_kent/pages/GroupChatModule/GroupSettingPage/group_setting_view.dart';
+import 'package:moto_kent/pages/GroupChatModule/JoinGroupRequestPage/join_group_request_view.dart';
+import 'package:moto_kent/pages/GroupChatModule/MyChatGroupsPage/my_groups_view.dart';
+import 'package:moto_kent/pages/GroupChatModule/SearchChatGroupPage/search_chat_group_view.dart';
+import 'package:moto_kent/pages/GroupChatModule/GroupsPage/groups_view.dart';
+import 'package:moto_kent/pages/MapModule/LoactionIconMapPage/loaction_icon_map_view.dart';
+import 'package:moto_kent/pages/LoginModule/LoginView/login_page.dart';
+import 'package:moto_kent/pages/ProfileModule/FollowedPage/connections_view.dart';
+import 'package:moto_kent/pages/ProfileModule/MyAppSettingsPage/my_app_settings_view.dart';
+import 'package:moto_kent/pages/ExploreModule/MyFavoritePostsPage/my_favorite_posts_view.dart';
+import 'package:moto_kent/pages/AppBarModule/MyNotificationsPage/my_notifications_view.dart';
+import 'package:moto_kent/pages/AppBarModule/MyPrivateMessagesPage/my_private_messages_view.dart';
+import 'package:moto_kent/pages/AppBarModule/OtherProfilePage/other_profile_view.dart';
+import 'package:moto_kent/pages/ExploreModule/PostDetailPage/post_detail_view.dart';
+import 'package:moto_kent/pages/ExploreModule/PostSharing/post_sharing_view.dart';
+import 'package:moto_kent/pages/AppBarModule/PrivateChatPage/private_chat_view.dart';
+import 'package:moto_kent/pages/ProfileModule/ProfilePage/profile_page.dart';
+import 'package:moto_kent/pages/AppBarModule/SearchPage/search_view.dart';
 import 'package:moto_kent/widgets/app_layout.dart';
 
 final _routerKey = GlobalKey<NavigatorState>();
@@ -35,7 +44,7 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: AppRoutes.loginPage,
       name: "login_page",
-      builder: (context, state) => LoginPage(),
+      builder: (context, state) => const LoginPage(),
     ),
     GoRoute(
       path: AppRoutes.joinGroupRequestPage,
@@ -51,6 +60,11 @@ final GoRouter router = GoRouter(
       path: AppRoutes.myFavoritePosts,
       name: "my_favorite_posts",
       builder: (context, state) => const MyFavoritePostsView(),
+    ),
+    GoRoute(
+      path: AppRoutes.aboutPage,
+      name: "about_page",
+      builder: (context, state) => const AboutView(),
     ),
     GoRoute(
       path: AppRoutes.myNotificationsPage,
@@ -77,12 +91,12 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: AppRoutes.myPrivatePessagesPage,
       builder: (context, state) {
-        return MyPrivateMessagesView();
+        return const MyPrivateMessagesView();
       },
     ),
     GoRoute(
       path: AppRoutes.searchPage,
-      builder: (context, state) => SearchView(),
+      builder: (context, state) => const SearchView(),
     ),
     GoRoute(
       path: AppRoutes.otherUserProfile,
@@ -128,15 +142,22 @@ final GoRouter router = GoRouter(
           )
         ]),
     GoRoute(
+      path: AppRoutes.registerUserProfilePage, // Yeni register_page rotası eklendi
+      builder: (context, state) => const RegisterUserProfileView(),
+    ),    GoRoute(
       path: AppRoutes.registerPage, // Yeni register_page rotası eklendi
-      builder: (context, state) => RegisterPage(),
+      builder: (context, state) {
+
+        final registerModel = state.extra as RegisterModel;
+        return RegisterView(registerModel: registerModel);
+      },
     ),
     StatefulShellRoute.indexedStack(
       branches: [
         StatefulShellBranch(routes: [
           GoRoute(
               path: AppRoutes.postScreenPage,
-              builder: (context, state) => ExploreView(),
+              builder: (context, state) => const ExploreView(),
               routes: [
                 GoRoute(
                   path: AppRoutes.postSharingView,
@@ -147,7 +168,7 @@ final GoRouter router = GoRouter(
         StatefulShellBranch(routes: [
           GoRoute(
             path: AppRoutes.mapPage,
-            builder: (context, state) =>  LocationIconMapView(),
+            builder: (context, state) =>  const LocationIconMapView(),
           ),
         ]),
         StatefulShellBranch(routes: [
@@ -169,13 +190,44 @@ final GoRouter router = GoRouter(
                     path: AppRoutes.myGroups,
                     name: "my_groups",
                     builder: (context, state) => const MyGroupsView(),
-                    routes: [])
+                    routes: const [])
               ]),
         ]),
         StatefulShellBranch(routes: [
           GoRoute(
             path: AppRoutes.profilePage,
             builder: (context, state) => const ProfilePage(),
+            routes: [
+              GoRoute(path: AppRoutes.followedPage,
+                builder: (context, state) => const ConnectionsView(),),
+              GoRoute
+              (path:AppRoutes.myAppSettingPage ,
+              builder: (context, state) => const MyAppSettingsView(),
+              routes: [
+
+                GoRoute(
+                  path: AppRoutes.editProfilePage,
+                  builder: (context, state) { 
+                    List<String> payload =state.extra as List<String>;
+                    return  EditProfileView(
+                        payload: payload,
+                    );},
+                  ),
+                GoRoute(
+                  path: AppRoutes.accountSecurityPage,
+                  builder: (context, state) { 
+                    return const  AccountSecurityView(
+                    );},
+                  routes: [
+                    GoRoute(path: AppRoutes.changePasswordPage,
+                    builder: (context, state) => const ChangePasswordView(),),
+                    GoRoute(path: AppRoutes.changeEmailPage,
+                    builder: (context, state) => const ChangeEmailView(),),
+                  ]
+                  )
+              ]
+              )
+            ]
           ),
         ]),
       ],

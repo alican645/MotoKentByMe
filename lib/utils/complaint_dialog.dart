@@ -8,6 +8,7 @@ class ComplaintDialog {
     required List<ComplaintReasonModel> reasons,
     int otherOptionId = 9,
     String title = 'Şikayet Nedenini Seçin',
+   
   }) async {
     int? selectedReasonId;
     TextEditingController customReasonController = TextEditingController();
@@ -29,7 +30,7 @@ class ComplaintDialog {
                 if (selectedReasonId == otherOptionId)
                   TextField(
                     controller: customReasonController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: "Nedeninizi Yazın",
                       border: OutlineInputBorder(),
                     ),
@@ -40,11 +41,11 @@ class ComplaintDialog {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context, null),
-              child: Text('İptal'),
+              child: const Text('İptal'),
             ),
             TextButton(
               onPressed: () => Navigator.pop(context, selectedReasonId),
-              child: Text('Tamam'),
+              child: const Text('Tamam'),
             ),
           ],
         ),

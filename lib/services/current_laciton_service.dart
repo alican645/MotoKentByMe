@@ -2,9 +2,9 @@
 
 import 'package:geolocator/geolocator.dart';
 import 'package:moto_kent/constants/api_constants.dart';
-import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
+import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
 import 'package:moto_kent/models/last_location_model.dart';
-import 'package:moto_kent/services/dio_service_3.dart';
+import 'package:moto_kent/services/api_service_impl.dart';
 
 
 class CurrentLacitonService {
@@ -47,7 +47,7 @@ class CurrentLacitonService {
       )
       );
 
-      String? userId=await SharedPreferencesHelper().getValue<String>("user_id");
+      String? userId=await LocalStorageImpl().getValue<String>("user_id");
       //print('Anlık Konum: ${position.latitude}, ${position.longitude}');
 
       var lastLocation = LastLocationModel(
@@ -57,9 +57,9 @@ class CurrentLacitonService {
         lng: position.longitude
       );
 
-      await SharedPreferencesHelper().setValue<double>("last_location_latidue", position.latitude);
-      await SharedPreferencesHelper().setValue<double>("last_location_longitude", position.longitude);
-      DioService().postRequest(ApiConstants.addUserLastLocation, lastLocation.toJson());
+      await LocalStorageImpl().setValue<double>("last_location_latidue", position.latitude);
+      await LocalStorageImpl().setValue<double>("last_location_longitude", position.longitude);
+      ApiServiceImpl().postRequest(ApiConstants.addUserLastLocation, lastLocation.toJson());
     } catch (e) {
       //print('Konum alınırken hata oluştu: $e');
 

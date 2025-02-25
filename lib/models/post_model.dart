@@ -1,86 +1,113 @@
-
 class PostModel {
   int? id;
   String? userId;
-  String? userProfilePhotoPath;
-  String? userFullName;
   String? postContentTitle;
   String? postContent;
-  String? postCategoryPhotoPath;
-  String? postCategoryCategoryName;
-  bool?isOriginalPost;
-  DateTime? postDate;
-  String? postLocation;
-  int? postCategoryId;
+  String? userFullName;
+  String? userProfilePhotoPath;
+  DateTime? createdDate;
+  int? illerEnum;
+  int? postCategoryEnum;
   int? likes;
+  int? commentCount;
+  double?totalRating;
   int? dislikes;
-  int?commentCount;
+  int? votedSurveyItemId;
   bool? isMyFavorite;
 
-  String? sharedUserId;
-  String? sharedUserFullName;
+  List<SurveyItems>? surveyItems;
 
   PostModel(
-      {this.userId,
-      this.id,
-      this.likes,
-      this.dislikes,
+      {this.id,
+      this.userId,
       this.postContentTitle,
       this.postContent,
-      this.postDate,
-      this.postLocation,
-      this.postCategoryId,
+      this.totalRating,
+
+      this.createdDate,
+      this.votedSurveyItemId,
+      this.illerEnum,
+      this.postCategoryEnum,
+      this.surveyItems,
       this.userProfilePhotoPath,
-      this.userFullName,
-      this.isOriginalPost,
-      this.postCategoryPhotoPath,
-      this.postCategoryCategoryName,
       this.isMyFavorite,
-      this.sharedUserId,
-      this.sharedUserFullName,this.commentCount});
+      this.likes,
+      this.commentCount,
+      this.dislikes,
+      this.userFullName,
+      });
 
   PostModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     userId = json['userId'];
-    isOriginalPost = json['isOriginalPost'];
-    isMyFavorite = json['isMyFavorite'];
-    sharedUserId = json['sharedUserId'];
-    sharedUserFullName = json['sharedUserFullName'];
+    totalRating = double.tryParse(json['totalRating'].toString());
+    votedSurveyItemId = json['votedSurveyItemId'];
+    userFullName = json['userFullName'];
+
     likes = json['likes'];
     dislikes = json['dislikes'];
     commentCount = json['commentCount'];
-    userFullName = json['userFullName'];
-    userProfilePhotoPath = json['userProfilePhotoPath'];
     postContentTitle = json['postContentTitle'];
+    isMyFavorite = json['isMyFavorite'];
+    userProfilePhotoPath = json['userProfilePhotoPath'];
     postContent = json['postContent'];
-    postDate = DateTime.tryParse(json['postDate']);
-    postLocation = json['postLocation'];
-    postCategoryId = json['postCategoryId'];
-    postCategoryPhotoPath = json['postCategoryPhotoPath'];
-    postCategoryCategoryName = json['postCategoryCategoryName'];
+    createdDate = DateTime.parse(json['createdDate']);
+    illerEnum = json['illerEnum'];
+    postCategoryEnum = json['postCategoryEnum'];
+    if (json['surveyItems'] != null) {
+      surveyItems = <SurveyItems>[];
+      json['surveyItems'].forEach((v) {
+        surveyItems!.add(SurveyItems.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['userId'] = userId;
-    data['isMyFavorite'] = isMyFavorite;
-    data['isOriginalPost'] = isOriginalPost;
-    data['sharedUserId'] = sharedUserId;
-    data['sharedUserFullName'] = sharedUserFullName;
-    data['likes'] = likes;
-    data['dislikes'] = dislikes;
-    data['commentCount'] = commentCount;
-    data['userFullName'] = userFullName;
-    data['userProfilePhotoPath'] = userProfilePhotoPath;
     data['id'] = id;
+    data['userId'] = userId;
+    data['likes'] = likes;
+    data['totalRating'] = totalRating;
+    data['votedSurveyItemId'] = votedSurveyItemId;
+    data['dislikes'] = dislikes;
+    data['userFullName'] = userFullName;
+    data['commentCount'] = commentCount;
+    data['isMyFavorite'] = isMyFavorite;
+    data['userProfilePhotoPath'] = userProfilePhotoPath;
     data['postContentTitle'] = postContentTitle;
     data['postContent'] = postContent;
-    data['postDate'] = postDate?.toIso8601String();
-    data['postLocation'] = postLocation;
-    data['postCategoryId'] = postCategoryId;
-    data['postCategoryPhotoPath'] = postCategoryPhotoPath;
-    data['postCategoryCategoryName'] = postCategoryCategoryName;
+    data['illerEnum'] = illerEnum;
+    data['postCategoryEnum'] = postCategoryEnum;
+    if (surveyItems != null) {
+      data['surveyItems'] = surveyItems!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
 
+class SurveyItems {
+  int? id;
+  int? voteCount;
+  String? content;
+
+  SurveyItems({
+    this.content,
+  this.id,
+  this.voteCount,
+  
+  });
+
+  SurveyItems.fromJson(Map<String, dynamic> json) {
+    id=json['id'];
+    content = json['content'];
+    voteCount = json['voteCount'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id']=id;
+    data['content'] = content;
+    data['voteCount'] = voteCount;
     return data;
   }
 }

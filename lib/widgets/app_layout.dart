@@ -3,15 +3,11 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/constants/api_constants.dart';
-import 'package:moto_kent/constants/app_routes.dart';
-import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
-import 'package:moto_kent/pages/LoginView/login_viewmodel.dart';
+import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
 import 'package:moto_kent/services/current_laciton_service.dart';
-import 'package:moto_kent/services/dio_service_3.dart';
+import 'package:moto_kent/services/api_service_impl.dart';
 import 'package:moto_kent/services/firebase_notification_service.dart';
-import 'package:provider/provider.dart';
 import '../App/app_theme.dart';
-import 'package:badges/badges.dart' as badges;
 
 
 class AppLayout extends StatefulWidget {
@@ -49,8 +45,8 @@ class _AppLayoutState extends State<AppLayout> {
     await Future.delayed(const Duration(seconds: 3));
 
     String? userId =
-        await SharedPreferencesHelper().getValue<String>("user_id");
-    DioService service = DioService();
+        await LocalStorageImpl().getValue<String>("user_id");
+    ApiServiceImpl service = ApiServiceImpl();
 
     try {
       var response = await service.postRequest(
@@ -72,73 +68,6 @@ class _AppLayoutState extends State<AppLayout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60.0),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppTheme.themeData.colorScheme.primary,
-                Colors.white,
-              ],
-            ),
-          ),
-          child: AppBar(
-            title: Image.asset(
-              'assets/images/moto_kent_logo.png', // Resminizin assets klasöründeki yolu
-              height: 60, // Resim yüksekliğini ayarlayın
-              fit: BoxFit.fitWidth,
-            ),
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            actions: [
-              IconButton(
-                onPressed: () {
-                  context.push('/search_page');
-                },
-                icon: const Icon(Icons.search),
-                tooltip: 'Search',
-              ),
-              GestureDetector(
-                onTap: () {
-                  context.push(AppRoutes.myNotificationsPage);
-                },
-                child: badges.Badge(
-                  showBadge:  Provider.of<LoginViewmodel>(context).notificationCount ==
-                            0
-                        ? false
-                        : true,
-                  badgeContent: Text(
-                      Provider.of<LoginViewmodel>(context).notificationCount ==
-                              0
-                          ? ""
-                          : Provider.of<LoginViewmodel>(context)
-                              .notificationCount
-                              .toString()),
-                  child: Icon(Icons.notifications),
-                ),
-              ),
-              SizedBox(width: 5,),
-              IconButton(
-                onPressed: () {
-                  context.push('/my_favorite_posts');
-                },
-                icon: const Icon(Icons.star),
-                tooltip: 'Favorites',
-              ),
-              IconButton(
-                onPressed: () {
-                  context.push('/my_private_messages_page');
-                },
-                icon: const Icon(Icons.message),
-                tooltip: 'Messages',
-              ),
-            ],
-          ),
-        ),
-      ),
 
       // Tüm sayfalarda yenileme özelliği için RefreshIndicator ile sarılı body
       body: widget.statefulNavigationShell,
@@ -177,3 +106,5 @@ class _AppLayoutState extends State<AppLayout> {
     );
   }
 }
+
+

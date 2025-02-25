@@ -1,3 +1,5 @@
+import 'package:moto_kent/constants/enums.dart';
+
 class ApiConstants {
   static const String baseUrl = 'http://10.0.2.2:8080';
   //static const String baseUrl = 'https://www.friendly-vaughan.104-247-167-18.plesk.page';
@@ -12,7 +14,15 @@ class ApiConstants {
 
 
 
-  static const String userProfileEndpoint = '$baseUrl/api/UserProfile/GetProfile';
+  static  String getMyProfile (String user){
+    return "$baseUrl/api/UserProfile/GetMyProfile?userId=$user";
+  }
+  static String getProfile (String targetUser,String user){
+    return '$baseUrl/api/UserProfile/GetProfile?targetUserId=$targetUser&userId=$user';
+  }
+  static  String getUserConnections(String userId){
+    return '$baseUrl/api/UserProfile/GetUserConnections?userId=$userId';
+  }
   static const String followEndpoint = '$baseUrl/api/UserProfile/Follow';
   static const String unfollowEndpoint = '$baseUrl/api/UserProfile/Unfollow';
   static const String userFollowerRelationshipEndPoint = '$baseUrl/api/UserProfile/UserFollowerRelationship';
@@ -32,10 +42,14 @@ class ApiConstants {
   static const String getAllPostCategories = '$baseUrl/api/PostCategory/GetCategories';
   static const String getAllPostCategoriesFormFile = '$baseUrl/api/PostCategory/GetCategoriesFormFile';
 
-  //static const String addPost = '$baseUrl/api/Post/AddPost';
+  static const String addPost = '$baseUrl/api/Post/AddPost';
+  static const String votePost = '$baseUrl/api/Post/VotePost';
   static const String sharePost = '$baseUrl/api/SharedPost/SharePost';
   //static const String sharePost = '$baseUrl/api/Post/SharePost';
   static const String likePost = '$baseUrl/api/Post/LikePost';
+
+
+  static const String getAbouts = '$baseUrl/api/Abouts/GetAboutTitles';
 
 
   static String getPaginatedComments(int postId,int page){
@@ -45,12 +59,34 @@ class ApiConstants {
   static const String quotePost = '$baseUrl/api/Post/QuotePost';
   static const String favoritePost = '$baseUrl/api/Post/FavoritePost';
   static const String getAllPost = '$baseUrl/api/Post/GetAllPost';
-  static String getPaginatedPostsByPageSize(int page,int pageSize){
+/*   static String getPaginatedPostsByPageSize(int page,int pageSize){
       return '/api/SharedPost/GetPaginatedPosts?page=$page&pageSize=$pageSize';
+  } */
+  static String getPaginatedPostsByPageSize(int page,int pageSize,String userId){
+      return '/api/Post/GetPaginatedPosts?pageSize=$pageSize&page=$page&userId=$userId';
+  }
+  
+  static String getPaginatedPostsByCategory({ 
+    int? turkeyProvince,  
+    int? postCategoryEnum,  
+    int? page, 
+    int?   pageSize}){
+      if(turkeyProvince!=null && postCategoryEnum!=null){
+        return '/api/Post/GetPaginatedPostsByCategory?illerEnum=$turkeyProvince&postCategoryEnum=$postCategoryEnum&pageSize=$pageSize&page=$page';
+      }if(turkeyProvince!=null){
+        return '/api/Post/GetPaginatedPostsByCategory?illerEnum=$turkeyProvince&pageSize=$pageSize&page=$page'; }
+        if(postCategoryEnum!=null){
+      return '/api/Post/GetPaginatedPostsByCategory?postCategoryEnum=$postCategoryEnum&pageSize=$pageSize&page=$page';
+      }else{
+        return '/api/Post/GetPaginatedPostsByCategory?pageSize=$pageSize&page=$page';
+      }
+  }                                              
+  static String getPaginatedPostsByCategoryId (int page,int categoryId){
+    return '$baseUrl/api/SharedPost/GetPaginatedPostsByCategoryId?page=$page&categoryId=$categoryId';
   }
 
-  static String getFavoritePostsByUserId(int page,String userId ){
-      return '/api/SharedPost/GetFavoritePostsByUserId?userId=$userId&page=$page';
+  static String getPaginatedFavoritePostsByUserId(int pageSize,int page,String userId ){
+      return '/api/Post/GetPaginatedFavoritePostsByUserId?userId=$userId&page=$page&pageSize=$pageSize';
   }
 
   static String getMyFavoritePosts(String userId){
@@ -60,7 +96,7 @@ class ApiConstants {
       return '$baseUrl/api/Post/GetPostByPostId?id=$postId&userId=$userId';
   }
 
-  static String getPaginatedPostsByCategoryId (int page,int categoryId){
+  static String GetPaginatedPostsByCategoryId (int page,int categoryId){
     return '$baseUrl/api/SharedPost/GetPaginatedPostsByCategoryId?page=$page&categoryId=$categoryId';
   }
 
@@ -82,7 +118,7 @@ class ApiConstants {
     return '$baseUrl/api/ChatGroup/GetChatGroupByGroupId?groupId=$grupId&userId=$userId';
   }
 
-  static const String joinChatGroup = '$baseUrl/api/ChatGroup/JoinGroup';
+
   static const String leaveChatGroup = '$baseUrl/api/ChatGroup/LeaveGroup';
   static const String senMessageChatGroups = '$baseUrl/api/ChatGroup/SendMessageGroup';
   static  String getMessagesChatGroup (int groupId,String userId){
@@ -104,12 +140,15 @@ class ApiConstants {
     return '$baseUrl/api/JoinGroupRequest/GetAllNotification?adminId=$userId';
     ///api/ChatGroup/GetAllJoinRequestByAdminId?adminId=7477f709-beed-48bf-b8ba-85f32fee0284
   }
-
- 
-  
+  static const String operationDone = '$baseUrl/api/Notifications/OperationDone';
+  static const String createUserRating = '$baseUrl/api/UserRatings/CreateUserRating';
 
   static const String getCustomMarkerItem = '$baseUrl/api/CustomLocationIcon/GetCustomLocationIcons';
+
   static const String getAllLocations = '$baseUrl/api/Location/GetAllLocations';
+  static  String getAllLocationsByCategoryId(int categoryId){
+   return '$baseUrl/api/Location/GetAllLocationsByCategoryId?categoryId=$categoryId';
+  }
   static const String addLocation = '$baseUrl/api/Location/AddLocation';
   static const String resetMap = '$baseUrl/api/Location/ResetMap';
   static const String addUserLastLocation = '$baseUrl/api/Location/AddUserLastLocation';
@@ -120,10 +159,14 @@ class ApiConstants {
 
 
 
+  static  String getAllLocations2 (String userId,double minLat,double minLng ,double maxLat,double maxLng){
+    return "${ApiConstants.getAllLocations}?userId=$userId&minLat=$minLat&minLng$minLng=&maxLat=$maxLat&maxLng=$maxLng";
+  }
   static  String getAppMarkerIconTokenByUserId (String userId){
     return '$baseUrl/api/AppMarkerIconToken/GetAppMarkerIconTokenByUserId?userId=$userId';
   }
 
+  //
   static const String createAppMarkerIconToken='$baseUrl/api/AppMarkerIconToken/CreateAppMarkerIconToken';
   static const String getAppMarkerCoinPriceAndCountList = '$baseUrl/api/AppMarkerIconToken/GetAppMarkerCoinPriceAndCountList';
   static const String addAppMarkerCoinPriceAndCount = '$baseUrl/api/AppMarkerIconToken/AddAppMarkerCoinPriceAndCount';

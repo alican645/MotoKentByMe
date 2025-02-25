@@ -1,14 +1,12 @@
 import 'dart:async';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:logging/logging.dart';
 import 'package:moto_kent/constants/api_constants.dart';
-import 'package:moto_kent/init/Helpers/shared_preferences_helper.dart';
+import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
 import 'package:moto_kent/models/chat_group_message_model.dart';
-import 'package:moto_kent/pages/MessagePage/message_viewmodel.dart';
-
+import 'package:moto_kent/pages/GroupChatModule/MessagePage/message_viewmodel.dart';
 import 'package:signalr_netcore/ihub_protocol.dart';
 import 'package:signalr_netcore/signalr_client.dart';
 
@@ -33,7 +31,7 @@ class SignalRMessageService {
   // Token'in geçerliliğini kontrol eden fonksiyon
   Future<bool> isTokenExpired() async {
 
-    String? token =await SharedPreferencesHelper().getValue<String>('jwt_token');
+    String? token =await LocalStorageImpl().getValue<String>('jwt_token');
     if (token == null) return true; // Eğer token yoksa geçersiz
     return JwtDecoder.isExpired(token);
   }
@@ -41,8 +39,8 @@ class SignalRMessageService {
   // Token yenileyen fonksiyon
   Future<void> refreshToken() async {
 
-    String? refreshToken =await SharedPreferencesHelper().getValue<String>('refresh_token');
-    String? accessToken =await SharedPreferencesHelper().getValue<String>('jwt_token');
+    String? refreshToken =await LocalStorageImpl().getValue<String>('refresh_token');
+    String? accessToken =await LocalStorageImpl().getValue<String>('jwt_token');
 
     if (refreshToken == null || accessToken == null) {
       throw Exception('Token bulunamadı.');
@@ -60,8 +58,8 @@ class SignalRMessageService {
       final newAccessToken = response.data['accessToken'];
       final newRefreshToken = response.data['refreshToken'];
 
-      await SharedPreferencesHelper().setValue<String>('jwt_token', newAccessToken);
-      await SharedPreferencesHelper().setValue<String>('refresh_token', newRefreshToken);
+      await LocalStorageImpl().setValue<String>('jwt_token', newAccessToken);
+      await LocalStorageImpl().setValue<String>('refresh_token', newRefreshToken);
     } else {
       throw Exception('Token yenileme başarısız oldu: ${response.statusCode}');
     }
@@ -73,7 +71,7 @@ class SignalRMessageService {
       await refreshToken();
     }
 
-    String? token =await SharedPreferencesHelper().getValue<String>('jwt_token');
+    String? token =await LocalStorageImpl().getValue<String>('jwt_token');
     if (token == null) {
       throw Exception('Token alınamadı.');
     }

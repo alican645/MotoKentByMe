@@ -29,6 +29,15 @@ class DataObjects{
     };
     return object;
   }
+
+  static Object votePost(int postId,String userId,int surveyItemId){
+    var object={
+      "postId": postId,
+      "userId": userId,
+      "surveyItemId": surveyItemId
+    };
+    return object;
+  }
   static Object favoritePost(int postId,String userId){
     var object={
       "postId": postId,

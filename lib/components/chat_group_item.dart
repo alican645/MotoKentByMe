@@ -16,6 +16,7 @@ class ChatGroupItem extends StatelessWidget {
     return GestureDetector(
       onTap: onPressed,
       child: Container(
+        height: 50,
         decoration: BoxDecoration(
           color: amIAdmin == null
               ? Colors.grey[300]
@@ -28,11 +29,11 @@ class ChatGroupItem extends StatelessWidget {
               padding: const EdgeInsets.all(8),
               child: CircleAvatar(
                 backgroundColor: Colors.white70,
-                radius: 30,
+                radius: 20,
                 child: ClipRRect(
                     borderRadius: BorderRadius.circular(90),
                     child: Image.network(
-                      '${ApiConstants.baseUrl}/${chatGroupModel.groupIconPath}',
+                      '${ApiConstants.baseUrl}/${chatGroupModel.groupImagePath}',
                       scale: 5,
                     )),
               ),
@@ -45,8 +46,8 @@ class ChatGroupItem extends StatelessWidget {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       chatGroupModel.name!,
-                      style: Theme.of(context).textTheme.headlineLarge),
-                  const SizedBox(height: 4.0),
+                  ),
+                  const SizedBox(height: 2.0),
                   Row(
                     children: [
                       Expanded(

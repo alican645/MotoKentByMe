@@ -7,6 +7,7 @@ class PaginatedPostsModel {
   int? totalItems;
   bool? hasPreviousPage;
   bool? hasNextPage;
+  int? totalNotificationCount;
   List<PostModel>? items;
 
   PaginatedPostsModel(
@@ -16,10 +17,12 @@ class PaginatedPostsModel {
         this.totalItems,
         this.hasPreviousPage,
         this.hasNextPage,
+        this.totalNotificationCount,
         this.items});
 
   PaginatedPostsModel.fromJson(Map<String, dynamic> json) {
     currentPage = json['currentPage'];
+    totalNotificationCount = json['totalNotificationCount'];
     totalPages = json['totalPages'];
     pageSize = json['pageSize'];
     totalItems = json['totalItems'];

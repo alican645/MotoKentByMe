@@ -1,6 +1,8 @@
 
 
 
+import 'package:moto_kent/constants/enums.dart';
+
 class Utils{
   Utils._();
   static String formatDateToDayMonthYear(DateTime dateTime) {
@@ -18,5 +20,19 @@ class Utils{
   }
 
 
+  static String getEnumValue(PostCategoryEnum postCategory) {
+    if(postCategory==PostCategoryEnum.etkinlik){
+      return "assets/svg/event.svg";
+  }else if(postCategory==PostCategoryEnum.duyuru){
+      return "assets/svg/questionnaire.svg";  
+  }else if(postCategory==PostCategoryEnum.anket){
+      return "assets/svg/questionnaire.svg";}
+  else if(postCategory==PostCategoryEnum.ilan){
+      return "assets/svg/ad.svg";}
+  else{
+    return "Bilinmeyen";
+  }
+  
+  }
 
 }
