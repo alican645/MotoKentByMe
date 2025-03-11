@@ -1,4 +1,3 @@
-import 'package:moto_kent/constants/enums.dart';
 
 class ApiConstants {
   static const String baseUrl = 'http://10.0.2.2:8080';
@@ -11,11 +10,15 @@ class ApiConstants {
   static const String refreshTokenEndpoint = '$baseUrl/api/Auth/RefreshToken';
   static const String revokeEndpoint = '$baseUrl/api/Auth/Revoke';
   static const String revokeAllEndpoint = '$baseUrl/api/Auth/RevokeAll';
+  static const String changePassword = '$baseUrl/api/Auth/ChangePassword';
+  static const String changeEmail = '$baseUrl/api/Auth/ChangeEmail';
 
 
 
   static  String getMyProfile (String user){
     return "$baseUrl/api/UserProfile/GetMyProfile?userId=$user";
+  }  static  String getMyEditableProfileData (String user){
+    return "$baseUrl/api/UserProfile/GetMyEditableProfileData?userId=$user";
   }
   static String getProfile (String targetUser,String user){
     return '$baseUrl/api/UserProfile/GetProfile?targetUserId=$targetUser&userId=$user';
@@ -59,9 +62,7 @@ class ApiConstants {
   static const String quotePost = '$baseUrl/api/Post/QuotePost';
   static const String favoritePost = '$baseUrl/api/Post/FavoritePost';
   static const String getAllPost = '$baseUrl/api/Post/GetAllPost';
-/*   static String getPaginatedPostsByPageSize(int page,int pageSize){
-      return '/api/SharedPost/GetPaginatedPosts?page=$page&pageSize=$pageSize';
-  } */
+
   static String getPaginatedPostsByPageSize(int page,int pageSize,String userId){
       return '/api/Post/GetPaginatedPosts?pageSize=$pageSize&page=$page&userId=$userId';
   }
@@ -123,22 +124,24 @@ class ApiConstants {
   static const String senMessageChatGroups = '$baseUrl/api/ChatGroup/SendMessageGroup';
   static  String getMessagesChatGroup (int groupId,String userId){
     return '$baseUrl/api/ChatGroup/GetGroupMessagesByGroupId?groupId=$groupId&userId=$userId';
-    ///api/ChatGroup/GetChatGroupByGroupId?groupId=7477f709-beed-48bf-b8ba-85f32fee0284
+  }
+  static  String getPrivateMessagesByPrivateConversationId (String user1,String user2){
+    return '$baseUrl/api/PrivateConversation/GetPrivateMessagesByPrivateConversationId?user1Id=$user1&user2Id=$user2';
+  }
+  static  String getMyPrivateConversationByUserId (String user){
+    return '$baseUrl/api/PrivateConversation/GetMyPrivateConversationByUserId?userId=$user';
   }
 
   static const String groupJoinRequest = '$baseUrl/api/JoinGroupRequest/GroupJoinRequest';
   static const String acceptGroupJoinRequest = '$baseUrl/api/JoinGroupRequest/AcceptGroupJoinRequest';
     static  String getAllJoinRequestByGroupId (int chatGroupUniqueId){
     return '$baseUrl/api/JoinGroupRequest/GetAllJoinRequestByGroupId?chatGroupId=$chatGroupUniqueId';
-    ///api/ChatGroup/GetChatGroupByGroupId?groupId=7477f709-beed-48bf-b8ba-85f32fee0284
   }
     static  String getAllJoinRequestByAdminId (String userId){
     return '$baseUrl/api/JoinGroupRequest/GetAllJoinRequestByAdminId?adminId=$userId';
-    ///api/ChatGroup/GetAllJoinRequestByAdminId?adminId=7477f709-beed-48bf-b8ba-85f32fee0284
   }
     static  String getAllNotificationByAdminId (String userId){
     return '$baseUrl/api/JoinGroupRequest/GetAllNotification?adminId=$userId';
-    ///api/ChatGroup/GetAllJoinRequestByAdminId?adminId=7477f709-beed-48bf-b8ba-85f32fee0284
   }
   static const String operationDone = '$baseUrl/api/Notifications/OperationDone';
   static const String createUserRating = '$baseUrl/api/UserRatings/CreateUserRating';
@@ -146,6 +149,7 @@ class ApiConstants {
   static const String getCustomMarkerItem = '$baseUrl/api/CustomLocationIcon/GetCustomLocationIcons';
 
   static const String getAllLocations = '$baseUrl/api/Location/GetAllLocations';
+
   static  String getAllLocationsByCategoryId(int categoryId){
    return '$baseUrl/api/Location/GetAllLocationsByCategoryId?categoryId=$categoryId';
   }
@@ -172,9 +176,7 @@ class ApiConstants {
   static const String addAppMarkerCoinPriceAndCount = '$baseUrl/api/AppMarkerIconToken/AddAppMarkerCoinPriceAndCount';
   static const String createPrivateConversation = '$baseUrl/api/PrivateConversation/CreateOrFecthPrivateConversation';
   static const String sendMessageToUser = '$baseUrl/api/PrivateConversation/SendMessageToUser';
-  static  String getPrivateMessagesByPrivateConversationId (String user1Id,String user2Id){
-    return '$baseUrl/api/PrivateConversation/GetPrivateMessagesByPrivateConversationId?user1Id=$user1Id&user2Id=$user2Id';
-  }
+
 
   static const String getAllComplaintReasons  = "$baseUrl/api/Complaint/GetAllComplaintReasons";
   static const String addComplaint  = "$baseUrl/api/Complaint/AddComplaint";

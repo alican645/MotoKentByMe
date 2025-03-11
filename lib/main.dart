@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-  import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
 import 'package:moto_kent/pages/AppBarModule/MyNotificationsPage/my_notifications_view.dart';
 import 'package:moto_kent/pages/AppBarModule/MyNotificationsPage/my_notifications_viewmodel.dart';
@@ -34,8 +34,6 @@ import 'package:moto_kent/pages/GroupChatModule/JoinGroupRequestPage/join_group_
 import 'package:moto_kent/pages/GroupChatModule/JoinGroupRequestPage/join_group_request_viewmodel.dart';
 import 'package:moto_kent/pages/GroupChatModule/MessagePage/message_view.dart';
 import 'package:moto_kent/pages/GroupChatModule/MessagePage/message_viewmodel.dart';
-import 'package:moto_kent/pages/GroupChatModule/MessagePage2/message_view_2.dart';
-import 'package:moto_kent/pages/GroupChatModule/MessagePage2/message_viewmodel2.dart';
 import 'package:moto_kent/pages/GroupChatModule/MyChatGroupsPage/my_groups_view.dart';
 import 'package:moto_kent/pages/GroupChatModule/MyChatGroupsPage/my_groups_viewmodel.dart';
 import 'package:moto_kent/pages/GroupChatModule/SearchChatGroupPage/search_chat_group_view.dart';
@@ -50,6 +48,10 @@ import 'package:moto_kent/pages/MapModule/LoactionIconMapPage/loaction_icon_map_
 import 'package:moto_kent/pages/MapModule/LoactionIconMapPage/loaction_icon_map_viewmodel.dart';
 import 'package:moto_kent/pages/ProfileModule/AboutPage/about_view.dart';
 import 'package:moto_kent/pages/ProfileModule/AboutPage/about_viewmodel.dart';
+import 'package:moto_kent/pages/ProfileModule/ChangeEmailPage/change_email_view.dart';
+import 'package:moto_kent/pages/ProfileModule/ChangeEmailPage/change_email_viewmodel.dart';
+import 'package:moto_kent/pages/ProfileModule/ChangePasswordPage/change_password_view.dart';
+import 'package:moto_kent/pages/ProfileModule/ChangePasswordPage/change_password_viewmodel.dart';
 import 'package:moto_kent/pages/ProfileModule/EditProfilePage/edit_profile_view.dart';
 import 'package:moto_kent/pages/ProfileModule/EditProfilePage/edit_profile_viewmodel.dart';
 import 'package:moto_kent/pages/ProfileModule/FollowedPage/connections_view.dart';
@@ -106,10 +108,11 @@ void main() async {
     ChangeNotifierProvider(create: (context) => JoinGroupRequestViewmodel(), child:  const JoinGroupRequestView()),
     ChangeNotifierProvider(create: (context) => MyNotificationsViewmodel(), child:  const MyNotificationsView()),
     ChangeNotifierProvider(create: (context) => MyAppSettingsViewmodel(), child:  const MyAppSettingsView()),
-    ChangeNotifierProvider(create: (context) => EditProfileViewmodel(), child:   EditProfileView()),
+    ChangeNotifierProvider(create: (context) => EditProfileViewmodel(), child:  const EditProfileView()),
+    ChangeNotifierProvider(create: (context) => ChangePasswordViewmodel(), child:  const  ChangePasswordView()),
+    ChangeNotifierProvider(create: (context) => ChangeEmailViewmodel(), child:  const  ChangeEmailView()),
     ChangeNotifierProvider(create: (context) => ConnectionsViewmodel(), child:const    ConnectionsView()),
     ChangeNotifierProvider(create: (context) => AboutViewmodel(), child:const   AboutView()),
-    ChangeNotifierProvider(create: (context) => SendMessageViewmodel2(), child:const   ChatPage()),
     ChangeNotifierProvider(
         create: (context) => SendMessageViewmodel(), child: const MessageView()),
     ChangeNotifierProvider(
