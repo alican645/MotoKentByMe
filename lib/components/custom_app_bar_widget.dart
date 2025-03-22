@@ -8,23 +8,14 @@ class CustomAppBar22 extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget>? actions;
   final bool? right;
 
-
-  CustomAppBar22({super.key, this.actions, this.right = false,})
-      : preferredSize = const Size.fromHeight(60.0);
+  const CustomAppBar22({
+    super.key,
+    this.actions,
+    this.right = false,
+  }) : preferredSize = const Size.fromHeight(60.0);
 
   @override
   Widget build(BuildContext context) {
-    var appBarBoxDecoration = BoxDecoration(
-      gradient: LinearGradient(
-        begin: Alignment.topCenter,
-        end: Alignment.bottomCenter,
-        colors: [
-          Theme.of(context).colorScheme.primary,
-          Colors.white,
-        ],
-      ),
-    );
-
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(

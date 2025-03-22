@@ -6,9 +6,8 @@ import 'package:moto_kent/pages/AppBarModule/MyPrivateMessagesPage/my_private_me
 import 'package:provider/provider.dart';
 
 mixin MyPrivateMessageViewMixin on State<MyPrivateMessagesView> {
-
   final _appBarTitle = "Sohbetlerim";
-  String get  appBarTitle =>_appBarTitle;
+  String get appBarTitle => _appBarTitle;
 
   Future<void> startConversation(String userId) async {
     var response = await context
@@ -20,8 +19,10 @@ mixin MyPrivateMessageViewMixin on State<MyPrivateMessagesView> {
         "connectionId": response.data["connectionId"],
         "privateConversationId": response.data["privateConversationId"]
       };
-      if(!mounted) return;
-      context.push(AppRoutes.privateChatPage, extra: args);
+      if (!mounted) return;
+      context.push(
+          '${AppRoutes.explorePage}/${AppRoutes.myPrivateMessagesPage}/${AppRoutes.privateChatPage}',
+          extra: args);
     }
   }
 }

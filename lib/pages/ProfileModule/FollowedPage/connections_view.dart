@@ -5,7 +5,6 @@ import 'package:moto_kent/components/custom_loading_widget.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/constants/app_routes.dart';
 import 'package:moto_kent/models/connection_model.dart';
-import 'package:moto_kent/pages/AppBarModule/MyNotificationsPage/my_notifications_view.dart';
 import 'package:moto_kent/pages/ProfileModule/FollowedPage/connections_viewmodel.dart';
 import 'package:provider/provider.dart';
 

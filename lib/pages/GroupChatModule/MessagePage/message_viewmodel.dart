@@ -6,23 +6,30 @@ import 'package:moto_kent/models/chat_group_message_model.dart';
 import 'package:moto_kent/services/api_service_impl.dart';
 import 'package:moto_kent/services/iapi_service.dart';
 
-class SendMessageViewmodel extends ChangeNotifier{
+class SendMessageViewmodel extends ChangeNotifier {
   IApiService apiService = ApiServiceImpl();
 
-  List<ChatGroupMessageModel> _messageList=[];
-  List<ChatGroupMessageModel> get messageList=>_messageList;
+  List<ChatGroupMessageModel> _messageList = [];
+  List<ChatGroupMessageModel> get messageList => _messageList;
 
   String? _groupId;
-  String? get groupId=>_groupId;
+  String? get groupId => _groupId;
+
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
 
   Future<Response> sendMessage(Object object) async {
-    var response = await apiService.postRequest(ApiConstants.senMessageChatGroups, object);
+    var response =
+        await apiService.postRequest(ApiConstants.senMessageChatGroups, object);
     return response;
   }
 
   Future<void> fetchMessageList(int groupId) async {
-    String? userId=await LocalStorageImpl().getValue<String>("user_id");
-    var response = await apiService.getRequest(ApiConstants.getMessagesChatGroup(groupId,userId!));
+    _isLoading = false;
+    notifyListeners();
+    String? userId = await LocalStorageImpl().getValue<String>("user_id");
+    var response = await apiService
+        .getRequest(ApiConstants.getMessagesChatGroup(groupId, userId!));
     // Dönüşümü doğru şekilde yapın
     if (response.data is List) {
       _messageList = (response.data as List)
@@ -31,7 +38,25 @@ class SendMessageViewmodel extends ChangeNotifier{
     } else {
       throw Exception('Unexpected data format: Expected a list');
     }
+    _isLoading = true;
+    notifyListeners();
+  }
 
+  Future<void> fetchMessageList2(int groupId) async {
+    _isLoading = false;
+    notifyListeners();
+    String? userId = await LocalStorageImpl().getValue<String>("user_id");
+    var response = await apiService
+        .getRequest(ApiConstants.getMessagesChatGroup(groupId, userId!));
+    // Dönüşümü doğru şekilde yapın
+    if (response.data is List) {
+      _messageList = (response.data as List)
+          .map((e) => ChatGroupMessageModel.fromJson(e))
+          .toList();
+    } else {
+      throw Exception('Unexpected data format: Expected a list');
+    }
+    _isLoading = true;
     notifyListeners();
   }
 
@@ -39,9 +64,4 @@ class SendMessageViewmodel extends ChangeNotifier{
     _messageList.add(value);
     notifyListeners();
   }
-
-
-
-
-
 }

@@ -1,37 +1,52 @@
 enum CallForHelpEnum { kazaYardim, sorunYardim, beniBul }
 
 enum PostCategoryEnum {
-  etkinlik(0), 
-  duyuru(1), 
+  etkinlik(0),
+  duyuru(1),
   anket(2),
   ilan(3);
-    
-    final int categoryId;
-    const PostCategoryEnum(this.categoryId);
-  
-    String get isim => name.toUpperCaseFirstLetter();
-    int get id => categoryId;
-    List<String> get valuess => ["Etkinlik", "Duyuru", "Anket", "İlan"];
-  }
 
+  final int categoryId;
+  const PostCategoryEnum(this.categoryId);
+
+  String get isim => name.toUpperCaseFirstLetter();
+  int get id => categoryId;
+  List<String> get valuess => ["Etkinlik", "Duyuru", "Anket", "İlan"];
+}
 
 enum TurkeyProvince {
   adana(1, "Adana"),
+
   adiyaman(2, "Adıyaman"),
+
   afyonkarahisar(3, "Afyonkarahisar"),
+
   agri(4, "Ağrı"),
+
   amasya(5, "Amasya"),
+
   ankara(6, "Ankara"),
+
   antalya(7, "Antalya"),
+
   artvin(8, "Artvin"),
+
   aydin(9, "Aydın"),
+
   balikesir(10, "Balıkesir"),
+
   bilecik(11, "Bilecik"),
+
   bingol(12, "Bingöl"),
+
   bitlis(13, "Bitlis"),
+
   bolu(14, "Bolu"),
+
   burdur(15, "Burdur"),
+
   bursa(16, "Bursa"),
+
   canakkale(17, "Çanakkale"),
   cankiri(18, "Çankırı"),
   corum(19, "Çorum"),
@@ -117,26 +132,29 @@ enum TurkeyProvince {
 
   static TurkeyProvince getByCityName(String cityName) {
     return TurkeyProvince.values.firstWhere(
-      (province) =>
-          province.provinceName.toLowerCase() == cityName.toLowerCase(),
+          (province) =>
+      province.provinceName.toLowerCase() == cityName.toLowerCase(),
       orElse: () => TurkeyProvince.diger,
     );
   }
 }
 
-enum NotificationTypeEnum
-{
+enum NotificationTypeEnum {
   privateMessage,
   groupChatMessage,
   groupJoinRequest,
   groupJoinRejectMessage,
   groupJoinAcceptMessage,
   postLike,
-  postComment
+  postComment,
+  groupChatIsClosedMessages,
+  userRemoveInGroupByAdmin,
 }
 
 String getProvinceNameByPlateCode(int plateCode) {
-  return TurkeyProvince.values.firstWhere((element) => element.plateCode == plateCode).provinceName;
+  return TurkeyProvince.values
+      .firstWhere((element) => element.plateCode == plateCode)
+      .provinceName;
 }
 
 extension StringExtension on String {

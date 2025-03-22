@@ -6,7 +6,7 @@ abstract class GeolocatorService {
 
 
 
-  Future<List<dynamic>> searchLocation(String girilenMetin);
+  Future<List<PlacePrediction>> searchLocation(String girilenMetin);
   //anlık konumu alan fonksiyon
   Future<LatLng> getCurrentLocation() ;
 

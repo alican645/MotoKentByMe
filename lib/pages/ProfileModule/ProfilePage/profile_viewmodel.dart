@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:moto_kent/constants/api_constants.dart';
@@ -10,23 +11,21 @@ class ProfileViewmodel extends ChangeNotifier {
   bool get isCompleted => _isCompleted;
 
   UserModel? _userModel;
-  UserModel? get userModel=>_userModel;
+  UserModel? get userModel => _userModel;
 
   Future<void> fetchUserProfile(String guid) async {
-    _isCompleted =false;
+    _isCompleted = false;
     notifyListeners();
 
     var response = await _dio.getRequest(ApiConstants.getMyProfile(guid));
-    _userModel=UserModel.fromJson(response.data);
-    _isCompleted=true;
+    _userModel = UserModel.fromJson(response.data);
+    _isCompleted = true;
     notifyListeners();
   }
 
-  Future<void> uploadPhoto(String guid,XFile photo) async {
-    await _dio.uploadPhoto(ApiConstants.uploadPhotoEndpoint, photo, {'userId': guid});
+  Future<Response> uploadPhoto(String guid, XFile photo) async {
+    var response = await _dio
+        .uploadPhoto(ApiConstants.uploadPhotoEndpoint, photo, {'userId': guid});
+    return response;
   }
-
-
-
-
 }

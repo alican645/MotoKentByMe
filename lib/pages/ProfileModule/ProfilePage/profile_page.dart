@@ -37,7 +37,13 @@ class _ProfilePageState extends State<ProfilePage> {
         await imagePicker.pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
       if (!mounted) return;
-      await context.read<ProfileViewmodel>().uploadPhoto(userID!, pickedImage);
+      var response = await context
+          .read<ProfileViewmodel>()
+          .uploadPhoto(userID!, pickedImage);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        userID = await LocalStorageImpl().getValue<String>("user_id");
+        await context.read<ProfileViewmodel>().fetchUserProfile(userID!);
+      }
     }
   }
 
@@ -87,8 +93,9 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         Flexible(
                           child: InkWell(
-                            onTap: (){
-                              context.push("${AppRoutes.profilePage}/${AppRoutes.followedPage}");
+                            onTap: () {
+                              context.push(
+                                  "${AppRoutes.profilePage}/${AppRoutes.followedPage}");
                             },
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -97,14 +104,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                   content: "Takipçi",
                                   count:
                                       value.userModel!.followerCount.toString(),
-
                                 ),
                                 SizedBox(width: width * 0.05),
                                 FollowedFollowerCountWidget(
                                   content: "Takip",
-                                  count:
-                                      value.userModel!.followingCount.toString(),
-
+                                  count: value.userModel!.followingCount
+                                      .toString(),
                                 ),
                               ],
                             ),
@@ -129,6 +134,24 @@ class _ProfilePageState extends State<ProfilePage> {
                       child: Text(value.userModel!.bio ?? ''),
                     ),
                     const SizedBox(height: 20),
+                    GestureDetector(
+                      onTap: () {
+                        context.go(
+                            "${AppRoutes.profilePage}/${AppRoutes.myAppSettingPage}/${AppRoutes.editProfilePage}");
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 1),
+                        decoration: BoxDecoration(
+                            color: const Color(0xfff48a34),
+                            borderRadius: BorderRadius.circular(16)),
+                        child: const Text(
+                          "Profili Düzenle",
+                          style: TextStyle(
+                              fontWeight: FontWeight.w500, color: Colors.white),
+                        ),
+                      ),
+                    ),
                     const Divider(
                       thickness: 2,
                       indent: 20,
@@ -209,7 +232,6 @@ class FollowedFollowerCountWidget extends StatelessWidget {
     super.key,
     required this.content,
     required this.count,
-
   });
 
   final String content;

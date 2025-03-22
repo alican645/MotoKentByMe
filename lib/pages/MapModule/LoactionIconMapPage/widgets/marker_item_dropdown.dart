@@ -1,5 +1,3 @@
-
-
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:moto_kent/constants/api_constants.dart';
@@ -7,9 +5,8 @@ import 'package:moto_kent/models/custom_marker_model.dart';
 import 'package:moto_kent/utils/utils.dart';
 
 class MarkerItemDropdown extends StatelessWidget {
-  const MarkerItemDropdown({
-    super.key,required this.filteredMarkers,this.onMarkerSelected
-  });
+  const MarkerItemDropdown(
+      {super.key, required this.filteredMarkers, this.onMarkerSelected});
   final List<CustomMarkerModel> filteredMarkers;
   final Function(CustomMarkerModel)? onMarkerSelected;
   @override
@@ -46,14 +43,13 @@ class MarkerItemDropdown extends StatelessWidget {
         ),
         items: filteredMarkers.map((marker) {
           return DropdownMenuItem<CustomMarkerModel>(
-
             value: marker,
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Row(
                 children: [
                   Image.network(
-                    "${ApiConstants.baseUrl}/${marker.iconPath}" ,
+                    "${ApiConstants.baseUrl}/${marker.iconPath}",
                     width: 40,
                     height: 40,
                     errorBuilder: (_, __, ___) => const Icon(Icons.location_on),
@@ -77,7 +73,7 @@ class MarkerItemDropdown extends StatelessWidget {
                           ),
                         if (marker.uploadedDate != null)
                           Text(
-                            "Uploaded:${ Utils.formatDateToDayMonthYear(marker.uploadedDate!)}",
+                            "Uploaded:${Utils.formatDateToDayMonthYear(marker.uploadedDate!)}",
                             style: const TextStyle(
                               fontSize: 10,
                               color: Colors.grey,
@@ -96,7 +92,6 @@ class MarkerItemDropdown extends StatelessWidget {
             onMarkerSelected!(value);
           }
         },
-
       ),
     );
   }

@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/models/user_model.dart';
@@ -23,7 +21,7 @@ class MemberCardItem extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: isAdmin ? Colors.orange[100] : Colors.grey[300],
-            borderRadius: BorderRadius.circular(90),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             children: [
@@ -31,9 +29,9 @@ class MemberCardItem extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 child: CircleAvatar(
                   backgroundColor: Theme.of(context).colorScheme.primary,
-                  radius: 30,
+                  radius: 20,
                   child: CircleAvatar(
-                    radius: 30,
+                    radius: 20,
                     backgroundImage: NetworkImage(
                         '${ApiConstants.baseUrl}/${userModel.profilePhotoPath}'),
                   ),
@@ -47,7 +45,7 @@ class MemberCardItem extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         userModel.fullName!,
-                        style: Theme.of(context).textTheme.headlineLarge),
+                        style: TextStyle(fontSize: 20)),
                     const SizedBox(height: 4.0),
                   ],
                 ),

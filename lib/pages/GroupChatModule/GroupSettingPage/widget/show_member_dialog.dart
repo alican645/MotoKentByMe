@@ -10,6 +10,7 @@ class ShowMemberDialog {
       required bool isMe,
       required VoidCallback onPressedReport,
       required VoidCallback onPressedSendMessage,
+      required VoidCallback onPressedRemoveUser,
       required VoidCallback onPressedViewProfile}) async {
     showDialog<void>(
       context: contextt,
@@ -34,8 +35,7 @@ class ShowMemberDialog {
                   text: "Şikayet Et",
                   icon: Icons.report,
                   onPressed: () async {
-
-                     onPressedReport();
+                    onPressedReport();
                   },
                 ),
           ActionButton(
@@ -53,6 +53,16 @@ class ShowMemberDialog {
                   icon: Icons.message,
                   onPressed: () async {
                     onPressedSendMessage();
+                  },
+                  context: context,
+                ),
+          isMe
+              ? const SizedBox()
+              : ActionButton(
+                  text: "Kullanıcıyı Çıkar",
+                  icon: Icons.person_remove,
+                  onPressed: () async {
+                    onPressedRemoveUser();
                   },
                   context: context,
                 ),

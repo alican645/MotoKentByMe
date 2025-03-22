@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:moto_kent/components/chat_group_item.dart';
 import 'package:moto_kent/components/chat_group_item_2.dart';
 import 'package:moto_kent/components/custom_app_bar_widget.dart';
+import 'package:moto_kent/pages/GroupChatModule/GroupsPage/groups_view_mixin.dart';
 
 import 'package:moto_kent/pages/GroupChatModule/GroupsPage/groups_viewmodel.dart';
 import 'package:moto_kent/pages/GroupChatModule/GroupsPage/widgets/bottom_butons_bar.dart';
@@ -13,7 +13,8 @@ class ChatGroupsView extends StatefulWidget {
   State<ChatGroupsView> createState() => _ChatGroupsViewState();
 }
 
-class _ChatGroupsViewState extends State<ChatGroupsView> {
+class _ChatGroupsViewState extends State<ChatGroupsView>
+    with ChatGroupsViewMixin {
   @override
   void initState() {
     super.initState();
@@ -24,58 +25,35 @@ class _ChatGroupsViewState extends State<ChatGroupsView> {
     });
   }
 
-  Future<void> joinChatGroup(int groupId) async {
-    try {
-      var response = await context
-          .read<ChatGroupsViewmodel>()
-          .joinRequestChatGroup(groupId);
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            backgroundColor: Colors.green,
-            content: Text("Katılma İsteği Gönderildi"),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-            backgroundColor: Colors.orange,
-            content: Text(response.data),
-          ),
-        );
-        
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-           SnackBar(
-            backgroundColor: Colors.orange,
-            content: Text(e.toString()),
-          ),
-        );
-    }
-  }
+  @override
+  void joinChatGropShowDialog(int groupId) => showDialog(
+        context: context,
+        builder: (joinChatGropShowDialogContext) => AlertDialog(
+          title: const Text("Bu gruba katılmak ister misiniz?"),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(joinChatGropShowDialogContext);
+                },
+                child: const Text("İptal")),
+            TextButton(
+                onPressed: () async {
+                  Navigator.pop(joinChatGropShowDialogContext);
+                  await joinChatGroup(groupId);
+                },
+                child: const Text("Katıl")),
+          ],
+        ),
+      );
 
-  void joinChatGropShowDialog(int groupId) {
-    showDialog(
-      context: context,
-      builder: (joinChatGropShowDialogContext) => AlertDialog(
-        title: const Text("Bu gruba katılmak ister misiniz?"),
-        actions: [
-          TextButton(
-              onPressed: () {
-                Navigator.pop(joinChatGropShowDialogContext);
-              },
-              child: const Text("İptal")),
-          TextButton(
-              onPressed: () async {
-                Navigator.pop(joinChatGropShowDialogContext);
-                await joinChatGroup(groupId);
-              },
-              child: const Text("Katıl")),
-        ],
-      ),
-    );
-  }
+  @override
+  void showScaffoldMessenger(String message) =>
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          backgroundColor: Colors.orange,
+          content: Text(message),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {

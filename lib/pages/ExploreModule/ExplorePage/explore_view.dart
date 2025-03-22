@@ -12,7 +12,6 @@ import 'package:provider/provider.dart';
 
 import 'package:badges/badges.dart' as badges;
 
-
 class ExploreView extends StatefulWidget {
   const ExploreView({super.key});
 
@@ -26,7 +25,6 @@ class _ExploreViewState extends State<ExploreView> {
 
   @override
   void initState() {
-
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final viewModel = Provider.of<ExploreViewmodel>(context, listen: false);
       await viewModel.fetchPostList();
@@ -55,49 +53,54 @@ class _ExploreViewState extends State<ExploreView> {
     return Scaffold(
       appBar: CustomAppBar22(
         actions: [
-              IconButton(
-                onPressed: () {
-                  context.push('/search_page');
-                },
-                icon: const Icon(Icons.search),
-                tooltip: 'Search',
-              ),
-              GestureDetector(
-                onTap: () {
-                  context.push(AppRoutes.myNotificationsPage);
-                  context.read<ExploreViewmodel>().resetNotification();
-                },
-                child: badges.Badge(
-                  showBadge:  Provider.of<ExploreViewmodel>(context).notificationCount ==
-                            0
-                        ? false
-                        : true,
-                  badgeContent: Text(
-                      Provider.of<ExploreViewmodel>(context).notificationCount ==
-                              0
-                          ? ""
-                          : Provider.of<ExploreViewmodel>(context)
-                              .notificationCount
-                              .toString()),
-                  child: const Icon(Icons.notifications),
-                ),
-              ),
-              const SizedBox(width: 5,),
-              IconButton(
-                onPressed: () {
-                  context.push('/my_favorite_posts');
-                },
-                icon: const Icon(Icons.star),
-                tooltip: 'Favorites',
-              ),
-              IconButton(
-                onPressed: () {
-                  context.push('/my_private_messages_page');
-                },
-                icon: const Icon(Icons.message),
-                tooltip: 'Messages',
-              ),
-            ],
+          IconButton(
+            onPressed: () {
+              ;
+              context.push('${AppRoutes.explorePage}/${AppRoutes.searchPage}');
+            },
+            icon: const Icon(Icons.search),
+            tooltip: 'Search',
+          ),
+          GestureDetector(
+            onTap: () {
+              context.push(
+                  '${AppRoutes.explorePage}/${AppRoutes.myNotificationsPage}');
+              context.read<ExploreViewmodel>().resetNotification();
+            },
+            child: badges.Badge(
+              showBadge:
+                  Provider.of<ExploreViewmodel>(context).notificationCount == 0
+                      ? false
+                      : true,
+              badgeContent: Text(
+                  Provider.of<ExploreViewmodel>(context).notificationCount == 0
+                      ? ""
+                      : Provider.of<ExploreViewmodel>(context)
+                          .notificationCount
+                          .toString()),
+              child: const Icon(Icons.notifications),
+            ),
+          ),
+          const SizedBox(
+            width: 5,
+          ),
+          IconButton(
+            onPressed: () {
+              context.push(
+                  '${AppRoutes.explorePage}/${AppRoutes.myFavoritePosts}');
+            },
+            icon: const Icon(Icons.star),
+            tooltip: 'Favorites',
+          ),
+          IconButton(
+            onPressed: () {
+              context.push(
+                  '${AppRoutes.explorePage}/${AppRoutes.myPrivateMessagesPage}');
+            },
+            icon: const Icon(Icons.message),
+            tooltip: 'Messages',
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -118,22 +121,19 @@ class _ExploreViewState extends State<ExploreView> {
                     child: RefreshIndicator(
                       onRefresh: () async {
                         final viewModel = context.read<ExploreViewmodel>();
-      
+
                         viewModel.resetPagination(); // Pagination sıfırlanır
-      
+
                         await viewModel
-                            .fetchAllOrCategoryId();// Tüm postlar yeniden yüklenir
-                        setState(() {
-      
-                        });
+                            .fetchAllOrCategoryId(); // Tüm postlar yeniden yüklenir
+                        setState(() {});
                       },
                       child: Consumer<ExploreViewmodel>(
                         builder: (context, viewModel, child) {
                           if (viewModel.posts.isEmpty && viewModel.isLoading) {
-                            return const Center(
-                                child: CustomLoadingWidget());
+                            return const Center(child: CustomLoadingWidget());
                           }
-      
+
                           return ListView.builder(
                             physics: const AlwaysScrollableScrollPhysics(),
                             controller: _scrollController,
@@ -174,5 +174,3 @@ class _ExploreViewState extends State<ExploreView> {
     super.dispose();
   }
 }
-
-

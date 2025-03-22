@@ -4,6 +4,7 @@ import 'package:moto_kent/components/custom_app_bar.dart';
 import 'package:moto_kent/components/custom_loading_widget.dart';
 import 'package:moto_kent/components/fallow_button.dart';
 import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/constants/app_routes.dart';
 import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
 import 'package:moto_kent/models/user_rating_model.dart';
 import 'package:moto_kent/pages/AppBarModule/OtherProfilePage/other_profile_viewmodel.dart';
@@ -22,9 +23,9 @@ class _OtherProfileViewState extends State<OtherProfileView> {
     await context.read<OtherProfileViewmodel>().fetchUserPhoto3(widget.userID!);
   }
 
-  Future<void> followOrUnfollowUser( isFollow) async {
+  Future<void> followOrUnfollowUser(isFollow) async {
     String? userId = await LocalStorageImpl().getValue<String>("user_id");
-    if(!mounted) return;
+    if (!mounted) return;
     var respnse = await context
         .read<OtherProfileViewmodel>()
         .followOrUnfollowUser(
@@ -32,7 +33,7 @@ class _OtherProfileViewState extends State<OtherProfileView> {
 
     if (respnse.statusCode == 200) {
       await fetchUserProfile();
-      if(!mounted) return;
+      if (!mounted) return;
       await followerRelationshipEndPoint(context);
     }
   }
@@ -75,8 +76,10 @@ class _OtherProfileViewState extends State<OtherProfileView> {
         "connectionId": response.data["connectionId"],
         "privateConversationId": response.data["privateConversationId"]
       };
-      if(!mounted) return;
-      context.push("/private_chat_page", extra: args);
+      if (!mounted) return;
+      context.push(
+          '${AppRoutes.explorePage}/${AppRoutes.searchPage}/${AppRoutes.otherUserProfile}/${AppRoutes.privateChatPage}',
+          extra: args);
     }
   }
 
@@ -233,16 +236,14 @@ class _OtherProfileViewState extends State<OtherProfileView> {
                                 value.isFollow
                                     ? PostDetailPageButton(
                                         onPressed: () async {
-                                          await followOrUnfollowUser(
-                                               false);
+                                          await followOrUnfollowUser(false);
                                         },
                                         content: "Takipten Çık",
                                       )
                                     : PostDetailPageButton(
                                         onPressed: () async {
                                           //await followUser(context);
-                                          await followOrUnfollowUser(
-                                               true);
+                                          await followOrUnfollowUser(true);
                                         },
                                         content: "Takip Et",
                                       ),
@@ -395,7 +396,6 @@ class _RatingWidgetState extends State<RatingWidget> {
       setState(() {
         currentRating = newRating;
       });
-
     }
   }
 
@@ -487,4 +487,3 @@ class StaticRatingWidget extends StatelessWidget {
     );
   }
 }
-

@@ -4,15 +4,14 @@ import 'package:moto_kent/models/notification_model.dart';
 import 'package:moto_kent/pages/AppBarModule/MyNotificationsPage/widgets/my_notification_page_button.dart';
 
 class NotificationItem extends StatelessWidget {
-  const NotificationItem({
-    super.key,
-    required this.model,
-    this.acceptUser,
-    this.goUserProfile,
-    this.goChatGroup,
-    this.rejectUser,
-    this.okey
-  });
+  const NotificationItem(
+      {super.key,
+      required this.model,
+      this.acceptUser,
+      this.goUserProfile,
+      this.goChatGroup,
+      this.rejectUser,
+      this.okey});
 
   final NotificationModel model;
   final VoidCallback? acceptUser;
@@ -55,19 +54,30 @@ class NotificationItem extends StatelessWidget {
         _ButtonConfig(Colors.orange, goUserProfile, Icons.remove_red_eye),
       ],
       NotificationTypeEnum.groupChatMessage.index: [
+        _ButtonConfig(Colors.red, okey, Icons.remove),
         _ButtonConfig(Colors.green, goChatGroup, Icons.arrow_forward),
       ],
       NotificationTypeEnum.groupJoinAcceptMessage.index: [
-        _ButtonConfig(Colors.green, okey, Icons.remove),
+        _ButtonConfig(Colors.red, okey, Icons.remove),
+      ],
+      NotificationTypeEnum.privateMessage.index: [
+        _ButtonConfig(Colors.red, okey, Icons.remove),
+        _ButtonConfig(Colors.green, goChatGroup, Icons.arrow_forward),
       ],
       NotificationTypeEnum.groupJoinRejectMessage.index: [
-        _ButtonConfig(Colors.green, okey, Icons.remove),
+        _ButtonConfig(Colors.red, okey, Icons.remove),
       ],
       NotificationTypeEnum.postLike.index: [
-        _ButtonConfig(Colors.green, okey, Icons.remove),
+        _ButtonConfig(Colors.red, okey, Icons.remove),
       ],
       NotificationTypeEnum.postComment.index: [
-        _ButtonConfig(Colors.green, okey, Icons.remove),
+        _ButtonConfig(Colors.red, okey, Icons.remove),
+      ],
+      NotificationTypeEnum.groupChatIsClosedMessages.index: [
+        _ButtonConfig(Colors.red, okey, Icons.remove),
+      ],
+      NotificationTypeEnum.userRemoveInGroupByAdmin.index: [
+        _ButtonConfig(Colors.red, okey, Icons.remove),
       ],
     };
 
@@ -79,14 +89,14 @@ class NotificationItem extends StatelessWidget {
       children: buttons
           .map(
             (config) => Padding(
-          padding: const EdgeInsets.only(left: 5),
-          child: MyNotificationsPageButton(
-            color: config.color,
-            onPressed: config.onPressed!,
-            icon: config.icon,
-          ),
-        ),
-      )
+              padding: const EdgeInsets.only(left: 5),
+              child: MyNotificationsPageButton(
+                color: config.color,
+                onPressed: config.onPressed!,
+                icon: config.icon,
+              ),
+            ),
+          )
           .toList(),
     );
   }

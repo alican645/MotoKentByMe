@@ -1,16 +1,14 @@
-
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-
 class OptionsWidget extends StatefulWidget {
-  const OptionsWidget({super.key, 
-  required this.amIAdmin,
-  required this.onLeaveGroup,
-  required this.onReportGroup,
-  required this.onShareGroup,
-
+  const OptionsWidget({
+    super.key,
+    required this.amIAdmin,
+    required this.onLeaveGroup,
+    required this.onReportGroup,
+    required this.onShareGroup,
   });
 
   final bool amIAdmin;
@@ -23,21 +21,21 @@ class OptionsWidget extends StatefulWidget {
 }
 
 class _OptionsWidgetState extends State<OptionsWidget> {
-  static const MenuItem _share= MenuItem(text: "Grubu Paylaş", icon: Icons.share);
-  static const MenuItem _report=  MenuItem(text: "Grubu Şikayet Et", icon: Icons.report_gmailerrorred_sharp);
-  static const MenuItem _leave=  MenuItem(text: "Grubtan Ayrıl", icon: Icons.logout);
-  static const MenuItem _delete=  MenuItem(text: "Grubu Sil", icon: Icons.delete);
+  static const MenuItem _share =
+      MenuItem(text: "Grubu Paylaş", icon: Icons.share);
+  static const MenuItem _report = MenuItem(
+      text: "Grubu Şikayet Et", icon: Icons.report_gmailerrorred_sharp);
+  static const MenuItem _leave =
+      MenuItem(text: "Grubtan Ayrıl", icon: Icons.logout);
+  static const MenuItem _delete =
+      MenuItem(text: "Grubu Sil", icon: Icons.delete);
   late List<MenuItem> itemList;
 
   @override
   void initState() {
     super.initState();
-    itemList = [
-      _share, _report, widget.amIAdmin ? _delete : _leave
-    ];
-
+    itemList = [_share, _report, widget.amIAdmin ? _delete : _leave];
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -77,9 +75,36 @@ class _OptionsWidgetState extends State<OptionsWidget> {
               widget.onReportGroup!();
               break;
             case _leave || _delete:
-              widget.onLeaveGroup!();
-              break;
+              String data = widget.amIAdmin
+                  ? "Grubu silmek istediğinize emin misiniz?"
+                  : "Grubtan ayrılmak istediğinize emin misiniz?";
+              showDialog<void>(
+                  context: context,
+                  builder: (BuildContext context) => AlertDialog(
+                        content: Text(data),
+                        actionsAlignment: MainAxisAlignment.center,
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text(
+                              "İptal",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                              widget.onLeaveGroup!();
+                            },
+                            child: const Text(
+                              "Evet",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ),
+                        ],
+                      ));
 
+              break;
           }
         },
         dropdownStyleData: DropdownStyleData(
@@ -109,4 +134,3 @@ class MenuItem {
   final String text;
   final IconData icon;
 }
-

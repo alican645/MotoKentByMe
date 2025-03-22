@@ -54,6 +54,7 @@ class PostDetailContentWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 PostContentButton(
+                  color: Colors.orange,
                   onPressed: () async {
                     favoritePost(context).then(
                       (value) {
@@ -66,36 +67,8 @@ class PostDetailContentWidget extends StatelessWidget {
                       : "assets/svg/not_favorite.svg",
                   content: 'Favorile',
                 ),
-                /* 
                 PostContentButton(
-                  iconData: Icons.send,
-                  content: 'Paylaş',
-                  onPressed: () async {
-                    showDialog(
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          content:
-                              const Text("Postu paylaşmak istiyor musunuz?"),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: const Text("Hayır")),
-                            TextButton(
-                                onPressed: () {
-                                  sharePost(context);
-                                },
-                                child: const Text("Evet"))
-                          ],
-                        );
-                      },
-                    );
-                  },
-                ),
-                */
-                PostContentButton(
+                  color: Colors.orange,
                   onPressed: () async {
                     await _showComplaintDialog(context);
                   },
@@ -125,9 +98,12 @@ class PostDetailContentWidget extends StatelessWidget {
                                 return ListTile(
                                   title: Row(
                                     children: [
+                                      Text(postModel
+                                          .surveyItems![index].content!),
                                       Text(
-                                          postModel.surveyItems![index].content!),
-                                      Text(" (${postModel.surveyItems![index].voteCount})",style: TextStyle(color: Colors.grey),)
+                                        " (${postModel.surveyItems![index].voteCount})",
+                                        style: TextStyle(color: Colors.grey),
+                                      )
                                     ],
                                   ),
                                   leading: Radio<int>(
@@ -135,14 +111,14 @@ class PostDetailContentWidget extends StatelessWidget {
                                     groupValue: postModel.votedSurveyItemId,
                                     onChanged: (value) async {
                                       await context
-                                          .read<PostDetailViewmodel>().votePost(
+                                          .read<PostDetailViewmodel>()
+                                          .votePost(
                                             DataObjects.votePost(
-                                                postModel.id!,
-                                                postModel.userId!,
-                                                postModel.surveyItems![index].id!,
-                                                ),
+                                              postModel.id!,
+                                              postModel.userId!,
+                                              postModel.surveyItems![index].id!,
+                                            ),
                                           );
-                                          
                                     },
                                   ),
                                 );
@@ -157,8 +133,12 @@ class PostDetailContentWidget extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text(Utils.formatDateToDayMonthYear(postModel.createdDate!)),
+                Text(
+                  Utils.formatDateToDayMonthYear(postModel.createdDate!),
+                  style: TextStyle(fontSize: 10),
+                ),
                 PostContentButton(
+                    color: Colors.green,
                     onPressed: () async {
                       await likePost(context, true);
                     },
@@ -166,6 +146,7 @@ class PostDetailContentWidget extends StatelessWidget {
                     count: postModel.likes,
                     iconData: Icons.thumb_up_alt),
                 PostContentButton(
+                    color: Colors.red,
                     onPressed: () async {
                       await likePost(context, false);
                     },
@@ -173,6 +154,7 @@ class PostDetailContentWidget extends StatelessWidget {
                     content: "Dislike",
                     iconData: Icons.thumb_down_alt),
                 PostContentButton(
+                    color: Colors.blue,
                     onPressed: () async {
                       showModalBottomSheet(
                         useSafeArea: true,
@@ -188,8 +170,10 @@ class PostDetailContentWidget extends StatelessWidget {
                     count: postModel.commentCount,
                     content: "Comment",
                     iconData: Icons.comment),
-                Text(TurkeyProvince.getCityNameByPlateCode(
-                    postModel.illerEnum!)),
+                Text(
+                  TurkeyProvince.getCityNameByPlateCode(postModel.illerEnum!),
+                  style: const TextStyle(fontSize: 10),
+                ),
               ],
             )
           ],
@@ -252,6 +236,4 @@ class PostDetailContentWidget extends StatelessWidget {
         .read<PostDetailViewmodel>()
         .likePost(DataObjects.likePost(postModel.id!, userId!, isLike));
   }
-
-
 }

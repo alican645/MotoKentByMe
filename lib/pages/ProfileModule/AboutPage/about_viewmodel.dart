@@ -2,7 +2,6 @@
 
 import 'package:flutter/material.dart';
 import 'package:moto_kent/constants/api_constants.dart';
-import 'package:moto_kent/models/about_item_model.dart';
 import 'package:moto_kent/models/about_title_model.dart';
 
 import 'package:moto_kent/services/api_service_impl.dart';

@@ -6,13 +6,15 @@ import 'package:moto_kent/components/custom_textfield.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/constants/app_routes.dart';
 import 'package:moto_kent/models/chat_group_message_model.dart';
+import 'package:moto_kent/pages/GroupChatModule/MessagePage/message_view_mixin.dart';
 import 'package:moto_kent/pages/GroupChatModule/MessagePage/message_viewmodel.dart';
 import 'package:moto_kent/pages/GroupChatModule/MessagePage/widgets/message_item.dart';
 import 'package:moto_kent/services/signalr_message_service.dart';
 import 'package:provider/provider.dart';
 
 class MessageView extends StatefulWidget {
-  const MessageView({super.key, this.groupId, this.userId, this.userName,this.groupName});
+  const MessageView(
+      {super.key, this.groupId, this.userId, this.userName, this.groupName});
   final int? groupId;
   final String? userId;
   final String? userName;
@@ -22,52 +24,38 @@ class MessageView extends StatefulWidget {
   State<MessageView> createState() => _MessageViewState();
 }
 
-class _MessageViewState extends State<MessageView> {
-  final ScrollController _scrollController = ScrollController();
-  final TextEditingController _textEditingController = TextEditingController();
-  late SignalRMessageService messageService;
-  //late GenericSignalRService messageService2;
-
-  late final String? groupName=widget.groupName;
-  late final int?   groupId=widget.groupId;
-  late final String? userName=widget.userName;
-  late final String? userId=widget.userId;
-
+class _MessageViewState extends State<MessageView> with MessageViewMixin {
   @override
   void initState() {
-
-
     // Sayfa açıldığında listeyi en sona kaydır
-    WidgetsBinding.instance.addPostFrameCallback((_) async  {
-     _scrollJumpTo();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _scrollJumpTo();
       context.read<SendMessageViewmodel>().fetchMessageList(groupId!);
 
       joinGroup();
 
       messageService.onReceivePost = () {
         setState(() {
-         _scrollToBottom();
+          _scrollToBottom();
         });
-
       };
     });
     super.initState();
   }
 
-
   @override
   void dispose() {
     super.dispose();
     messageService.leaveGroup(groupId!);
-
   }
 
   Future<void> joinGroup() async {
     var viewmodel = context.read<SendMessageViewmodel>();
     messageService = SignalRMessageService(vm: viewmodel);
 
-
-    messageService.initializeSignalR(ApiConstants.signalRChatGroupEndpoint).then(
+    messageService
+        .initializeSignalR(ApiConstants.signalRChatGroupEndpoint)
+        .then(
       (value) {
         messageService.joinGroup(groupId!);
       },
@@ -77,29 +65,31 @@ class _MessageViewState extends State<MessageView> {
   /// Listeyi en sona kaydırma işlemi
   Future<void> _scrollToBottom() async {
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
+      scrollController.animateTo(
+        scrollController.position.maxScrollExtent,
         duration: Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
     });
-
-  }  /// Listeyi en sona kaydırma işlemi
-  Future<void> _scrollJumpTo() async {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      _scrollController.jumpTo(
-        _scrollController.position.maxScrollExtent,
-      );
-    });
-
   }
 
-
+  /// Listeyi en sona kaydırma işlemi
+  Future<void> _scrollJumpTo() async {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      if (scrollController.positions.isNotEmpty) {
+        scrollController.jumpTo(
+          scrollController.position.maxScrollExtent,
+        );
+      } else {
+        return;
+      }
+    });
+  }
 
   Future<void> sendMessage() async {
     var messageModel = ChatGroupMessageModel()
       ..chatGroupId = groupId
-      ..content = _textEditingController.text
+      ..content = textEditingController.text
       ..senderUserId = userId
       ..senderUserName = userName
       ..sentAt = DateTime.now();
@@ -109,7 +99,7 @@ class _MessageViewState extends State<MessageView> {
         .sendMessage(messageModel.toJson());
     if (response.statusCode == 200) {
       //signalrdan geleni veriyi listeye ekle
-      _textEditingController.clear();
+      textEditingController.clear();
       _scrollToBottom();
     }
   }
@@ -120,25 +110,33 @@ class _MessageViewState extends State<MessageView> {
       appBar: CustomAppBar(
         title: groupName!,
         actions: [
-          IconButton(onPressed: () {
-            context.push("${AppRoutes.messagePage}/${AppRoutes.groupSettingPage}",extra: widget.groupId  );
-          }, icon: const Icon(Icons.settings))
+          IconButton(
+              onPressed: () {
+                context.push(
+                    '${AppRoutes.chatGroupsPage}/${AppRoutes.myGroups}/${AppRoutes.messagePage}/${AppRoutes.groupSettingPage}',
+                    extra: widget.groupId);
+              },
+              icon: const Icon(Icons.settings))
         ],
       ),
       body: Column(
         children: [
-
           Flexible(
             child: Consumer<SendMessageViewmodel>(
-              builder: (context, value, child) => ListView.builder(
-                controller: _scrollController,
-                itemCount: value.messageList.length,
-                itemBuilder: (context, index) => MessageItem(
-                  messageModel: value.messageList[index],
-                  userId: userId!,
-                  userName: userName!,
-                ),
-              ),
+              builder: (context, value, child) {
+                if (value.isLoading == false) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                return ListView.builder(
+                  controller: scrollController,
+                  itemCount: value.messageList.length,
+                  itemBuilder: (context, index) => MessageItem(
+                    messageModel: value.messageList[index],
+                    userId: userId!,
+                    userName: userName!,
+                  ),
+                );
+              },
             ),
           ),
           Padding(
@@ -147,12 +145,12 @@ class _MessageViewState extends State<MessageView> {
               children: [
                 Flexible(
                     child: CustomTextField(
-                      onTap: () {
-                        setState(() {
-                          _scrollToBottom();
-                        });
-                      },
-                        controller: _textEditingController,
+                        onTap: () {
+                          setState(() {
+                            _scrollToBottom();
+                          });
+                        },
+                        controller: textEditingController,
                         hintText: "Mesajınızı giriniz")),
                 IconButton(
                     onPressed: () async {
@@ -160,7 +158,6 @@ class _MessageViewState extends State<MessageView> {
                       setState(() {
                         _scrollToBottom();
                       });
-
                     },
                     icon: const Icon(Icons.send)),
               ],
@@ -171,4 +168,3 @@ class _MessageViewState extends State<MessageView> {
     );
   }
 }
-

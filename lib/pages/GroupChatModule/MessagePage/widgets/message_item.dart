@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:moto_kent/models/chat_group_message_model.dart';
 import 'package:moto_kent/utils/utils.dart';
@@ -7,9 +5,9 @@ import 'package:moto_kent/utils/utils.dart';
 class MessageItem extends StatelessWidget {
   const MessageItem(
       {super.key,
-        required this.userId,
-        required this.userName,
-        required this.messageModel});
+      required this.userId,
+      required this.userName,
+      required this.messageModel});
   final String userId;
   final String userName;
   final ChatGroupMessageModel messageModel;
@@ -28,7 +26,10 @@ class MessageItem extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(messageModel.senderUserName!),
+            Text(
+              messageModel.senderUserName!,
+              style: TextStyle(fontWeight: FontWeight.w500),
+            ),
             Text(messageModel.content!),
             Align(
               alignment: Alignment.centerRight,

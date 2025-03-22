@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:moto_kent/components/custom_app_bar.dart';
-import 'package:moto_kent/pages/AppBarModule/MyNotificationsPage/my_notifications_view.dart';
 import 'package:moto_kent/pages/AppBarModule/MyPrivateMessagesPage/my_private_messages_mixin.dart';
 import 'package:moto_kent/pages/AppBarModule/MyPrivateMessagesPage/my_private_messages_viewmodel.dart';
 import 'package:moto_kent/pages/AppBarModule/MyPrivateMessagesPage/widgets/private_conversation_item.dart';
@@ -38,7 +36,7 @@ class _MyPrivateMessagesViewState extends State<MyPrivateMessagesView>
           builder: (context, value, child) => ListView.builder(
               itemCount: value.list.length,
               itemBuilder: (context, index) => PrivateConversationItem(
-                onTap: () => startConversation(value.list[index].userId!),
+                    onTap: () => startConversation(value.list[index].userId!),
                     model: value.list[index],
                   )),
         ));

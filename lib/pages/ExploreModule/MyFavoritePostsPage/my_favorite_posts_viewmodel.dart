@@ -1,14 +1,13 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
 import 'package:moto_kent/models/paginated_posts_model.dart';
 import 'package:moto_kent/models/post_model.dart';
 import 'package:moto_kent/services/api_service_impl.dart';
+import 'package:moto_kent/services/iapi_service.dart';
 
 class MyFavoritePostsViewmodel extends ChangeNotifier {
-  final ApiServiceImpl _dio = ApiServiceImpl();
+  final IApiService _dio = ApiServiceImpl();
 
   int _currentPage = 1;
   int get currentPage => _currentPage;
@@ -19,22 +18,21 @@ class MyFavoritePostsViewmodel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-
   final List<PostModel> _posts = [];
   List<PostModel> get posts => _posts;
 
-
   // Tüm postları getir
   Future<void> fetchFavoritePostList() async {
-    String? userId=await LocalStorageImpl().getValue<String>("user_id");
+    String? userId = await LocalStorageImpl().getValue<String>("user_id");
     if (_isLoading || _currentPage > _totalPages) return;
 
     _isLoading = true;
     notifyListeners();
 
     try {
-
-      var response = await _dio.getRequest(ApiConstants.getPaginatedFavoritePostsByUserId(10,_currentPage,userId!));
+      var response = await _dio.getRequest(
+          ApiConstants.getPaginatedFavoritePostsByUserId(
+              10, _currentPage, userId!));
       var model = PaginatedPostsModel.fromJson(response.data);
       _posts.addAll(model.items!);
       _currentPage++;
@@ -55,7 +53,4 @@ class MyFavoritePostsViewmodel extends ChangeNotifier {
     fetchFavoritePostList();
     notifyListeners();
   }
-
-
-
 }

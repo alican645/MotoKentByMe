@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:moto_kent/models/private_message_model.dart';
 import 'package:moto_kent/utils/utils.dart';
@@ -8,20 +7,19 @@ class PrivateMessageItem extends StatelessWidget {
   final String receiverUserId;
   final String myFullName;
   final String otherUserFullName;
-  const PrivateMessageItem({
-    super.key,
-    required this.privateMessageModel,
-    required this.receiverUserId,
-    required this.myFullName,
-    required this.otherUserFullName
-
-  });
-
+  const PrivateMessageItem(
+      {super.key,
+      required this.privateMessageModel,
+      required this.receiverUserId,
+      required this.myFullName,
+      required this.otherUserFullName});
 
   @override
   Widget build(BuildContext context) {
     return Align(
-      alignment: receiverUserId==privateMessageModel.senderId?Alignment.centerLeft:Alignment.centerRight,
+      alignment: receiverUserId == privateMessageModel.senderId
+          ? Alignment.centerLeft
+          : Alignment.centerRight,
       child: Container(
         margin: const EdgeInsets.all(10),
         width: MediaQuery.sizeOf(context).width / 1.5,
@@ -31,12 +29,17 @@ class PrivateMessageItem extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text( receiverUserId==privateMessageModel.senderId?otherUserFullName:myFullName
+            Text(
+              receiverUserId == privateMessageModel.senderId
+                  ? otherUserFullName
+                  : myFullName,
+              style: TextStyle(fontWeight: FontWeight.w500),
             ),
             Text(privateMessageModel.messageContent!),
             Align(
               alignment: Alignment.centerRight,
-              child: Text(Utils.getCurrentTime(privateMessageModel.createdDate!)),
+              child:
+                  Text(Utils.getCurrentTime(privateMessageModel.createdDate!)),
             )
           ],
         ),

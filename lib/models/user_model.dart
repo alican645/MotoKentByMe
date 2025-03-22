@@ -11,20 +11,20 @@ class UserModel {
 
   UserModel(
       {this.userId,
-        this.fullName,
-        this.totalRating,
-        this.profilePhotoPath,
-        this.bio,
-        this.rating,
-        this.photos,
-        this.followerCount,
-        this.followingCount});
+      this.fullName,
+      this.totalRating,
+      this.profilePhotoPath,
+      this.bio,
+      this.rating,
+      this.photos,
+      this.followerCount,
+      this.followingCount});
 
   UserModel.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
     fullName = json['fullName'];
     totalRating = double.tryParse(json['totalRating'].toString());
-    photos = json['photos'].cast<String>()??[];
+    photos = json['photos'].cast<String>() ?? [];
     profilePhotoPath = json['profilePhotoPath'];
     bio = json['bio'];
     rating = json['rating'];
@@ -46,9 +46,11 @@ class UserModel {
     return data;
   }
 }
+
 class UserModel2 {
   String? userId;
   String? fullName;
+  String? email;
   String? profilePhotoPath;
   String? bio;
   int? rating;
@@ -57,16 +59,18 @@ class UserModel2 {
 
   UserModel2(
       {this.userId,
-        this.fullName,
-        this.profilePhotoPath,
-        this.bio,
-        this.rating,
-        this.followerCount,
-        this.followingCount});
+      this.fullName,
+      this.profilePhotoPath,
+      this.bio,
+      this.rating,
+      this.email,
+      this.followerCount,
+      this.followingCount});
 
   UserModel2.fromJson(Map<String, dynamic> json) {
     userId = json['userId'];
     fullName = json['fullName'];
+    email = json['email'];
     profilePhotoPath = json['profilePhotoPath'];
     bio = json['bio'];
     rating = json['rating'];
@@ -77,6 +81,7 @@ class UserModel2 {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['userId'] = userId;
+    data['email'] = email;
     data['fullName'] = fullName;
     data['profilePhotoPath'] = profilePhotoPath;
     data['bio'] = bio;

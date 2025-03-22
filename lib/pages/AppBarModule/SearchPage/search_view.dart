@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/components/custom_app_bar.dart';
 import 'package:moto_kent/constants/api_constants.dart';
+import 'package:moto_kent/constants/app_routes.dart';
 import 'package:moto_kent/models/user_search_item_model.dart';
 import 'package:moto_kent/pages/AppBarModule/SearchPage/search_viewmodel.dart';
 import 'package:provider/provider.dart';
@@ -16,30 +17,31 @@ class SearchView extends StatelessWidget {
         context.read<SearchViewmodel>().clearSearchItemList();
       },
       child: Scaffold(
-          appBar:  CustomAppBar(title: "Kullanıcı Arayın...",),
+          appBar: CustomAppBar(
+            title: "Kullanıcı Arayın...",
+          ),
           body: Column(
             children: [
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Flexible(
-                        child: TextFormField(
-                          decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 10),
-                              hintText: "Search..."),
-                          onChanged: (value) {
-                            context.read<SearchViewmodel>().fetchUsers(value);
-                          },
-                        ),
+                  child: Row(children: [
+                    Flexible(
+                      child: TextFormField(
+                        decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            contentPadding:
+                                const EdgeInsets.symmetric(horizontal: 10),
+                            hintText: "Search..."),
+                        onChanged: (value) {
+                          context.read<SearchViewmodel>().fetchUsers(value);
+                        },
                       ),
-                      const Icon(Icons.search)
-                    ]
-                  ),
+                    ),
+                    const Icon(Icons.search)
+                  ]),
                 ),
               ),
               Flexible(
@@ -48,7 +50,8 @@ class SearchView extends StatelessWidget {
                     itemCount: value.searchItemList.length,
                     itemBuilder: (context, index) => SearchUserItem(
                       onPressed: () {
-                        context.push("/other_user_profile",
+                        context.push(
+                            '${AppRoutes.explorePage}/${AppRoutes.searchPage}/${AppRoutes.otherUserProfile}',
                             extra: value.searchItemList[index].id);
                       },
                       userSearchItemModel: value.searchItemList[index],
@@ -79,7 +82,7 @@ class SearchUserItem extends StatelessWidget {
         child: Container(
           decoration: BoxDecoration(
             color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(90),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             children: [
@@ -89,18 +92,19 @@ class SearchUserItem extends StatelessWidget {
                   backgroundColor: Theme.of(context).colorScheme.primary,
                   backgroundImage: NetworkImage(
                       '${ApiConstants.baseUrl}/${userSearchItemModel.profilePhotoPath}'),
-                  radius: 30,
+                  radius: 20,
                 ),
               ),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         userSearchItemModel.fullName!,
-                        style: Theme.of(context).textTheme.headlineLarge),
+                        style: TextStyle(fontSize: 20)),
                     const SizedBox(height: 4.0),
                   ],
                 ),

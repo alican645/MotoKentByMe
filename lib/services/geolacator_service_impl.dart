@@ -10,12 +10,8 @@ import 'package:moto_kent/services/api_service_impl.dart';
 import 'package:moto_kent/services/iapi_service.dart';
 
 class GeolocatorServiceImpl implements GeolocatorService {
-
-
   IApiService dio = ApiServiceImpl();
   final String _apiKey = "AIzaSyDHRNFT_MzvYjYopYaM5PDcrDHQGcDO4t4";
-
-
 
   //anlık konumu alan fonksiyon
   @override
@@ -50,7 +46,6 @@ class GeolocatorServiceImpl implements GeolocatorService {
   @override
   Future<Set<Polyline>> getRoute(
       LatLng startLocation, LatLng destinationLocation) async {
-    
     final List<LatLng> polylineCoordinates = [];
     final Set<Polyline> polylines = {};
 
@@ -70,7 +65,7 @@ class GeolocatorServiceImpl implements GeolocatorService {
         // PolylinePoints ile decode ediyoruz
         PolylinePoints polylinePoints = PolylinePoints();
         List<PointLatLng> result =
-            polylinePoints.decodePolyline(encodedPolyline);
+        polylinePoints.decodePolyline(encodedPolyline);
 
         // Decode edilmiş noktaları LatLng'e çeviriyoruz
         if (result.isNotEmpty) {
@@ -98,19 +93,20 @@ class GeolocatorServiceImpl implements GeolocatorService {
     }
   }
 
-
   @override
-  Future<List<dynamic>> searchLocation(String girilenMetin) async {
+  Future<List<PlacePrediction>> searchLocation(String girilenMetin) async {
     final String url =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json'
         '?input=$girilenMetin&key=$_apiKey&components=country:tr';
-    List<dynamic> placePredictions = [];
+    List<PlacePrediction> placePredictions = [];
     try {
       final response = await dio.getRequest(url);
       if (response.statusCode == 200) {
-        placePredictions = response.data['predictions'];
+        placePredictions = (response.data['predictions'] as List)
+            .map((prediction) => PlacePrediction.fromJson(prediction))
+            .toList();
         return placePredictions;
-      }else{
+      } else {
         return placePredictions;
       }
     } catch (e) {
@@ -118,7 +114,6 @@ class GeolocatorServiceImpl implements GeolocatorService {
       throw LocationException('Failed to get place predictions: $e');
     }
   }
-
 
   @override
   Future<LocationDetailModel?> getLocationDetail(String placeId) async {
@@ -128,28 +123,26 @@ class GeolocatorServiceImpl implements GeolocatorService {
       final response = await dio.getRequest(url);
       if (response.statusCode == 200) {
         final result = response.data['result'];
-          var locationDetailModel=LocationDetailModel(
+        var locationDetailModel = LocationDetailModel(
             lng: result['geometry']['location']['lng'],
-            lat:result['geometry']['location']['lat'],
-            formattedAddress: result['formatted_address']
-          );
+            lat: result['geometry']['location']['lat'],
+            formattedAddress: result['formatted_address']);
         return locationDetailModel;
-        }
-        return null;
-        
       }
-     catch (e) {
+      return null;
+    } catch (e) {
       log('Konum detayını alırken hata oluştu: $e');
     }
     return null;
   }
 
   @override
-  Future<String?> getCityNameFromGoogle(double latitude, double longitude) async {
+  Future<String?> getCityNameFromGoogle(
+      double latitude, double longitude) async {
     // Google API anahtarınızı buraya ekleyin
 
     final String url =
-      'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$_apiKey';
+        'https://maps.googleapis.com/maps/api/geocode/json?latlng=$latitude,$longitude&key=$_apiKey';
 
     try {
       final response = await dio.getRequest(url);
@@ -177,20 +170,21 @@ class GeolocatorServiceImpl implements GeolocatorService {
         return 'HTTP Hatası: ${response.statusCode}';
       }
     } catch (e) {
-      log(e.toString(),name:"şehir adı bulma");
+      log(e.toString(), name: "şehir adı bulma");
       return null;
     }
   }
 
   @override
-  Future<LatLngBounds?> getVisibleRegion(GoogleMapController? mapController) async {
+  Future<LatLngBounds?> getVisibleRegion(
+      GoogleMapController? mapController) async {
     if (mapController == null) return null;
     final visibleRegion = await mapController.getVisibleRegion();
     LatLngBounds? _currentVisibleArea = LatLngBounds(
       northeast: visibleRegion.northeast,
       southwest: visibleRegion.southwest,
     );
-     return _currentVisibleArea;
+    return _currentVisibleArea;
   }
 
   @override
@@ -201,9 +195,6 @@ class GeolocatorServiceImpl implements GeolocatorService {
     );
     return Geolocator.getPositionStream(locationSettings: locationSettings);
   }
-
-
-
 }
 
 class LocationException implements Exception {
@@ -213,7 +204,6 @@ class LocationException implements Exception {
   @override
   String toString() => 'LocationException: $message';
 }
-
 
 class LocationDetailModel {
   double? lat;
@@ -230,9 +220,37 @@ class LocationDetailModel {
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['lat'] = this.lat;
-    data['lng'] = this.lng;
-    data['formatted_address'] = this.formattedAddress;
+    data['lat'] = lat;
+    data['lng'] = lng;
+    data['formatted_address'] = formattedAddress;
     return data;
+  }
+}
+
+class PlacePrediction {
+  final String description;
+  final String placeId;
+  final String reference;
+
+  PlacePrediction({
+    required this.description,
+    required this.placeId,
+    required this.reference,
+  });
+
+  factory PlacePrediction.fromJson(Map<String, dynamic> json) {
+    return PlacePrediction(
+      description: json['description'] as String,
+      placeId: json['place_id'] as String,
+      reference: json['reference'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'description': description,
+      'place_id': placeId,
+      'reference': reference,
+    };
   }
 }

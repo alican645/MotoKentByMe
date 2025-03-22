@@ -17,12 +17,11 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
   final ApiServiceImpl _dio = ApiServiceImpl();
   final GeolocatorService _geolocatorService = GeolocatorServiceImpl();
 
-
   // Debounce için timer
   Timer? _debounceTimer;
 
-  List<dynamic> _placePredictions = [];
-  List<dynamic> get placePredictions => _placePredictions;
+  List<PlacePrediction> _placePredictions = [];
+  List<PlacePrediction> get placePredictions => _placePredictions;
 
   int _totalMarkerIconToken = 0;
   int get totalMarkerIconToken => _totalMarkerIconToken;
@@ -42,14 +41,12 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
   LatLng? currentLocation;
   LatLng? destinationLocation;
 
-  bool _selectLocation = false;
-  bool get selectLocation => _selectLocation;
-  void setSelectLocation(bool value) {
-    _selectLocation = value;
+  bool _locationIsSelected = false;
+  bool get locationIsSelected => _locationIsSelected;
+  void setLocationIsSelected(bool value) {
+    _locationIsSelected = value;
     notifyListeners();
   }
-
-
 
   final String _serchBarText = "";
   String get serchBarText => _serchBarText;
@@ -58,143 +55,112 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
   CameraPosition? _initialPosition;
   CameraPosition? get initialPosition => _initialPosition;
 
-  final Completer<GoogleMapController> _controller =
-  Completer<GoogleMapController>();
-  Completer<GoogleMapController> get controller => _controller;
-
   bool _initialFlag = false;
   bool get initialFlag => _initialFlag;
 
-  bool _fetchCustomMarkerItemFlag=false;
-  bool get fetchCustomMarkerItemFlag=>_fetchCustomMarkerItemFlag;
+  bool _fetchCustomMarkerItemFlag = false;
+  bool get fetchCustomMarkerItemFlag => _fetchCustomMarkerItemFlag;
+
   Future<void> fetchCustomMarkerItem() async {
-    _fetchCustomMarkerItemFlag=false;
+    _fetchCustomMarkerItemFlag = false;
     notifyListeners();
-    var response = await _dio.getRequest(ApiConstants.getCustomMarkerItem);
-    _modelList = (response.data as List)
+    String? userId = await LocalStorageImpl().getValue<String>("user_id");
+    var response =
+        await _dio.getRequest(ApiConstants.getCustomMarkerItem(userId!));
+    _modelList = (response.data["locationIconDtos"] as List)
         .map((e) => CustomMarkerModel.fromJson(e))
         .toList();
-    _fetchCustomMarkerItemFlag=true;
+    _fetchCustomMarkerItemFlag = true;
     notifyListeners();
   }
 
   Future<Uint8List> fetchCustomMarkerIconBytes(String endpoint) async {
     Uint8List data;
-    _selectLocation = false;
     var response = await _dio.getRequestUnit8List(endpoint);
-
     data = response.data;
     return data;
   }
 
-  Future<void> fetchAllLocations(BuildContext context) async {
-    String? userId = await LocalStorageImpl().getValue<String>("user_id");
-    var response =
-    await _dio.getRequest("${ApiConstants.getAllLocations}?userId=$userId");
-    (response.data as List).map((e) async {
+  Future<void> fetchAllLocations(
+      Marker Function(LocationModel location, Uint8List byteData)
+          marker) async {
+    _initialFlag = false;
+    _markerList.clear();
+    notifyListeners();
+    var response = await _dio.getRequest(ApiConstants.getAllLocations);
+    var dataList = (response.data as List);
+    await Future.wait(dataList.map((e) async {
       var location = LocationModel.fromJson(e);
-      var customMarkerIconBytes;
+      dynamic customMarkerIconBytes;
       try {
         var response = await _dio
             .getRequestUnit8List('${ApiConstants.baseUrl}${location.iconPath}');
-        customMarkerIconBytes = response.data;
+        customMarkerIconBytes = await response.data;
       } catch (e) {
         throw Exception(e);
       }
-      _markerList.add(Marker(
-
-          infoWindow: InfoWindow(
-            title: "Kullanıcı Yorumu:",
-            snippet: location.comment,
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (contextt) => AlertDialog(
-                  actions: [
-                    TextButton(
-                        onPressed: () async {
-                          await getRoute(location);
-                          Navigator.pop(contextt);
-                        },
-                        child: const Text("Yol Tarifi Al"))
-                  ],
-                ),
-              );
-            },
-          ),
-          position: LatLng(location.latitude!, location.longitude!),
-          markerId: MarkerId(location.markerId!),
-          icon: BitmapDescriptor.bytes(customMarkerIconBytes,
-              height: 48, width: 48)));
-    }).toList();
+      _markerList.add(marker(location, customMarkerIconBytes));
+      await Future.delayed(const Duration(seconds: 1));
+    }).toList());
+    _initialFlag = true;
+    notifyListeners();
   }
 
-  Future<void> fetchAllLocationsByCategoryId (BuildContext context,int categoryId ) async{
-    var response = await _dio.getRequest(ApiConstants.getAllLocationsByCategoryId(categoryId));
-    (response.data as List).map((e) async {
+  Future<void> fetchAllLocationsByCategoryId(
+    int categoryId,
+    Marker Function(LocationModel location, Uint8List byteData) marker,
+  ) async {
+    _initialFlag = false;
+    _markerList.clear();
+    notifyListeners();
+
+    var response = await _dio
+        .getRequest(ApiConstants.getAllLocationsByCategoryId(categoryId));
+    var dataList = (response.data as List);
+    await Future.wait(dataList.map((e) async {
       var location = LocationModel.fromJson(e);
-      var customMarkerIconBytes;
+      dynamic customMarkerIconBytes;
       try {
         var response = await _dio
             .getRequestUnit8List('${ApiConstants.baseUrl}${location.iconPath}');
-        customMarkerIconBytes = response.data;
+        customMarkerIconBytes = await response.data;
       } catch (e) {
         throw Exception(e);
       }
-      _markerList.add(Marker(
+      _markerList.add(marker(location, customMarkerIconBytes));
+      await Future.delayed(const Duration(seconds: 1));
+    }).toList());
 
-          infoWindow: InfoWindow(
-            title: "Kullanıcı Yorumu:",
-            snippet: location.comment,
-            onTap: () {
-              showDialog(
-                context: context,
-                builder: (contextt) => AlertDialog(
-                  actions: [
-                    TextButton(
-                        onPressed: () async {
-                          await getRoute(location);
-                          Navigator.pop(contextt);
-                        },
-                        child: const Text("Yol Tarifi Al"))
-                  ],
-                ),
-              );
-            },
-          ),
-          position: LatLng(location.latitude!, location.longitude!),
-          markerId: MarkerId(location.markerId!),
-          icon: BitmapDescriptor.bytes(customMarkerIconBytes,
-              height: 48, width: 48)));
-    }).toList();
+    _initialFlag = true;
+    notifyListeners();
   }
 
   Future<void> getRoute(LocationModel location) async {
-    _isStartLocationTracking=true;
+    _isStartLocationTracking = true;
     notifyListeners();
     _polylineCoordinates.clear();
-    LatLng startLocation =
-    await _geolocatorService.getCurrentLocation();
+    LatLng startLocation = await _geolocatorService.getCurrentLocation();
     LatLng destinationLocation =
-    LatLng(location.latitude!, location.longitude!);
-    _polylines=await _geolocatorService.getRoute(
-        startLocation, destinationLocation);
+        LatLng(location.latitude!, location.longitude!);
+    _polylines =
+        await _geolocatorService.getRoute(startLocation, destinationLocation);
     notifyListeners();
   }
 
-  bool _isStartLocationTracking=false;
-  bool get  isStartLocationTracking=>_isStartLocationTracking;
+  bool _isStartLocationTracking = false;
+  bool get isStartLocationTracking => _isStartLocationTracking;
 
-  Future<void> stopLocationTracking( ) async{
+  Future<void> stopLocationTracking() async {
     _polylineCoordinates.clear();
     _polylines.clear();
-    _isStartLocationTracking=false;
+    _isStartLocationTracking = false;
     notifyListeners();
   }
+
   Future<Response> createMarker(LocationModel model) async {
     try {
       var response =
-      await _dio.postRequest(ApiConstants.addLocation, model.toJson());
+          await _dio.postRequest(ApiConstants.addLocation, model.toJson());
       if (response.statusCode == 200) {
         fetchUserAppMarkerIconTotalToken();
         notifyListeners();
@@ -206,39 +172,15 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
   }
 
   Future<void> addMarker(
-      BuildContext context,
-      LocationModel model,
-      String iconPath,
-      ) async {
+    Marker Function(LocationModel location, Uint8List byteData) marker,
+    LocationModel model,
+    String iconPath,
+  ) async {
     Uint8List customMarkerIconBytes;
     customMarkerIconBytes =
-    await fetchCustomMarkerIconBytes('${ApiConstants.baseUrl}${iconPath}');
-
-    markerList.add(Marker(
-        infoWindow: InfoWindow(
-          title: "Kullanıcı Yorumu:",
-          snippet: model.comment,
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (contextt) => AlertDialog(
-                actions: [
-                  const Text("Yol tarifi almak ister misiniz?"),
-                  TextButton(
-                      onPressed: () async {
-                        await getRoute(model);
-                        Navigator.pop(contextt);
-                      },
-                      child: const Text("Yol Tarifi Al"))
-                ],
-              ),
-            );
-          },
-        ),
-        position: LatLng(model.latitude!, model.longitude!),
-        markerId: MarkerId(model.markerId!),
-        icon: BitmapDescriptor.bytes(customMarkerIconBytes,
-            height: 48, width: 48)));
+        await fetchCustomMarkerIconBytes('${ApiConstants.baseUrl}${iconPath}');
+    _locationIsSelected = false;
+    markerList.add(marker(model, customMarkerIconBytes));
     notifyListeners();
   }
 
@@ -248,47 +190,31 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
         .getRequest(ApiConstants.getAppMarkerIconTokenByUserId(userID!));
     if (response.statusCode == 200) {
       _totalMarkerIconToken =
-      (response.data as Map<String, dynamic>)["totalToken"];
+          (response.data as Map<String, dynamic>)["totalToken"];
     }
   }
 
-  Future<void> initialize(
-      BuildContext context,
-      ) async {
-    try {
-      _initialFlag = false;
-      notifyListeners();
-      Future.wait([
+  Future<void> setInitialLocation() async {
+    LatLng latLng = await _geolocatorService.getCurrentLocation();
+    currentLocation = latLng;
+    _initialPosition = CameraPosition(
+      target: latLng,
+      zoom: 29,
+    );
 
-        fetchCustomMarkerItem(),
-        fetchAllLocations(context),
-        fetchUserAppMarkerIconTotalToken(),
-      ]);
-      _initialFlag = true;
-      notifyListeners();
-    } catch (e) {
-      dev.log("GoogleMapBaşlatmaHatası", error: e);
-    }
-  }
-
-
-  Future<void> setInitialLocation()async{
-    LatLng latLng=await _geolocatorService.getCurrentLocation();
-    _initialPosition= CameraPosition(target: latLng,zoom: 29,) ;
-    _markerList.add(Marker(
-        markerId: MarkerId("me"),
-        position: latLng));
     notifyListeners();
   }
 
   // haritadaki işaretçileri sıfırlayan fonksiyon
-  Future<void> resetMap(BuildContext context) async {
+  Future<void> resetMap(
+      Marker Function(LocationModel location, Uint8List byteData)
+          marker) async {
     String? userId = await LocalStorageImpl().getValue<String>("user_id");
     var response = await _dio.postRequest(
         ApiConstants.resetMap, DataObjects.onlyUserIdObject(userId!));
     if (response.statusCode == 200) {
       _markerList = {markerList.toList()[0]};
-      fetchAllLocations(context);
+      fetchAllLocations(marker);
       notifyListeners();
     }
   }
@@ -314,11 +240,12 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
     }
   }
 
-  Future<LocationDetailModel?> getLocationDetail(String placeId) async {
+  Future<LocationDetailModel?> getLocationDetail(
+      String placeId, Completer<GoogleMapController> controller) async {
     try {
       var data = await _geolocatorService.getLocationDetail(placeId);
       if (data != null) {
-        _controller.future.then((controller) {
+        controller.future.then((controller) {
           controller.animateCamera(CameraUpdate.newCameraPosition(
               CameraPosition(target: LatLng(data.lat!, data.lng!), zoom: 15)));
         });
@@ -332,10 +259,4 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
       return null;
     }
   }
-
-
-
-
-
-
 }

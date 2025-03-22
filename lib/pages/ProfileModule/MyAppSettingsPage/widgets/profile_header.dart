@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 
-class ProfileHeader extends StatelessWidget {
-  ProfileHeader({
+ class ProfileHeader extends StatelessWidget {
+   const ProfileHeader({
     super.key,
     this.onPressed,
     required this.fullName,
     required this.username,
     required this.userProfilePhotoPath,
   });
-  VoidCallback? onPressed;
-  String username;
-  String fullName;
-  String userProfilePhotoPath;
+  final VoidCallback? onPressed;
+  final String username;
+  final String fullName;
+  final String userProfilePhotoPath;
 
   @override
   Widget build(BuildContext context) {

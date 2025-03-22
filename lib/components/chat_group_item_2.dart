@@ -15,7 +15,7 @@ class ChatGroupItem2 extends StatelessWidget {
       borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(5),
-        margin: const EdgeInsets.symmetric(horizontal: 16,vertical: 2),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
         decoration: BoxDecoration(
           color: amIAdmin == null
               ? Colors.grey[300]
@@ -37,7 +37,8 @@ class ChatGroupItem2 extends StatelessWidget {
               radius: 20,
               backgroundColor: Colors.white,
               backgroundImage: NetworkImage(
-                  "${ApiConstants.baseUrl}/${group.groupImagePath}",scale: 5),
+                  "${ApiConstants.baseUrl}/${group.groupImagePath}",
+                  scale: 5),
             ),
             const SizedBox(width: 16),
             Expanded(
