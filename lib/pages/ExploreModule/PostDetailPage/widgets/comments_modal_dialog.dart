@@ -1,10 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:moto_kent/components/custom_loading_widget.dart';
 import 'package:moto_kent/components/custom_textfield.dart';
 import 'package:moto_kent/constants/api_constants.dart';
-import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
-import 'package:moto_kent/models/post_comment_model.dart';
 import 'package:moto_kent/pages/ExploreModule/PostDetailPage/post_detail_viewmodel.dart';
+import 'package:moto_kent/pages/ExploreModule/PostDetailPage/widgets/comments_modal_dialog_mixin.dart';
 import 'package:provider/provider.dart';
 
 class CommentsPage extends StatefulWidget {
@@ -12,47 +12,28 @@ class CommentsPage extends StatefulWidget {
   const CommentsPage({super.key, required this.postId});
 
   @override
-  _CommentsPageState createState() => _CommentsPageState();
+  CommentsPageState createState() => CommentsPageState();
 }
 
-class _CommentsPageState extends State<CommentsPage> {
-  final TextEditingController _commentController = TextEditingController();
-  final ScrollController _scrollController = ScrollController();
-
-  void _addComment() async {
-    final newComment = _commentController.text.trim();
-    if (newComment.isNotEmpty) {
-      String? userId =
-          await LocalStorageImpl().getValue<String>("user_id");
-      String? photopath =
-          await LocalStorageImpl().getValue<String>("userfoto");
-      String? fullname =
-          await LocalStorageImpl().getValue<String>("userfullname");
-
-      var object = PostCommentModel(
-        userId: userId,
-        content: newComment,
-        postId: widget.postId,
-        userFullName: fullname,
-        userProfilePhotoPath: photopath
-      );
-      var response =
-          await context.read<PostDetailViewmodel>().addComment(object.toJson());
-      if (response.statusCode == 200) {
-        setState(() {
-          context.read<PostDetailViewmodel>().addCommentToList(object);
-        });
-        _commentController.clear();
-      }
-    }
-  }
-
+class CommentsPageState extends State<CommentsPage> with CommentsPageMixin {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) {
+        final viewModel =
+            Provider.of<PostDetailViewmodel>(context, listen: false);
         context.read<PostDetailViewmodel>().fetchCommentList(widget.postId);
+
+        scrollController.addListener(() {
+          if (scrollController.position.pixels ==
+                  scrollController.position.maxScrollExtent &&
+              !viewModel.isLoadingComment &&
+              viewModel.currentPageComment <= viewModel.totalPagesComment) {
+            viewModel
+                .fetchCommentList(widget.postId); // Yeni sayfa verilerini yükle
+          }
+        });
       },
     );
   }
@@ -63,26 +44,28 @@ class _CommentsPageState extends State<CommentsPage> {
       padding: MediaQuery.of(context).viewInsets,
       child: Container(
         height: MediaQuery.of(context).size.height * 0.75,
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Text(
+            const Text(
               "Yorumlar",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-            Divider(),
+            const Divider(),
             Expanded(
               child: Consumer<PostDetailViewmodel>(
                   builder: (context, viewModel, child) => ListView.builder(
                         physics: const AlwaysScrollableScrollPhysics(),
-                        controller: _scrollController,
+                        controller: scrollController,
                         itemCount: viewModel.comments.length +
-                            (viewModel.isLoading ? 1 : 0),
+                            (viewModel.isLoadingComment ? 1 : 0),
                         itemBuilder: (context, index) {
                           if (index < viewModel.comments.length) {
-
                             return ListTile(
                               leading: CircleAvatar(
+                                onBackgroundImageError:
+                                    (exception, stackTrace) => FileImage(File(
+                                        "${viewModel.comments[index].userProfilePhotoPath}")),
                                 backgroundImage: NetworkImage(
                                     "${ApiConstants.baseUrl}//${viewModel.comments[index].userProfilePhotoPath}"),
                               ),
@@ -111,13 +94,12 @@ class _CommentsPageState extends State<CommentsPage> {
               children: [
                 Expanded(
                   child: CustomTextField(
-                      controller: _commentController,
-                      hintText: "Yorum yaz..."),
+                      controller: commentController, hintText: "Yorum yaz..."),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 IconButton(
-                  onPressed: _addComment,
-                  icon: Icon(Icons.send),
+                  onPressed: addComment,
+                  icon: const Icon(Icons.send),
                   color: Theme.of(context).primaryColor,
                 ),
               ],

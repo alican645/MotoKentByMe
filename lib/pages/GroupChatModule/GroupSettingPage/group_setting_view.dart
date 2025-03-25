@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:moto_kent/components/custom_app_bar.dart';
+import 'package:moto_kent/components/custom_loading_widget.dart';
 
 import 'package:moto_kent/models/chat_group_model.dart';
 import 'package:moto_kent/models/user_model.dart';
@@ -23,8 +24,14 @@ class _GroupSettingViewState extends State<GroupSettingView>
     with GroupSettingViewMixin {
   @override
   void initState() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        await context
+            .read<GroupSettingViewmodel>()
+            .fetchGroupData(widget.groupId!);
+      },
+    );
     super.initState();
-    context.read<GroupSettingViewmodel>().fetchGroupData(widget.groupId!);
   }
 
   @override
@@ -33,6 +40,9 @@ class _GroupSettingViewState extends State<GroupSettingView>
 
     return Consumer<GroupSettingViewmodel>(
       builder: (context, value, child) {
+        if (value.isLoading == false) {
+          return const CustomLoadingWidget();
+        }
         ChatGroupModel groupData = value.chatGroupModel!;
         final myUserId = value.myUserId;
         return Scaffold(

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:moto_kent/components/custom_app_bar.dart';
 import 'package:moto_kent/components/custom_loading_widget.dart';
 import 'package:moto_kent/components/fallow_button.dart';
 import 'package:moto_kent/constants/api_constants.dart';
-import 'package:moto_kent/constants/app_routes.dart';
 import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
 import 'package:moto_kent/models/post_model.dart';
 import 'package:moto_kent/pages/AppBarModule/OtherProfilePage/other_profile_view.dart';
+import 'package:moto_kent/pages/ExploreModule/PostDetailPage/post_detail_view_mixin.dart';
 import 'package:moto_kent/pages/ExploreModule/PostDetailPage/post_detail_viewmodel.dart';
 import 'package:moto_kent/pages/ExploreModule/PostDetailPage/widgets/post_detail_content_widget.dart';
 import 'package:moto_kent/pages/ExploreModule/PostDetailPage/widgets/post_detail_profile_widget.dart';
@@ -22,9 +21,8 @@ class PostDetailView extends StatefulWidget {
   State<PostDetailView> createState() => _PostDetailViewState();
 }
 
-class _PostDetailViewState extends State<PostDetailView> {
-  String? userId;
-
+class _PostDetailViewState extends State<PostDetailView>
+    with PostDetailViewMixin {
   @override
   void initState() {
     super.initState();
@@ -36,35 +34,6 @@ class _PostDetailViewState extends State<PostDetailView> {
         userId = await LocalStorageImpl().getValue<String>("user_id");
       },
     );
-  }
-
-  Future<void> fetchPostData() async {
-    await context
-        .read<PostDetailViewmodel>()
-        .getPostByPostId(widget.postModel!.id!);
-  }
-
-  Future<void> fetchComplaintReasons() async {
-    await context.read<PostDetailViewmodel>().fetchComplaintReason();
-  }
-
-  Future<void> followOrUnfollowUser(BuildContext context, isFollow) async {
-    var respnse = await context
-        .read<PostDetailViewmodel>()
-        .followOrUnfollowUser(
-            {"followerId": userId, "followedUserId": widget.postModel!.userId},
-            isFollow);
-
-    if (respnse.statusCode == 200) {
-      await followerRelationshipEndPoint(context);
-      await fetchPostData();
-    }
-  }
-
-  Future<void> followerRelationshipEndPoint(BuildContext context) async {
-    String? userId = await LocalStorageImpl().getValue<String>("user_id");
-    await context.read<PostDetailViewmodel>().followerRelationshipEndPoint(
-        {"followerId": userId, "followedUserId": widget.postModel!.userId});
   }
 
   @override
@@ -157,21 +126,5 @@ class _PostDetailViewState extends State<PostDetailView> {
         );
       }),
     );
-  }
-
-  Future<void> startConversation(BuildContext context) async {
-    var response = await context
-        .read<PostDetailViewmodel>()
-        .startPrivateConversation(widget.postModel!.userId!);
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> args = {
-        "userId": widget.postModel!.userId.toString(),
-        "connectionId": response.data["connectionId"],
-        "privateConversationId": response.data["privateConversationId"]
-      };
-      context.push(
-          '${AppRoutes.explorePage}/${AppRoutes.postDetailView}/${AppRoutes.privateChatPage}',
-          extra: args);
-    }
   }
 }

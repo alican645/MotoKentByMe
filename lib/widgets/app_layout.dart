@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:flutter/material.dart';
+
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
@@ -8,7 +9,6 @@ import 'package:moto_kent/services/current_laciton_service.dart';
 import 'package:moto_kent/services/api_service_impl.dart';
 import 'package:moto_kent/services/firebase_notification_service.dart';
 import '../App/app_theme.dart';
-
 
 class AppLayout extends StatefulWidget {
   final StatefulNavigationShell statefulNavigationShell;
@@ -44,8 +44,7 @@ class _AppLayoutState extends State<AppLayout> {
   Future<void> addDeviceTokenToUser() async {
     await Future.delayed(const Duration(seconds: 3));
 
-    String? userId =
-        await LocalStorageImpl().getValue<String>("user_id");
+    String? userId = await LocalStorageImpl().getValue<String>("user_id");
     ApiServiceImpl service = ApiServiceImpl();
 
     try {
@@ -68,7 +67,6 @@ class _AppLayoutState extends State<AppLayout> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       // Tüm sayfalarda yenileme özelliği için RefreshIndicator ile sarılı body
       body: widget.statefulNavigationShell,
 
@@ -106,5 +104,3 @@ class _AppLayoutState extends State<AppLayout> {
     );
   }
 }
-
-

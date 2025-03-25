@@ -15,7 +15,9 @@ import 'package:moto_kent/pages/MapModule/LoactionIconMapPage/widgets/searched_l
 import 'package:provider/provider.dart';
 
 class LocationIconMapView extends StatefulWidget {
-  const LocationIconMapView({super.key});
+  const LocationIconMapView({super.key, this.callForHelpLatLangModel});
+
+  final LocationModel? callForHelpLatLangModel;
 
   @override
   State<LocationIconMapView> createState() => _LocationIconMapViewState();
@@ -27,8 +29,22 @@ class _LocationIconMapViewState extends State<LocationIconMapView>
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<LoactionIconMapViewmodel>().fetchAllLocations(marker);
-      context.read<LoactionIconMapViewmodel>().setInitialLocation();
+      if (widget.callForHelpLatLangModel != null) {
+        context.read<LoactionIconMapViewmodel>().addMarker(
+            marker,
+            widget.callForHelpLatLangModel!,
+            widget.callForHelpLatLangModel!.iconPath!);
+        context.read<LoactionIconMapViewmodel>().setInitialLocation(
+            isCallForHelp: true,
+            LatLng(widget.callForHelpLatLangModel!.latitude!,
+                widget.callForHelpLatLangModel!.longitude!));
+        context.read<LoactionIconMapViewmodel>().fetchAllLocations(marker);
+      } else {
+        context
+            .read<LoactionIconMapViewmodel>()
+            .setInitialLocation(isCallForHelp: false, null);
+        context.read<LoactionIconMapViewmodel>().fetchAllLocations(marker);
+      }
     });
   }
 

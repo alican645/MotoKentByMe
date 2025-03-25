@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:moto_kent/app/app_theme.dart';
 import 'package:moto_kent/components/custom_app_bar_widget.dart';
 import 'package:moto_kent/components/custom_loading_widget.dart';
 import 'package:moto_kent/constants/app_routes.dart';
@@ -18,7 +22,7 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final imagePicker = ImagePicker();
-
+  File? selectedImage;
   bool isLongPress = false;
   String? userID;
   @override
@@ -32,17 +36,50 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  Future<File?> _cropImage(File imageFile) async {
+    final croppedFile = await ImageCropper().cropImage(
+      sourcePath: imageFile.path,
+      compressFormat: ImageCompressFormat.jpg,
+      compressQuality: 100,
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Cropper',
+          toolbarColor: AppTheme.themeData.primaryColor,
+          toolbarWidgetColor: Colors.white,
+          initAspectRatio: CropAspectRatioPreset.square,
+          lockAspectRatio: true,
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+          ],
+        ),
+        IOSUiSettings(
+          title: 'Cropper',
+          aspectRatioPresets: [
+            CropAspectRatioPreset.square,
+          ],
+        ),
+      ],
+    );
+    if (croppedFile != null) {
+      return File(croppedFile.path);
+    }
+    return null;
+  }
+
   Future<void> uploadPhoto() async {
     final pickedImage =
         await imagePicker.pickImage(source: ImageSource.gallery);
     if (pickedImage != null) {
-      if (!mounted) return;
-      var response = await context
-          .read<ProfileViewmodel>()
-          .uploadPhoto(userID!, pickedImage);
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        userID = await LocalStorageImpl().getValue<String>("user_id");
-        await context.read<ProfileViewmodel>().fetchUserProfile(userID!);
+      File? croppedImage = await _cropImage(File(pickedImage.path));
+      if (croppedImage != null) {
+        if (!mounted) return;
+        var response = await context
+            .read<ProfileViewmodel>()
+            .uploadPhoto(userID!, XFile(croppedImage.path));
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          userID = await LocalStorageImpl().getValue<String>("user_id");
+          await context.read<ProfileViewmodel>().fetchUserProfile(userID!);
+        }
       }
     }
   }
@@ -187,7 +224,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             );
                           } else {
                             return GestureDetector(
-                              onLongPress: () {
+                              onTap: () {
                                 showDialog(
                                   context: context,
                                   builder: (dialogContext) {
@@ -197,19 +234,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                           borderRadius:
                                               BorderRadius.circular(16),
                                           child: Image.network(
-                                              '${ApiConstants.baseUrl}${value.userModel!.photos![0]}')),
+                                              '${ApiConstants.baseUrl}${value.userModel!.photos![index - 1]}')),
                                     );
                                   },
                                 );
                               },
-                              onTap: () {
-                                context.go("/profile_page/post_detail_view",
-                                    extra:
-                                        '${ApiConstants.baseUrl}${value.userModel!.photos![index - 1]}');
-                              },
-                              child: Image.network(
-                                '${ApiConstants.baseUrl}${value.userModel!.photos![index - 1]}',
-                                fit: BoxFit.fitHeight,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.grey)),
+                                child: Image.network(
+                                  '${ApiConstants.baseUrl}${value.userModel!.photos![index - 1]}',
+                                  fit: BoxFit.fitHeight,
+                                ),
                               ),
                             );
                           }

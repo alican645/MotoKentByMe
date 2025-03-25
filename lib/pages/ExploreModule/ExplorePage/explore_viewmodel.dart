@@ -90,7 +90,7 @@ class ExploreViewmodel extends ChangeNotifier {
     if (_isLoading || _currentPage > _totalPages) return;
 
     _isLoading = true;
-    resetPagination();
+    //resetPagination();
     notifyListeners();
 
     try {
@@ -111,7 +111,7 @@ class ExploreViewmodel extends ChangeNotifier {
   }
 
   Future<void> fetchPostList2({int? category, int? city}) async {
-    resetPagination();
+    //resetPagination();
     resetNotification();
     if (_isLoading || _currentPage > _totalPages) return;
 

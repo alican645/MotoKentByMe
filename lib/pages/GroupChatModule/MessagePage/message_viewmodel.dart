@@ -18,6 +18,9 @@ class SendMessageViewmodel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
+  bool _pageIsOpen = false;
+  bool get pageIsOpen => _pageIsOpen;
+
   Future<Response> sendMessage(Object object) async {
     var response =
         await apiService.postRequest(ApiConstants.senMessageChatGroups, object);

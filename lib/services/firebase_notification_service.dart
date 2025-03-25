@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:moto_kent/constants/app_routes.dart';
+import 'package:moto_kent/constants/enums.dart';
+import 'package:moto_kent/models/location_model.dart';
+import 'package:moto_kent/router.dart';
+import 'package:go_router/go_router.dart';
 
 class FirebaseNotificationService {
   late final FirebaseMessaging messaging;
@@ -14,32 +17,32 @@ class FirebaseNotificationService {
 
   // Flutter Local Notifications Plugin'in global instance'ı
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
   // Bildirim kurulumu
   Future<void> initializeNotifications() async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('@mipmap/ic_launcher'); // smallIcon tanımı
+        AndroidInitializationSettings(
+            '@mipmap/ic_launcher'); // smallIcon tanımı
 
     const InitializationSettings initializationSettings =
-    InitializationSettings(android: initializationSettingsAndroid);
+        InitializationSettings(android: initializationSettingsAndroid);
 
     await flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
-        log(response.payload!,name: "payload");
+        log(response.payload!, name: "payload");
         // Bildirime tıklandığında çalışacak
         if (response.payload != null) {
-
-          String fixedJson = response.payload!.replaceAll('."longitude"', ',"longitude"');
-
+          String fixedJson = response.payload!.replaceAllMapped(
+              RegExp(r'(\s*)\."(\w+)"'), (match) => ', "${match[2]}"');
 
           // JSON string'ini Map<String, dynamic> olarak decode et
           var decodedMap = jsonDecode(fixedJson) as Map<String, dynamic>;
 
           // Map<String, dynamic>'i Map<String, String>'e dönüştür
           Map<String, String> payloadMap = decodedMap.map(
-                (key, value) => MapEntry(key, value.toString()),
+            (key, value) => MapEntry(key, value.toString()),
           );
           _handlePayload(payloadMap);
         }
@@ -59,7 +62,6 @@ class FirebaseNotificationService {
     messaging.setForegroundNotificationPresentationOptions(
         alert: true, badge: true, sound: true);
 
-
     // Local Notification'ı başlat
     await initializeNotifications();
 
@@ -76,7 +78,7 @@ class FirebaseNotificationService {
         0, // Bildirim ID'si
         event.notification?.title ?? "Başlık Yok",
         event.notification?.body ?? "İçerik Yok",
-        NotificationDetails(
+        const NotificationDetails(
           android: AndroidNotificationDetails(
             'high_importance_channel', // Kanal ID
             'High Importance Notifications', // Kanal Adı
@@ -86,7 +88,7 @@ class FirebaseNotificationService {
             playSound: true,
           ),
         ),
-        payload:jsonEncode(event.data), // Payload olarak data'ları ekle
+        payload: jsonEncode(event.data), // Payload olarak data'ları ekle
       );
     });
 
@@ -101,22 +103,63 @@ class FirebaseNotificationService {
   static Future<void> firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
     await Firebase.initializeApp();
-
-
   }
 
   // Data alanını işle (payload)
-  void _handlePayload(Map<String,String> payload) async {
+  void _handlePayload(Map<String, String> payload) async {
+    //final Uri googleMapsUrl = Uri.parse(
+    //    "https://www.google.com/maps/search/?api=1&query=${payload['latitude']},${payload['longitude']}");
 
-    final Uri googleMapsUrl = Uri.parse(
-        "https://www.google.com/maps/search/?api=1&query=${payload['latitude']},${payload['longitude']}");
-
-
-
-    if (await canLaunchUrl(googleMapsUrl)) {
-      await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
-    } else {
-      print("Google Haritalar açılamadı.");
+    //if (await canLaunchUrl(googleMapsUrl)) {
+    //  await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
+    //} else {
+    //  print("Google Haritalar açılamadı.");
+    if (payload["notificationType"] ==
+        NotificationTypeEnum.callForHelp.index.toString()) {
+      var locationModel = LocationModel(
+          latitude: double.tryParse(payload["latitude"].toString()),
+          longitude: double.tryParse(payload["longitude"].toString()),
+          markerId: payload["markerId"],
+          iconPath: payload["iconPath"]);
+      Map<String, dynamic> data = {
+        "route": payload["route"]!,
+        "locationModel": locationModel
+      };
+      if (routerKey.currentContext != null) {
+        GoRouter.of(routerKey.currentContext!)
+            .go(payload["route"]!, extra: locationModel);
+      } else {
+        Future.delayed(const Duration(milliseconds: 200), () {
+          if (routerKey.currentContext != null) {
+            GoRouter.of(routerKey.currentContext!)
+                .go(AppRoutes.splashScreen, extra: data);
+          }
+        });
+      }
+    } else if (payload["notificationType"] ==
+        NotificationTypeEnum.privateMessage.index.toString()) {
+      var userId = payload["userId"];
+      var connectionId = payload["connectionId"];
+      var privateConversationId =
+          int.tryParse(payload["privateConversationId"].toString());
+      final Map<String, dynamic> args = {
+        "userId": userId,
+        "connectionId": connectionId,
+        "privateConversationId": privateConversationId
+      };
+      if (routerKey.currentContext != null) {
+        GoRouter.of(routerKey.currentContext!).push(
+            '${AppRoutes.explorePage}/${AppRoutes.myPrivateMessagesPage}/${AppRoutes.privateChatPage}',
+            extra: args);
+      } else {
+        Future.delayed(const Duration(milliseconds: 200), () {
+          if (routerKey.currentContext != null) {
+            GoRouter.of(routerKey.currentContext!).push(
+                '${AppRoutes.explorePage}/${AppRoutes.myPrivateMessagesPage}/${AppRoutes.privateChatPage}',
+                extra: args);
+          }
+        });
+      }
     }
   }
 }

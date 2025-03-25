@@ -16,10 +16,14 @@ class GroupSettingViewmodel extends ChangeNotifier {
   String? _myUserId;
   String? get myUserId => _myUserId;
 
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
   List<ComplaintReasonModel> _list = [];
   List<ComplaintReasonModel> get list => _list;
 
   Future<void> fetchGroupData(int groupId) async {
+    _isLoading = false;
+    notifyListeners();
     _myUserId = await LocalStorageImpl().getValue<String>("user_id");
     var response = await _dioService
         .getRequest(ApiConstants.getChatGroupByGroupId(groupId, _myUserId!));
@@ -29,6 +33,7 @@ class GroupSettingViewmodel extends ChangeNotifier {
         _chatGroupModel = ChatGroupModel.fromJson(map);
       }
     }
+    _isLoading = true;
     notifyListeners();
   }
 

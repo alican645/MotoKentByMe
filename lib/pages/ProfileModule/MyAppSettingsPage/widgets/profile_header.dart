@@ -25,9 +25,11 @@ import 'package:moto_kent/constants/api_constants.dart';
           children: [
             Row(
               children: [
-                SizedBox(
+                Container(
+                  decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
                   height: 150,
                   child: ClipRRect(
+
                     borderRadius: BorderRadius.circular(16),
                     child: Image.network(
                       '${ApiConstants.baseUrl}/$userProfilePhotoPath',

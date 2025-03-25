@@ -132,8 +132,8 @@ enum TurkeyProvince {
 
   static TurkeyProvince getByCityName(String cityName) {
     return TurkeyProvince.values.firstWhere(
-          (province) =>
-      province.provinceName.toLowerCase() == cityName.toLowerCase(),
+      (province) =>
+          province.provinceName.toLowerCase() == cityName.toLowerCase(),
       orElse: () => TurkeyProvince.diger,
     );
   }
@@ -149,6 +149,7 @@ enum NotificationTypeEnum {
   postComment,
   groupChatIsClosedMessages,
   userRemoveInGroupByAdmin,
+  callForHelp
 }
 
 String getProvinceNameByPlateCode(int plateCode) {

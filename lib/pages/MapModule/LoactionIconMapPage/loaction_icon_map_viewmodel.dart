@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:developer' as dev;
+import 'dart:developer';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -87,21 +88,26 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
     _initialFlag = false;
     _markerList.clear();
     notifyListeners();
-    var response = await _dio.getRequest(ApiConstants.getAllLocations);
-    var dataList = (response.data as List);
-    await Future.wait(dataList.map((e) async {
-      var location = LocationModel.fromJson(e);
-      dynamic customMarkerIconBytes;
-      try {
-        var response = await _dio
-            .getRequestUnit8List('${ApiConstants.baseUrl}${location.iconPath}');
-        customMarkerIconBytes = await response.data;
-      } catch (e) {
-        throw Exception(e);
-      }
-      _markerList.add(marker(location, customMarkerIconBytes));
-      await Future.delayed(const Duration(seconds: 1));
-    }).toList());
+
+    try {
+      var response = await _dio.getRequest(ApiConstants.getAllLocations);
+      var dataList = (response.data as List);
+      await Future.wait(dataList.map((e) async {
+        var location = LocationModel.fromJson(e);
+        dynamic customMarkerIconBytes;
+        try {
+          var response = await _dio.getRequestUnit8List(
+              '${ApiConstants.baseUrl}${location.iconPath}');
+          customMarkerIconBytes = await response.data;
+        } catch (e) {
+          throw Exception(e);
+        }
+        _markerList.add(marker(location, customMarkerIconBytes));
+        await Future.delayed(const Duration(seconds: 1));
+      }).toList());
+    } catch (ex) {
+      log(ex.toString());
+    }
     _initialFlag = true;
     notifyListeners();
   }
@@ -194,14 +200,21 @@ class LoactionIconMapViewmodel extends ChangeNotifier {
     }
   }
 
-  Future<void> setInitialLocation() async {
-    LatLng latLng = await _geolocatorService.getCurrentLocation();
-    currentLocation = latLng;
-    _initialPosition = CameraPosition(
-      target: latLng,
-      zoom: 29,
-    );
-
+  Future<void> setInitialLocation(LatLng? location,
+      {required bool isCallForHelp}) async {
+    if (isCallForHelp) {
+      _initialPosition = CameraPosition(
+        target: location!,
+        zoom: 29,
+      );
+    } else {
+      LatLng latLng = await _geolocatorService.getCurrentLocation();
+      currentLocation = latLng;
+      _initialPosition = CameraPosition(
+        target: latLng,
+        zoom: 29,
+      );
+    }
     notifyListeners();
   }
 

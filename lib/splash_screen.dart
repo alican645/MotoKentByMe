@@ -9,8 +9,8 @@ import 'package:moto_kent/pages/LoginModule/LoginView/login_viewmodel.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-
+  const SplashScreen({super.key, this.data});
+  final Map<String, dynamic>? data;
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
@@ -20,11 +20,16 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _checkAutoLogin();
+      String? route = widget.data?["route"] as String?;
+      if (route != null) {
+        _checkAutoLogin(false, route: widget.data!["route"]);
+      } else {
+        _checkAutoLogin(true, route: null);
+      }
     });
   }
 
-  Future<void> _checkAutoLogin() async {
+  Future<void> _checkAutoLogin(bool isNormalLogin, {String? route}) async {
     LocalStorage localStorage = LocalStorageImpl();
     final username = await localStorage.getValue<String>("username");
     final password = await localStorage.getValue<String>("password");
@@ -37,7 +42,11 @@ class _SplashScreenState extends State<SplashScreen> {
         });
         if (response.statusCode == 200) {
           if (!mounted) return;
-          context.go(AppRoutes.explorePage); // Ana sayfaya yönlendirin
+          if (isNormalLogin) {
+            context.go(AppRoutes.explorePage); // Ana sayfaya yönlendirin
+          } else {
+            context.go(route!, extra: widget.data!["locationModel"]);
+          }
         } else {
           if (!mounted) return;
           context.go(AppRoutes.loginPage);

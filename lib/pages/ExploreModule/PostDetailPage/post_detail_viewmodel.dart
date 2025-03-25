@@ -1,6 +1,3 @@
-
-
-
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
@@ -14,42 +11,42 @@ import 'package:moto_kent/models/post_comment_model.dart';
 import 'package:moto_kent/models/post_model.dart';
 import 'package:moto_kent/services/api_service_impl.dart';
 
-
-class PostDetailViewmodel extends ChangeNotifier{
+class PostDetailViewmodel extends ChangeNotifier {
   PostModel? _postModel;
-  PostModel? get postModel=>_postModel;
-  final ApiServiceImpl _dio=ApiServiceImpl();
+  PostModel? get postModel => _postModel;
+  final ApiServiceImpl _dio = ApiServiceImpl();
 
-  List<ComplaintReasonModel> _list=[];
-  List<ComplaintReasonModel> get list=>_list;
+  List<ComplaintReasonModel> _list = [];
+  List<ComplaintReasonModel> get list => _list;
 
   bool _isFollow = false;
   bool get isFollow => _isFollow;
 
   final List<PostCommentModel> _comments = [];
   List<PostCommentModel> get comments => _comments;
-  void addCommentToList(PostCommentModel model){
-    _comments.add(model);
+  void addCommentToList(PostCommentModel model) {
+    _comments.insert(0, model);
     notifyListeners();
   }
 
-  int _currentPage = 1;
-  int get currentPage => _currentPage;
+  int _currentPageComment = 1;
+  int get currentPageComment => _currentPageComment;
 
-  int _totalPages = 1;
-  int get totalPages => _totalPages;
+  int _totalPagesComment = 1;
+  int get totalPagesComment => _totalPagesComment;
 
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  bool _isLoadingComment = false;
+  bool get isLoadingComment => _isLoadingComment;
 
   // post detay ekranı ilk yüklendiğinde
   Future<void> getPostByPostId(int postId) async {
-    _postModel=null;
+    _postModel = null;
     notifyListeners();
-    String? userId=await LocalStorageImpl().getValue<String>("user_id");
-    var response=await _dio.getRequest(ApiConstants.getPostByPostId(postId,userId!));
-    if(response.statusCode==200){
-      _postModel=PostModel.fromJson(response.data);
+    String? userId = await LocalStorageImpl().getValue<String>("user_id");
+    var response =
+        await _dio.getRequest(ApiConstants.getPostByPostId(postId, userId!));
+    if (response.statusCode == 200) {
+      _postModel = PostModel.fromJson(response.data);
       notifyListeners();
     }
   }
@@ -57,43 +54,39 @@ class PostDetailViewmodel extends ChangeNotifier{
   // post detay erkanındaki like ve dislike butonuna basıldığında
   Future<void> returnPostByPostId(int postId) async {
     notifyListeners();
-    String? userId=await LocalStorageImpl().getValue<String>("user_id");
-    var response=await _dio.getRequest(ApiConstants.getPostByPostId(postId,userId!));
-    if(response.statusCode==200){
-      _postModel=PostModel.fromJson(response.data);
+    String? userId = await LocalStorageImpl().getValue<String>("user_id");
+    var response =
+        await _dio.getRequest(ApiConstants.getPostByPostId(postId, userId!));
+    if (response.statusCode == 200) {
+      _postModel = PostModel.fromJson(response.data);
       notifyListeners();
     }
   }
 
-
-
-  Future<void> likePost (Object data) async{
-      var response=await _dio.postRequest(ApiConstants.likePost, data);
-      if(response.statusCode==200){
-        returnPostByPostId((data as Map<String,dynamic>)["postId"]);
-      }
-  }
-
-  Future<void> votePost(Object data) async{
-    var response=await _dio.postRequest(ApiConstants.votePost, data);
-    if(response.statusCode==200){
-      returnPostByPostId((data as Map<String,dynamic>)["postId"]);
+  Future<void> likePost(Object data) async {
+    var response = await _dio.postRequest(ApiConstants.likePost, data);
+    if (response.statusCode == 200) {
+      returnPostByPostId((data as Map<String, dynamic>)["postId"]);
     }
   }
 
-
-  Future<void> favoritePost(Object data) async{
-    var response=await _dio.postRequest(ApiConstants.favoritePost, data);
-    if(response.statusCode==200){
-      returnPostByPostId((data as Map<String,dynamic>)["postId"]);
+  Future<void> votePost(Object data) async {
+    var response = await _dio.postRequest(ApiConstants.votePost, data);
+    if (response.statusCode == 200) {
+      returnPostByPostId((data as Map<String, dynamic>)["postId"]);
     }
-
   }
 
+  Future<void> favoritePost(Object data) async {
+    var response = await _dio.postRequest(ApiConstants.favoritePost, data);
+    if (response.statusCode == 200) {
+      returnPostByPostId((data as Map<String, dynamic>)["postId"]);
+    }
+  }
 
   Future<Response> followOrUnfollowUser(Object object, bool isFollow) async {
     String endpoint =
-    isFollow ? ApiConstants.followEndpoint : ApiConstants.unfollowEndpoint;
+        isFollow ? ApiConstants.followEndpoint : ApiConstants.unfollowEndpoint;
     var response = await _dio.postRequest(endpoint, object);
     return response;
   }
@@ -114,79 +107,72 @@ class PostDetailViewmodel extends ChangeNotifier{
     }
   }
 
-  Future<Response> startPrivateConversation(String userId2) async{
-    String? userId=await LocalStorageImpl().getValue<String>("user_id");
-    var response = await _dio.postRequest(ApiConstants.createPrivateConversation, DataObjects.privateConversationObject(userId!, userId2));
+  Future<Response> startPrivateConversation(String userId2) async {
+    String? userId = await LocalStorageImpl().getValue<String>("user_id");
+    var response = await _dio.postRequest(
+        ApiConstants.createPrivateConversation,
+        DataObjects.privateConversationObject(userId!, userId2));
     return response;
   }
 
   Future<Response> sharePost(Object requestBody) async {
-    var result =
-    await _dio.postRequest(ApiConstants.sharePost, requestBody);
+    var result = await _dio.postRequest(ApiConstants.sharePost, requestBody);
     return result;
   }
 
   Future<void> fetchComplaintReason() async {
-    var response =await _dio.getRequest(ApiConstants.getAllComplaintReasons);
-    if(response.data is List){
-      _list=(response.data as List).map((e) => ComplaintReasonModel.fromJson(e),).toList();
+    var response = await _dio.getRequest(ApiConstants.getAllComplaintReasons);
+    if (response.data is List) {
+      _list = (response.data as List)
+          .map(
+            (e) => ComplaintReasonModel.fromJson(e),
+          )
+          .toList();
     }
   }
+
   Future<Response> addComplaint(Object data) async {
-    var response =await _dio.postRequest(ApiConstants.addComplaint,data);
+    var response = await _dio.postRequest(ApiConstants.addComplaint, data);
     return response;
   }
 
   // Tüm postları getir
   Future<void> fetchCommentList(int postid) async {
-    if (_isLoading || _currentPage > _totalPages) return;
+    if (_isLoadingComment || _currentPageComment > _totalPagesComment) return;
 
-    _isLoading = true;
+    _isLoadingComment = true;
     notifyListeners();
 
     try {
-      var response = await _dio.getRequest(ApiConstants.getPaginatedComments(postid, _currentPage));
+      var response = await _dio.getRequest(
+          ApiConstants.getPaginatedComments(postid, _currentPageComment));
       var model = PaginatedCommentsModel.fromJson(response.data);
       _comments.addAll(model.items!);
-      _currentPage++;
-      _totalPages = model.totalPages!;
+      _currentPageComment++;
+      _totalPagesComment = model.totalPages!;
     } catch (e) {
-      log("PaginatedComments",error: e.toString());
+      log("PaginatedComments", error: e.toString());
     } finally {
-      _isLoading = false;
+      _isLoadingComment = false;
       notifyListeners();
     }
   }
 
-  Future<Response> addComment(Object data) async{
-
-    try{
-      var response=await _dio.postRequest(ApiConstants.addPostComment, data);
+  Future<Response> addComment(Object data) async {
+    try {
+      var response = await _dio.postRequest(ApiConstants.addPostComment, data);
       return response;
-    }catch(ex){
-      log("AddComment",error:ex.toString());
+    } catch (ex) {
+      log("AddComment", error: ex.toString());
       throw Exception(ex);
     }
-
   }
 
-
   // Pagination ve post listesini sıfırla
-  void resetPagination( ) {
-    _currentPage = 1;
-    _totalPages = 1;
+  void resetPagination() {
+    _currentPageComment = 1;
+    _totalPagesComment = 1;
     _comments.clear();
     notifyListeners();
   }
-
-
-
-
-
-
-
-
-
-
-
 }

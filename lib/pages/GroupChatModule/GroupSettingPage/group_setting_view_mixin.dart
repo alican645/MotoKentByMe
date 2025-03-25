@@ -117,7 +117,9 @@ mixin GroupSettingViewMixin on State<GroupSettingView> {
           "privateConversationId": response.data["privateConversationId"]
         };
         if (!mounted) return;
-        context.push("/private_chat_page", extra: args);
+        context.push(
+            '${AppRoutes.chatGroupsPage}/${AppRoutes.myGroups}/${AppRoutes.messagePage}/${AppRoutes.groupSettingPage}/${AppRoutes.privateChatPage}',
+            extra: args);
       }
     } catch (e) {
       log("GrupSettingPage_to_private_chat_page", error: e.toString());

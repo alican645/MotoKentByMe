@@ -10,6 +10,7 @@ import 'package:moto_kent/models/post_model.dart';
 import 'package:moto_kent/pages/ExploreModule/MyFavoritePostsPage/my_favorite_posts_viewmodel.dart';
 import 'package:moto_kent/pages/ExploreModule/PostDetailPage/post_detail_viewmodel.dart';
 import 'package:moto_kent/pages/ExploreModule/PostDetailPage/widgets/comments_modal_dialog.dart';
+import 'package:moto_kent/pages/ExploreModule/PostDetailPage/widgets/ilan_photo_tab_view_2.dart';
 import 'package:moto_kent/pages/ExploreModule/PostDetailPage/widgets/post_content_button.dart';
 import 'package:moto_kent/utils/complaint_dialog.dart';
 import 'package:moto_kent/utils/utils.dart';
@@ -125,6 +126,12 @@ class PostDetailContentWidget extends StatelessWidget {
                               },
                             )
                           : const SizedBox(),
+                      postModel.postCategoryEnum == PostCategoryEnum.ilan.index
+                          ? IlanPhotoTabView2(
+                              selectedImages:
+                                  postModel.postIlanPhotos as List<String>,
+                            )
+                          : const SizedBox()
                     ],
                   ),
                 ),
@@ -135,7 +142,7 @@ class PostDetailContentWidget extends StatelessWidget {
               children: [
                 Text(
                   Utils.formatDateToDayMonthYear(postModel.createdDate!),
-                  style: TextStyle(fontSize: 10),
+                  style: const TextStyle(fontSize: 10),
                 ),
                 PostContentButton(
                     color: Colors.green,

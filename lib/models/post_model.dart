@@ -10,12 +10,12 @@ class PostModel {
   int? postCategoryEnum;
   int? likes;
   int? commentCount;
-  double?totalRating;
+  double? totalRating;
   int? dislikes;
   int? votedSurveyItemId;
   bool? isMyFavorite;
-
   List<SurveyItems>? surveyItems;
+  List<Object>? postIlanPhotos;
 
   PostModel(
       {this.id,
@@ -23,7 +23,6 @@ class PostModel {
       this.postContentTitle,
       this.postContent,
       this.totalRating,
-
       this.createdDate,
       this.votedSurveyItemId,
       this.illerEnum,
@@ -35,7 +34,7 @@ class PostModel {
       this.commentCount,
       this.dislikes,
       this.userFullName,
-      });
+      this.postIlanPhotos});
 
   PostModel.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -60,6 +59,12 @@ class PostModel {
         surveyItems!.add(SurveyItems.fromJson(v));
       });
     }
+    if (json['postIlanPhotos'] != null) {
+      postIlanPhotos = <String>[];
+      json['postIlanPhotos'].forEach((v) {
+        postIlanPhotos!.add(v);
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -81,6 +86,9 @@ class PostModel {
     if (surveyItems != null) {
       data['surveyItems'] = surveyItems!.map((v) => v.toJson()).toList();
     }
+    if (postIlanPhotos != null) {
+      data['postIlanPhotos'] = postIlanPhotos!.map((v) => v).toList();
+    }
     return data;
   }
 }
@@ -92,20 +100,19 @@ class SurveyItems {
 
   SurveyItems({
     this.content,
-  this.id,
-  this.voteCount,
-  
+    this.id,
+    this.voteCount,
   });
 
   SurveyItems.fromJson(Map<String, dynamic> json) {
-    id=json['id'];
+    id = json['id'];
     content = json['content'];
     voteCount = json['voteCount'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['id']=id;
+    data['id'] = id;
     data['content'] = content;
     data['voteCount'] = voteCount;
     return data;

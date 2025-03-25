@@ -83,7 +83,7 @@ class PostItem extends StatelessWidget {
                                 postContent,
                                 style:
                                     Theme.of(context).textTheme.headlineSmall,
-                                maxLines: 5,
+                                maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ],

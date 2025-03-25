@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/constants/app_routes.dart';
+import 'package:moto_kent/models/location_model.dart';
 import 'package:moto_kent/models/post_model.dart';
 import 'package:moto_kent/models/register_model.dart';
 import 'package:moto_kent/pages/CallForHelpModule/CallForHelpPage/call_for_help_view.dart';
@@ -32,22 +33,25 @@ import 'package:moto_kent/pages/ExploreModule/PostSharing/post_sharing_view.dart
 import 'package:moto_kent/pages/AppBarModule/PrivateChatPage/private_chat_view.dart';
 import 'package:moto_kent/pages/ProfileModule/MyPostPage/my_post_view.dart';
 import 'package:moto_kent/pages/ProfileModule/NotificationSettingPage/notification_settings_view.dart';
-
 import 'package:moto_kent/pages/ProfileModule/ProfilePage/profile_page.dart';
 import 'package:moto_kent/pages/AppBarModule/SearchPage/search_view.dart';
 import 'package:moto_kent/splash_screen.dart';
-
 import 'package:moto_kent/widgets/app_layout.dart';
 
-final _routerKey = GlobalKey<NavigatorState>();
+final routerKey = GlobalKey<NavigatorState>();
 
 final GoRouter router = GoRouter(
   initialLocation: AppRoutes.splashScreen,
-  navigatorKey: _routerKey,
+  navigatorKey: routerKey,
   routes: [
     GoRoute(
       path: AppRoutes.splashScreen,
-      builder: (context, state) => const SplashScreen(),
+      builder: (context, state) {
+        Map<String, dynamic>? data = state.extra as Map<String, dynamic>?;
+        return SplashScreen(
+          data: data,
+        );
+      },
     ),
     GoRoute(
       path: AppRoutes.loginPage,
@@ -85,12 +89,12 @@ final GoRouter router = GoRouter(
                         path: AppRoutes.privateChatPage,
                         builder: (context, state) {
                           final Map<String, dynamic> args =
-                          state.extra as Map<String, dynamic>;
+                              state.extra as Map<String, dynamic>;
                           return PrivateChatView(
                             userId: args["userId"],
                             connectionId: args["connectionId"],
                             privateConversationId:
-                            args["privateConversationId"],
+                                args["privateConversationId"],
                           );
                         },
                       ),
@@ -107,12 +111,12 @@ final GoRouter router = GoRouter(
                               path: AppRoutes.privateChatPage,
                               builder: (context, state) {
                                 final Map<String, dynamic> args =
-                                state.extra as Map<String, dynamic>;
+                                    state.extra as Map<String, dynamic>;
                                 return PrivateChatView(
                                   userId: args["userId"],
                                   connectionId: args["connectionId"],
                                   privateConversationId:
-                                  args["privateConversationId"],
+                                      args["privateConversationId"],
                                 );
                               },
                             ),
@@ -144,12 +148,12 @@ final GoRouter router = GoRouter(
                               path: AppRoutes.privateChatPage,
                               builder: (context, state) {
                                 final Map<String, dynamic> args =
-                                state.extra as Map<String, dynamic>;
+                                    state.extra as Map<String, dynamic>;
                                 return PrivateChatView(
                                   userId: args["userId"],
                                   connectionId: args["connectionId"],
                                   privateConversationId:
-                                  args["privateConversationId"],
+                                      args["privateConversationId"],
                                 );
                               },
                             ),
@@ -173,12 +177,12 @@ final GoRouter router = GoRouter(
                               path: AppRoutes.privateChatPage,
                               builder: (context, state) {
                                 final Map<String, dynamic> args =
-                                state.extra as Map<String, dynamic>;
+                                    state.extra as Map<String, dynamic>;
                                 return PrivateChatView(
                                   userId: args["userId"],
                                   connectionId: args["connectionId"],
                                   privateConversationId:
-                                  args["privateConversationId"],
+                                      args["privateConversationId"],
                                 );
                               },
                             ),
@@ -187,7 +191,7 @@ final GoRouter router = GoRouter(
                           path: AppRoutes.messagePage,
                           builder: (context, state) {
                             final Map<String, dynamic> args =
-                            state.extra as Map<String, dynamic>;
+                                state.extra as Map<String, dynamic>;
                             return MessageView(
                               userName: args['userName'],
                               groupId: args['groupId'],
@@ -217,12 +221,12 @@ final GoRouter router = GoRouter(
                         path: AppRoutes.privateChatPage,
                         builder: (context, state) {
                           final Map<String, dynamic> args =
-                          state.extra as Map<String, dynamic>;
+                              state.extra as Map<String, dynamic>;
                           return PrivateChatView(
                             userId: args["userId"],
                             connectionId: args["connectionId"],
                             privateConversationId:
-                            args["privateConversationId"],
+                                args["privateConversationId"],
                           );
                         },
                       ),
@@ -233,7 +237,10 @@ final GoRouter router = GoRouter(
         StatefulShellBranch(routes: [
           GoRoute(
               path: AppRoutes.mapPage,
-              builder: (context, state) => const LocationIconMapView(),
+              builder: (context, state) {
+                final LocationModel? arg = state.extra as LocationModel?;
+                return LocationIconMapView(callForHelpLatLangModel: arg);
+              },
               routes: [
                 GoRoute(
                   path: AppRoutes.buyCoinPage,
@@ -257,7 +264,7 @@ final GoRouter router = GoRouter(
               routes: [
                 GoRoute(
                   path: AppRoutes.createChatGroup,
-                  builder: (context, state) =>  CreateChatGroupView(),
+                  builder: (context, state) => CreateChatGroupView(),
                 ),
                 GoRoute(
                     path: AppRoutes.myGroups,
@@ -268,7 +275,7 @@ final GoRouter router = GoRouter(
                           path: AppRoutes.messagePage,
                           builder: (context, state) {
                             final Map<String, dynamic> args =
-                            state.extra as Map<String, dynamic>;
+                                state.extra as Map<String, dynamic>;
                             return MessageView(
                               userName: args['userName'],
                               groupId: args['groupId'],
@@ -287,6 +294,19 @@ final GoRouter router = GoRouter(
                                 },
                                 routes: [
                                   GoRoute(
+                                    path: AppRoutes.privateChatPage,
+                                    builder: (context, state) {
+                                      final Map<String, dynamic> args =
+                                          state.extra as Map<String, dynamic>;
+                                      return PrivateChatView(
+                                        userId: args["userId"],
+                                        connectionId: args["connectionId"],
+                                        privateConversationId:
+                                            args["privateConversationId"],
+                                      );
+                                    },
+                                  ),
+                                  GoRoute(
                                       path: AppRoutes.otherUserProfile,
                                       builder: (context, state) {
                                         final data = state.extra as String;
@@ -299,14 +319,14 @@ final GoRouter router = GoRouter(
                                           path: AppRoutes.privateChatPage,
                                           builder: (context, state) {
                                             final Map<String, dynamic> args =
-                                            state.extra
-                                            as Map<String, dynamic>;
+                                                state.extra
+                                                    as Map<String, dynamic>;
                                             return PrivateChatView(
                                               userId: args["userId"],
                                               connectionId:
-                                              args["connectionId"],
+                                                  args["connectionId"],
                                               privateConversationId:
-                                              args["privateConversationId"],
+                                                  args["privateConversationId"],
                                             );
                                           },
                                         ),
@@ -344,7 +364,7 @@ final GoRouter router = GoRouter(
                       GoRoute(
                         path: AppRoutes.notificationSettingsPage,
                         builder: (context, state) =>
-                        const NotificationSettingsView(),
+                            const NotificationSettingsView(),
                       ),
                       GoRoute(
                           path: AppRoutes.accountSecurityPage,
@@ -355,12 +375,12 @@ final GoRouter router = GoRouter(
                             GoRoute(
                               path: AppRoutes.changePasswordPage,
                               builder: (context, state) =>
-                              const ChangePasswordView(),
+                                  const ChangePasswordView(),
                             ),
                             GoRoute(
                               path: AppRoutes.changeEmailPage,
                               builder: (context, state) =>
-                              const ChangeEmailView(),
+                                  const ChangeEmailView(),
                             ),
                           ]),
                       GoRoute(

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:moto_kent/components/category_dropdown.dart';
 import 'package:moto_kent/components/custom_app_bar_widget.dart';
 import 'package:moto_kent/components/custom_app_button.dart';
 import 'package:moto_kent/constants/enums.dart';
-import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
-import 'package:moto_kent/models/post_model.dart';
+import 'package:moto_kent/pages/ExploreModule/PostSharing/post_sharing_view_mixin.dart';
 import 'package:moto_kent/pages/ExploreModule/PostSharing/post_sharing_viewmodel.dart';
+import 'package:moto_kent/pages/ExploreModule/PostSharing/widgets/anket_ilan_add_button.dart';
+import 'package:moto_kent/pages/ExploreModule/PostSharing/widgets/ilan_photo_tab_view.dart';
 import 'package:moto_kent/utils/utils.dart';
 import 'package:provider/provider.dart';
 
@@ -17,19 +17,8 @@ class PostSharingView extends StatefulWidget {
   State<PostSharingView> createState() => _PostSharingViewState();
 }
 
-class _PostSharingViewState extends State<PostSharingView> {
-  final imagePicker = ImagePicker();
-  final _formKey = GlobalKey<FormState>();
-  final paylasBtnTxt = "Paylaş";
-
-  int? _seciliKategori;
-
-  List<TextEditingController> _anketControllers = [TextEditingController()];
-  List<SurveyItems> _surveyItems = [];
-  String? selectedPostKategori;
-
-  TextEditingController contentController = TextEditingController();
-  TextEditingController contentTitleContreller = TextEditingController();
+class _PostSharingViewState extends State<PostSharingView>
+    with PostSharingViewMixin {
   @override
   void initState() {
     super.initState();
@@ -48,72 +37,17 @@ class _PostSharingViewState extends State<PostSharingView> {
     contentController.dispose();
   }
 
-  Future<void> _submit() async {
-    final isValid = _formKey.currentState?.validate();
-    if (!isValid!) {
-      return;
-    }
-    String? userId = await LocalStorageImpl().getValue<String>("user_id");
-    String content = contentController.text;
-    String contentTitle = contentTitleContreller.text;
-    String cityName =  Provider.of<PostSharingViewmodel>(context, listen: false)
-        .city!;
-    
-    if(_seciliKategori == PostCategoryEnum.anket.index){
-          for (var controller in _anketControllers) {
-      _surveyItems.add(SurveyItems(
-        id: 0,
-        voteCount: 0,
-        content: controller.text));
-    }
-    }
-
-    var postModel = PostModel(
-        id: 0,
-        postContent: content,
-        postContentTitle: contentTitle,
-        userId: userId,
-        illerEnum: TurkeyProvince.getByCityName(cityName).plateCode,
-        postCategoryEnum: _seciliKategori,
-        surveyItems: _surveyItems,
-
-        );
-
-    if (!mounted) return;
-    var response =
-        await context.read<PostSharingViewmodel>().AddPost(postModel.toJson());
-    if (response.statusCode == 200) {
-      if (!mounted) return;
-      Navigator.pop(context);
-    } 
-    _formKey.currentState?.save();
-  }
-
-  void _anketEkle() {
-    setState(() {
-      _anketControllers.add(TextEditingController());
-    });
-  }
-
-  void _anketSil(int index) {
-    if (_anketControllers.length > 1) {
-      setState(() {
-        _anketControllers.removeAt(index);
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar22(
+      appBar: const CustomAppBar22(
         right: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Form(
-            key: _formKey,
+            key: fromKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -146,10 +80,12 @@ class _PostSharingViewState extends State<PostSharingView> {
                 const SizedBox(
                   height: 25,
                 ),
-                
-                CategoryDropDown(seciliKategori: _seciliKategori, onChanged: (value) {
-                  setState(() => _seciliKategori = value);
-                },),
+                CategoryDropDown(
+                  seciliKategori: seciliKategori,
+                  onChanged: (value) {
+                    setState(() => seciliKategori = value);
+                  },
+                ),
                 const SizedBox(height: 20),
                 TextFormField(
                   maxLength: 100,
@@ -181,11 +117,11 @@ class _PostSharingViewState extends State<PostSharingView> {
                   },
                 ),
                 const SizedBox(height: 5),
-                if (_seciliKategori == PostCategoryEnum.anket.index) ...[
+                if (seciliKategori == PostCategoryEnum.anket.index) ...[
                   const SizedBox(height: 20),
                   const Text('Anket Seçenekleri',
                       style: TextStyle(fontSize: 16)),
-                  ..._anketControllers.asMap().entries.map((entry) {
+                  ...anketControllers.asMap().entries.map((entry) {
                     int index = entry.key;
                     TextEditingController controller = entry.value;
                     return Padding(
@@ -206,22 +142,24 @@ class _PostSharingViewState extends State<PostSharingView> {
                           IconButton(
                             icon: const Icon(Icons.remove_circle,
                                 color: Colors.red),
-                            onPressed: () => _anketSil(index),
+                            onPressed: () => anketSil(index),
                           ),
                         ],
                       ),
                     );
                   }),
-                  Center(
-                    child: OutlinedButton(
-                      style: const ButtonStyle(),
-                      onPressed: _anketEkle,
-                      child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 50.0),
-                        child: Text('Seçenek Ekle'),
-                      ),
-                    ),
-                  ),
+                  AnketIlanAddButton(onPressed: anketEkle, text: 'Seçenek Ekle')
+                ],
+                if (seciliKategori == PostCategoryEnum.ilan.index) ...[
+                  AnketIlanAddButton(onPressed: pickImage, text: 'Resim Ekle'),
+                  if (selectedImages.isNotEmpty)
+                    IlanPhotoTabView(
+                        onPressed: (p0) {
+                          setState(() {
+                            selectedImages.removeAt(p0);
+                          });
+                        },
+                        selectedImages: selectedImages),
                 ],
                 const SizedBox(height: 20),
                 Align(
@@ -229,7 +167,7 @@ class _PostSharingViewState extends State<PostSharingView> {
                   child: CustomAppButton(
                       btnWidth: MediaQuery.sizeOf(context).width / 4,
                       onPressed: () {
-                        _submit();
+                        submit();
                       },
                       btnText: paylasBtnTxt),
                 ),
@@ -241,4 +179,3 @@ class _PostSharingViewState extends State<PostSharingView> {
     );
   }
 }
-
