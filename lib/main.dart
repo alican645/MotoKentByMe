@@ -1,8 +1,12 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
 import 'package:moto_kent/pages/AppBarModule/MyNotificationsPage/my_notifications_view.dart';
 import 'package:moto_kent/pages/AppBarModule/MyNotificationsPage/my_notifications_viewmodel.dart';
@@ -63,6 +67,7 @@ import 'package:moto_kent/pages/ProfileModule/MyPostPage/my_post_viewmodel.dart'
 import 'package:moto_kent/pages/ProfileModule/ProfilePage/profile_page.dart';
 import 'package:moto_kent/pages/ProfileModule/ProfilePage/profile_viewmodel.dart';
 import 'package:moto_kent/router.dart';
+import 'package:moto_kent/services/api_service_impl.dart';
 import 'package:moto_kent/services/firebase_notification_service.dart';
 import 'package:provider/provider.dart';
 import 'App/app_theme.dart';
@@ -73,11 +78,14 @@ void main() async {
   WidgetsFlutterBinding
       .ensureInitialized(); // Bu satır async kullanımı için gerekli
   await Firebase.initializeApp();
+
   await LocalStorageImpl().init();
+
   FirebaseMessaging.onBackgroundMessage(
       FirebaseNotificationService.firebaseMessagingBackgroundHandler);
+
   String initialRoute =
-  await getInitialRoute(); // İlk rotayı belirlemek için token kontrolü yapılacak
+      await getInitialRoute(); // İlk rotayı belirlemek için token kontrolü yapılacak
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(
         create: (context) => ExploreViewmodel(), child: const ExploreView()),
@@ -92,7 +100,7 @@ void main() async {
         create: (context) => ProfileViewmodel(), child: const ProfilePage()),
     ChangeNotifierProvider(
         create: (context) => CreateChatGroupViewmodel(),
-        child: CreateChatGroupView()),
+        child: const CreateChatGroupView()),
     ChangeNotifierProvider(
         create: (context) => ChatGroupsViewmodel(),
         child: const ChatGroupsView()),
@@ -166,9 +174,9 @@ void main() async {
     SystemUiOverlayStyle(
       statusBarColor: Colors.transparent, // Durum çubuğunu şeffaf yapar
       statusBarIconBrightness:
-      Brightness.dark, // İkonların rengini ayarlar (örneğin: koyu)
+          Brightness.dark, // İkonların rengini ayarlar (örneğin: koyu)
       systemNavigationBarColor:
-      _categorySelectionBarColor, // Alt kısımda yer alan geri ve ana ekran tuşlarının arka plan rengini ayarlar
+          _categorySelectionBarColor, // Alt kısımda yer alan geri ve ana ekran tuşlarının arka plan rengini ayarlar
       systemNavigationBarIconBrightness: Brightness
           .dark, // Alt kısımdaki ikonların rengini ayarlar (örneğin: kapalı)
     ),
@@ -186,10 +194,67 @@ Future<String> getInitialRoute() async {
   }
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   final String initialRoute;
 
   const MyApp({required this.initialRoute, super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final FirebaseNotificationService _notificationService =
+      FirebaseNotificationService();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        log("map app başlatılmak üzere,context verilmeden öncesi",
+            name: "my_app");
+        _notificationService.init(context).then(
+          (value) {
+            addDeviceTokenToUser();
+            log("map app başlatılıyor,context verilliyor,addPostFrameCallback içi",
+                name: "my_app");
+          },
+        );
+      },
+    );
+    log("map app başlatılıyor,context verilliyor,addPostFrameCallback içi",
+        name: "my_app");
+
+    super.initState();
+  }
+
+  Future<void> initNotification() async {
+    addDeviceTokenToUser();
+  }
+
+  Future<void> addDeviceTokenToUser() async {
+    await Future.delayed(const Duration(seconds: 3));
+
+    String? userId = await LocalStorageImpl().getValue<String>("user_id");
+    ApiServiceImpl service = ApiServiceImpl();
+
+    try {
+      var response = await service.postRequest(
+          ApiConstants.addDeviceTokenToUser,
+          jsonEncode({
+            "userId": userId,
+            "deviceToken": _notificationService.deviceToken
+          }));
+      if (response.statusCode == 200) {
+        log("güncelleme başarılı", name: "isSuccess");
+      } else {
+        log(response.data, name: "isNotSuccess");
+      }
+    } catch (e) {
+      log(e.toString(), name: "isNotSuccess");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(

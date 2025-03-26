@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:moto_kent/App/app_theme.dart';
 import 'package:moto_kent/components/custom_button_22.dart';
 import 'package:moto_kent/components/my_textfile.dart';
+import 'package:moto_kent/init/Helpers/local_storage.dart';
+import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
 import 'package:moto_kent/models/register_model.dart';
 import 'package:moto_kent/pages/LoginModule/RegisterPage/register_viewmodel.dart';
 import 'package:moto_kent/widgets/loading_overlay.dart';
@@ -17,7 +19,6 @@ class RegisterView extends StatefulWidget {
 }
 
 class RegisterViewState extends State<RegisterView> {
-
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmPasswordController = TextEditingController();
@@ -29,9 +30,9 @@ class RegisterViewState extends State<RegisterView> {
 
   Future<void> registerUser() async {
     var registerModel = widget.registerModel!;
-    registerModel.email=emailController.text;
-    registerModel.password=passwordController.text;
-    registerModel.confirmPassword=confirmPasswordController.text;
+    registerModel.email = emailController.text;
+    registerModel.password = passwordController.text;
+    registerModel.confirmPassword = confirmPasswordController.text;
     if (registerModel.password != registerModel.confirmPassword) {
       _showErrorDialog(context, 'Hata', 'Şifreler eşleşmiyor.');
       return;
@@ -45,6 +46,8 @@ class RegisterViewState extends State<RegisterView> {
       if (!mounted) return;
 
       if (response.statusCode == 201) {
+        await LocalStorageImpl()
+            .setValue<String>("userfullname", registerModel.fullName!);
         _showSuccessDialog(context, "Başarılı", response.data.toString());
       } else {
         _showErrorDialog(
@@ -136,7 +139,9 @@ class RegisterViewState extends State<RegisterView> {
                       ),
                       child: Column(
                         children: [
-                          const SizedBox(height: 50,),
+                          const SizedBox(
+                            height: 50,
+                          ),
                           // Email textfield
                           MyTextField(
                             controller: emailController,
@@ -167,16 +172,15 @@ class RegisterViewState extends State<RegisterView> {
                           CustomButton22(
                             color: Colors.black,
                             splashColor: Colors.grey,
-
                             onPressed: () async {
                               await registerUser();
                             },
                             text: "Kayıt Ol",
-                          ),],
+                          ),
+                        ],
                       ),
                     ),
                     // Ad soyad textfield
-
                   ],
                 ),
               ),

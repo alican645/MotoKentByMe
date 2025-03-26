@@ -114,14 +114,10 @@ mixin EditProfileViewMixin on State<EditProfileView> {
       );
 
       if (response.statusCode == 200) {
-        if (profilePhotoPath != null) {
-          var profilePhotoPathh = response.data["profilePath"];
-          var fullName = response.data["fullName"];
-
-          // Yeni dosyanın yolunu shared preferences'a kaydet
-          await localStorage.setValue<String>("userfoto", profilePhotoPathh);
-          await localStorage.setValue<String>("userfullname", fullName);
-        }
+        var profilePhotoPathh = response.data["profilePath"];
+        var fullName = response.data["fullName"];
+        await localStorage.setValue<String>("userfoto", profilePhotoPathh);
+        await localStorage.setValue<String>("userfullname", fullName);
 
         Fluttertoast.showToast(msg: 'Profil güncellendi');
         context.pop();

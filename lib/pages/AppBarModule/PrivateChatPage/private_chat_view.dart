@@ -8,11 +8,9 @@ import 'package:moto_kent/pages/AppBarModule/PrivateChatPage/widgets/private_mes
 import 'package:provider/provider.dart';
 
 class PrivateChatView extends StatefulWidget {
-  final String? userId;
-  final String? connectionId;
-  final int? privateConversationId;
-  const PrivateChatView(
-      {super.key, this.userId, this.connectionId, this.privateConversationId});
+  final Map<String, dynamic>? data;
+
+  const PrivateChatView({super.key, this.data});
 
   @override
   State<PrivateChatView> createState() => _PrivateChatViewState();
@@ -25,7 +23,9 @@ class _PrivateChatViewState extends State<PrivateChatView>
     // Sayfa açıldığında listeyi en sona kaydır
     WidgetsBinding.instance.addPostFrameCallback(
       (_) async {
-        context.read<PrivateChatViewmodel>().initialize(widget.userId!);
+        context
+            .read<PrivateChatViewmodel>()
+            .initialize(widget.data!["userId"]!);
         joinGroup();
         scrollToBottom();
         messageService.onReceivePost = () {
@@ -39,7 +39,7 @@ class _PrivateChatViewState extends State<PrivateChatView>
   @override
   void dispose() {
     super.dispose();
-    messageService.leaveGroup(widget.connectionId!);
+    messageService.leaveGroup(widget.data!["connectionId"]!);
   }
 
   @override
@@ -69,7 +69,7 @@ class _PrivateChatViewState extends State<PrivateChatView>
                               return PrivateMessageItem(
                                 myFullName: value.myFullName!,
                                 otherUserFullName: value.otherUserFullName!,
-                                receiverUserId: widget.userId!,
+                                receiverUserId: widget.data!["userId"]!,
                                 privateMessageModel: value.messageList[index],
                               );
                             },

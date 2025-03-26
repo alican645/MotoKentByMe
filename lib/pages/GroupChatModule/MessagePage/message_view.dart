@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:go_router/go_router.dart';
 import 'package:moto_kent/components/custom_app_bar.dart';
 import 'package:moto_kent/components/custom_textfield.dart';
-import 'package:moto_kent/constants/api_constants.dart';
 import 'package:moto_kent/constants/app_routes.dart';
-import 'package:moto_kent/models/chat_group_message_model.dart';
 import 'package:moto_kent/pages/GroupChatModule/MessagePage/message_view_mixin.dart';
 import 'package:moto_kent/pages/GroupChatModule/MessagePage/message_viewmodel.dart';
 import 'package:moto_kent/pages/GroupChatModule/MessagePage/widgets/message_item.dart';
-import 'package:moto_kent/services/signalr_message_service.dart';
 import 'package:provider/provider.dart';
 
 class MessageView extends StatefulWidget {
-  const MessageView(
-      {super.key, this.groupId, this.userId, this.userName, this.groupName});
-  final int? groupId;
-  final String? userId;
-  final String? userName;
-  final String? groupName;
+  const MessageView({super.key, this.arg});
+
+  final Map<String, dynamic>? arg;
 
   @override
   State<MessageView> createState() => _MessageViewState();
@@ -29,14 +22,14 @@ class _MessageViewState extends State<MessageView> with MessageViewMixin {
   void initState() {
     // Sayfa açıldığında listeyi en sona kaydır
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _scrollJumpTo();
+      scrollJumpTo();
       context.read<SendMessageViewmodel>().fetchMessageList(groupId!);
 
       joinGroup();
 
       messageService.onReceivePost = () {
         setState(() {
-          _scrollToBottom();
+          scrollToBottom();
         });
       };
     });
@@ -49,61 +42,6 @@ class _MessageViewState extends State<MessageView> with MessageViewMixin {
     messageService.leaveGroup(groupId!);
   }
 
-  Future<void> joinGroup() async {
-    var viewmodel = context.read<SendMessageViewmodel>();
-    messageService = SignalRMessageService(vm: viewmodel);
-
-    messageService
-        .initializeSignalR(ApiConstants.signalRChatGroupEndpoint)
-        .then(
-      (value) {
-        messageService.joinGroup(groupId!);
-      },
-    );
-  }
-
-  /// Listeyi en sona kaydırma işlemi
-  Future<void> _scrollToBottom() async {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      scrollController.animateTo(
-        scrollController.position.maxScrollExtent,
-        duration: Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
-    });
-  }
-
-  /// Listeyi en sona kaydırma işlemi
-  Future<void> _scrollJumpTo() async {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      if (scrollController.positions.isNotEmpty) {
-        scrollController.jumpTo(
-          scrollController.position.maxScrollExtent,
-        );
-      } else {
-        return;
-      }
-    });
-  }
-
-  Future<void> sendMessage() async {
-    var messageModel = ChatGroupMessageModel()
-      ..chatGroupId = groupId
-      ..content = textEditingController.text
-      ..senderUserId = userId
-      ..senderUserName = userName
-      ..sentAt = DateTime.now();
-
-    var response = await context
-        .read<SendMessageViewmodel>()
-        .sendMessage(messageModel.toJson());
-    if (response.statusCode == 200) {
-      //signalrdan geleni veriyi listeye ekle
-      textEditingController.clear();
-      _scrollToBottom();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,7 +52,7 @@ class _MessageViewState extends State<MessageView> with MessageViewMixin {
               onPressed: () {
                 context.push(
                     '${AppRoutes.chatGroupsPage}/${AppRoutes.myGroups}/${AppRoutes.messagePage}/${AppRoutes.groupSettingPage}',
-                    extra: widget.groupId);
+                    extra: widget.arg!["groupId"]);
               },
               icon: const Icon(Icons.settings))
         ],
@@ -133,7 +71,6 @@ class _MessageViewState extends State<MessageView> with MessageViewMixin {
                   itemBuilder: (context, index) => MessageItem(
                     messageModel: value.messageList[index],
                     userId: userId!,
-                    userName: userName!,
                   ),
                 );
               },
@@ -147,7 +84,7 @@ class _MessageViewState extends State<MessageView> with MessageViewMixin {
                     child: CustomTextField(
                         onTap: () {
                           setState(() {
-                            _scrollToBottom();
+                            scrollToBottom();
                           });
                         },
                         controller: textEditingController,
@@ -156,7 +93,7 @@ class _MessageViewState extends State<MessageView> with MessageViewMixin {
                     onPressed: () async {
                       await sendMessage();
                       setState(() {
-                        _scrollToBottom();
+                        scrollToBottom();
                       });
                     },
                     icon: const Icon(Icons.send)),

@@ -8,11 +8,15 @@ import 'package:moto_kent/pages/GroupChatModule/MyChatGroupsPage/my_groups_viewm
 mixin MyGroupsViewMixin on State<MyGroupsView> {
   void goToMessagePage(MyGroupsViewmodel value, int index) async {
     String? userId = await LocalStorageImpl().getValue<String>("user_id");
+    String? userfullname =
+        await LocalStorageImpl().getValue<String>("userfullname");
+
     Map<String, dynamic> object = {
       "userId": userId!,
-      "groupId": value.groupsList[index].chatGroupId!,
-      "userName": "username",
-      "groupName": value.groupsList[index].name!
+      "groupId": value.lastGroupMessageList[index].chatGroupId!,
+      "userName": userfullname,
+      "groupName": value.lastGroupMessageList[index].chatGroupName!,
+      "groupIndex": index,
     };
     if (!mounted) return;
     context.push(

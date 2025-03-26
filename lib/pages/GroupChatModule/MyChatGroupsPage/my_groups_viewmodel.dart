@@ -26,6 +26,7 @@ class MyGroupsViewmodel extends ChangeNotifier {
     var response =
         await apiService.getRequest(ApiConstants.getUserChatGroups2(userId!));
 
+
     // Dönüşümü doğru şekilde yapın
     if (response.data is List) {
       _lastGroupMessageList = (response.data as List)

@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:moto_kent/constants/app_routes.dart';
 import 'package:moto_kent/constants/enums.dart';
@@ -10,28 +10,83 @@ import 'package:moto_kent/router.dart';
 import 'package:go_router/go_router.dart';
 
 class FirebaseNotificationService {
-  late final FirebaseMessaging messaging;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _flutterLocalNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
+
   late final String? _deviceToken;
 
   String? get deviceToken => _deviceToken;
-
   // Flutter Local Notifications Plugin'in global instance'ı
-  final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-      FlutterLocalNotificationsPlugin();
+
+  // Background mesajları işleme
+  static Future<void> firebaseMessagingBackgroundHandler(
+      RemoteMessage message) async {
+    await Firebase.initializeApp();
+  }
+
+  // Firebase Messaging ile bağlantı
+  Future<void> init(BuildContext context) async {
+    // Firebase Cloud Messaging izinlerini ayarlama
+    NotificationSettings settings = await _firebaseMessaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('Kullanıcı bildirim izni verdi');
+
+      // Uygulama açıkken gelen bildirimleri dinleme
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
+        debugPrint(
+            'Uygulama açıkken bildirim geldi: ${message.notification?.title}');
+        _handleForegroundMessage(context, message);
+      });
+
+      // Arka planda gelen bildirimleri işleme
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        debugPrint('Bildirime tıklandı: ${message.notification?.title}');
+        //_navigateToSpecificPage(context, message);
+      });
+
+      // Yerel bildirimleri başlatma
+
+      _initLocalNotifications(context);
+    } else {
+      print('Kullanıcı bildirim izni vermedi');
+    }
+
+    // FCM Token al
+    _firebaseMessaging.getToken().then((value) {
+      _deviceToken = value;
+      print('Firebase Messaging Token: $value');
+    });
+  }
 
   // Bildirim kurulumu
-  Future<void> initializeNotifications() async {
+  Future<void> _initLocalNotifications(BuildContext context) async {
     const AndroidInitializationSettings initializationSettingsAndroid =
-        AndroidInitializationSettings(
-            '@mipmap/ic_launcher'); // smallIcon tanımı
+        AndroidInitializationSettings('@mipmap/ic_launcher');
+
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+      requestSoundPermission: false,
+      requestBadgePermission: false,
+      requestAlertPermission: false,
+    );
 
     const InitializationSettings initializationSettings =
-        InitializationSettings(android: initializationSettingsAndroid);
-
-    await flutterLocalNotificationsPlugin.initialize(
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+    );
+    await _flutterLocalNotificationsPlugin.initialize(
       initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) async {
-        log(response.payload!, name: "payload");
+        debugPrint(
+          response.payload!,
+        );
         // Bildirime tıklandığında çalışacak
         if (response.payload != null) {
           String fixedJson = response.payload!.replaceAllMapped(
@@ -44,76 +99,14 @@ class FirebaseNotificationService {
           Map<String, String> payloadMap = decodedMap.map(
             (key, value) => MapEntry(key, value.toString()),
           );
-          _handlePayload(payloadMap);
+          _handlePayload(payloadMap, context);
         }
       },
     );
   }
 
-  // Firebase Messaging ile bağlantı
-  Future<void> connectNotification() async {
-    await Firebase.initializeApp();
-    messaging = FirebaseMessaging.instance;
-
-    // Bildirim izinlerini ayarla
-    await messaging.requestPermission(sound: true, alert: true, badge: true);
-
-    // Foreground bildirim ayarları
-    messaging.setForegroundNotificationPresentationOptions(
-        alert: true, badge: true, sound: true);
-
-    // Local Notification'ı başlat
-    await initializeNotifications();
-
-    // Foreground mesajları dinle
-    FirebaseMessaging.onMessage.listen((RemoteMessage event) async {
-      print("Gelen bildirim başlığı: ${event.notification?.title}");
-
-      // Data alanını işle
-      final data = event.data;
-      print("Gelen Data: $data");
-
-      // Bildirim göster
-      await flutterLocalNotificationsPlugin.show(
-        0, // Bildirim ID'si
-        event.notification?.title ?? "Başlık Yok",
-        event.notification?.body ?? "İçerik Yok",
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'high_importance_channel', // Kanal ID
-            'High Importance Notifications', // Kanal Adı
-            channelDescription: 'Bu kanal önemli bildirimler içindir',
-            importance: Importance.max,
-            priority: Priority.high,
-            playSound: true,
-          ),
-        ),
-        payload: jsonEncode(event.data), // Payload olarak data'ları ekle
-      );
-    });
-
-    // FCM Token al
-    messaging.getToken().then((value) {
-      _deviceToken = value;
-      print('Firebase Messaging Token: $value');
-    });
-  }
-
-  // Background mesajları işleme
-  static Future<void> firebaseMessagingBackgroundHandler(
-      RemoteMessage message) async {
-    await Firebase.initializeApp();
-  }
-
   // Data alanını işle (payload)
-  void _handlePayload(Map<String, String> payload) async {
-    //final Uri googleMapsUrl = Uri.parse(
-    //    "https://www.google.com/maps/search/?api=1&query=${payload['latitude']},${payload['longitude']}");
-
-    //if (await canLaunchUrl(googleMapsUrl)) {
-    //  await launchUrl(googleMapsUrl, mode: LaunchMode.externalApplication);
-    //} else {
-    //  print("Google Haritalar açılamadı.");
+  void _handlePayload(Map<String, String> payload, BuildContext context) async {
     if (payload["notificationType"] ==
         NotificationTypeEnum.callForHelp.index.toString()) {
       var locationModel = LocationModel(
@@ -121,21 +114,22 @@ class FirebaseNotificationService {
           longitude: double.tryParse(payload["longitude"].toString()),
           markerId: payload["markerId"],
           iconPath: payload["iconPath"]);
-      Map<String, dynamic> data = {
-        "route": payload["route"]!,
-        "locationModel": locationModel
+      Map<String, dynamic> arg = {
+        "callForHelpLatLangModel": locationModel,
+        "notificationType": payload["notificationType"],
       };
       if (routerKey.currentContext != null) {
+        final isBackground = <String, dynamic>{"isBackground": false};
+        arg.addEntries(isBackground.entries);
         GoRouter.of(routerKey.currentContext!)
-            .go(payload["route"]!, extra: locationModel);
+            .go(AppRoutes.splashScreen, extra: arg);
       } else {
-        Future.delayed(const Duration(milliseconds: 200), () {
-          if (routerKey.currentContext != null) {
-            GoRouter.of(routerKey.currentContext!)
-                .go(AppRoutes.splashScreen, extra: data);
-          }
-        });
+        final isBackground = <String, dynamic>{"isBackground": true};
+        arg.addEntries(isBackground.entries);
+        GoRouter.of(context).go(AppRoutes.splashScreen, extra: arg);
       }
+
+      //private message
     } else if (payload["notificationType"] ==
         NotificationTypeEnum.privateMessage.index.toString()) {
       var userId = payload["userId"];
@@ -143,23 +137,82 @@ class FirebaseNotificationService {
       var privateConversationId =
           int.tryParse(payload["privateConversationId"].toString());
       final Map<String, dynamic> args = {
+        "notificationType": payload["notificationType"],
         "userId": userId,
         "connectionId": connectionId,
         "privateConversationId": privateConversationId
       };
       if (routerKey.currentContext != null) {
-        GoRouter.of(routerKey.currentContext!).push(
-            '${AppRoutes.explorePage}/${AppRoutes.myPrivateMessagesPage}/${AppRoutes.privateChatPage}',
-            extra: args);
+        final isBackground = <String, dynamic>{"isBackground": false};
+        args.addEntries(isBackground.entries);
+        GoRouter.of(routerKey.currentContext!)
+            .go(AppRoutes.splashScreen, extra: args);
       } else {
-        Future.delayed(const Duration(milliseconds: 200), () {
-          if (routerKey.currentContext != null) {
-            GoRouter.of(routerKey.currentContext!).push(
-                '${AppRoutes.explorePage}/${AppRoutes.myPrivateMessagesPage}/${AppRoutes.privateChatPage}',
-                extra: args);
-          }
-        });
+        debugPrint("context verilmeden öncesi");
+        final isBackground = <String, dynamic>{"isBackground": true};
+        args.addEntries(isBackground.entries);
+        GoRouter.of(context).go(AppRoutes.splashScreen, extra: args);
+        debugPrint("context verilmeden sonrası");
+      }
+    } else if (payload["notificationType"] ==
+        NotificationTypeEnum.groupChatMessage.index.toString()) {
+      final Map<String, dynamic> args = {
+        "notificationType": payload["notificationType"],
+        "userId": payload["userId"],
+        "groupId": int.tryParse(payload["groupId"].toString()),
+        "userName": payload["userName"],
+        "groupName": payload["groupName"]
+      };
+      if (routerKey.currentContext != null) {
+        final isBackground = <String, dynamic>{"isBackground": false};
+        args.addEntries(isBackground.entries);
+        GoRouter.of(routerKey.currentContext!)
+            .go(AppRoutes.splashScreen, extra: args);
+      } else {
+        debugPrint("context verilmeden öncesi");
+        final isBackground = <String, dynamic>{"isBackground": true};
+        args.addEntries(isBackground.entries);
+        GoRouter.of(context).go(AppRoutes.splashScreen, extra: args);
+        debugPrint("context verilmeden sonrası");
       }
     }
+  }
+
+  // Ön planda gelen bildirimleri işleme
+  void _handleForegroundMessage(BuildContext context, RemoteMessage message) {
+    // Yerel bildirim gösterme
+    _showLocalNotification(
+      title: message.notification?.title ?? 'Bildirim',
+      body: message.notification?.body ?? 'Yeni bir bildiriminiz var',
+      payload: jsonEncode(message.data),
+    );
+  }
+
+  // Yerel bildirim gösterme
+  Future<void> _showLocalNotification({
+    required String title,
+    required String body,
+    required String payload,
+  }) async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+            'high_importance_channel', // Kanal ID
+            'High Importance Notifications', // Kanal Adı
+            channelDescription: 'Bu kanal önemli bildirimler içindir',
+            importance: Importance.max,
+            priority: Priority.high,
+            playSound: true);
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    await _flutterLocalNotificationsPlugin.show(
+      0,
+      title,
+      body,
+      platformChannelSpecifics,
+      payload: payload,
+    );
   }
 }

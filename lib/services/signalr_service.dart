@@ -39,9 +39,9 @@ class SignalRService {
 
     try {
       await _connection.start();
-      print("SignalR bağlantısı başarılı.");
+      debugPrint("SignalR bağlantısı başarılı.");
     } catch (e) {
-      print("SignalR bağlantı hatası: $e");
+      debugPrint("SignalR bağlantı hatası: $e");
     }
   }
 

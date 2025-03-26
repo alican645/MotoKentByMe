@@ -4,12 +4,8 @@ import 'package:moto_kent/utils/utils.dart';
 
 class MessageItem extends StatelessWidget {
   const MessageItem(
-      {super.key,
-      required this.userId,
-      required this.userName,
-      required this.messageModel});
+      {super.key, required this.userId, required this.messageModel});
   final String userId;
-  final String userName;
   final ChatGroupMessageModel messageModel;
   @override
   Widget build(BuildContext context) {

@@ -1,13 +1,6 @@
-import 'dart:convert';
-import 'dart:developer';
 import 'package:flutter/material.dart';
-
 import 'package:go_router/go_router.dart';
-import 'package:moto_kent/constants/api_constants.dart';
-import 'package:moto_kent/init/Helpers/local_storage_impl.dart';
 import 'package:moto_kent/services/current_laciton_service.dart';
-import 'package:moto_kent/services/api_service_impl.dart';
-import 'package:moto_kent/services/firebase_notification_service.dart';
 import '../App/app_theme.dart';
 
 class AppLayout extends StatefulWidget {
@@ -16,52 +9,22 @@ class AppLayout extends StatefulWidget {
   const AppLayout({super.key, required this.statefulNavigationShell});
 
   @override
-  _AppLayoutState createState() => _AppLayoutState();
+  AppLayoutState createState() => AppLayoutState();
 }
 
-class _AppLayoutState extends State<AppLayout> {
-  final FirebaseNotificationService _notificationService =
-      FirebaseNotificationService();
-
+class AppLayoutState extends State<AppLayout> {
   @override
   void initState() {
-    super.initState();
-    initializeSetLastLocation().then(
-      (value) {
-        _notificationService.connectNotification().then(
-          (value) {
-            addDeviceTokenToUser();
-          },
-        );
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) async {
+        initializeSetLastLocation();
       },
     );
+    super.initState();
   }
 
   Future<void> initializeSetLastLocation() async {
     await CurrentLacitonService().initialize();
-  }
-
-  Future<void> addDeviceTokenToUser() async {
-    await Future.delayed(const Duration(seconds: 3));
-
-    String? userId = await LocalStorageImpl().getValue<String>("user_id");
-    ApiServiceImpl service = ApiServiceImpl();
-
-    try {
-      var response = await service.postRequest(
-          ApiConstants.addDeviceTokenToUser,
-          jsonEncode({
-            "userId": userId,
-            "deviceToken": _notificationService.deviceToken
-          }));
-      if (response.statusCode == 200) {
-        log("güncelleme başarılı", name: "isSuccess");
-      } else {
-        log(response.data, name: "isNotSuccess");
-      }
-    } catch (e) {
-      log(e.toString(), name: "isNotSuccess");
-    }
   }
 
   @override

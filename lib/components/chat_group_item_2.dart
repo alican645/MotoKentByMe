@@ -54,7 +54,7 @@ class ChatGroupItem2 extends StatelessWidget {
                   ),
                   Text(
                     group.groupDescription!,
-                    maxLines: 3,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       color: Colors.grey[600],
